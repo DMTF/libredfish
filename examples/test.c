@@ -6,7 +6,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 #include <signal.h>
 
 #include <redfish.h>
@@ -127,6 +129,10 @@ void printRedfishEvent(redfishPayload* event, enumeratorAuthentication* auth, co
     free(string);
 }
 
+#ifdef _MSC_VER
+#define strcasecmp _stricmp
+#endif
+
 int main(int argc, char** argv)
 {
     int              arg;
@@ -236,7 +242,11 @@ int main(int argc, char** argv)
             printf("Successfully registered. Waiting for events...\n");
             while(!stop)
             {
+#ifdef _MSC_VER
+				Sleep(INFINITE);
+#else
                 pause();
+#endif
             }
         }
         else
