@@ -15,7 +15,11 @@ typedef struct {
     json_t* versions;
     unsigned int flags;
     char* sessionToken;
+#ifdef _MSC_VER
+	HANDLE mutex;
+#else
     pthread_mutex_t mutex;
+#endif
 } redfishService;
 
 typedef struct {
