@@ -77,7 +77,11 @@ char* getPayloadStringValue(redfishPayload* payload)
             return NULL;
         }
     }
+#ifdef _MSC_VER
+	return _strdup(value);
+#else
     return strdup(value);
+#endif
 }
 
 int getPayloadIntValue(redfishPayload* payload)
@@ -371,7 +375,7 @@ bool deletePayload(redfishPayload* payload)
     json = json_object_get(payload->json, "@odata.id");
     if(json == NULL)
     {
-        return NULL;
+        return false;
     }
     uri = strdup(json_string_value(json));
 

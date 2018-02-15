@@ -118,7 +118,11 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     headers = curl_slist_append(headers, "OData-Version: 4.0");
     headers = curl_slist_append(headers, "Accept: application/json");
     headers = curl_slist_append(headers, "User-Agent: libredfish");
+#ifdef _MSC_VER
+	WaitForSingleObject(service->mutex, INFINITE);
+#else
     pthread_mutex_lock(&service->mutex);
+#endif
     curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, "GET");
     curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(service->curl, CURLOPT_HTTPGET, 1L);
@@ -127,7 +131,11 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     res = curl_easy_perform(service->curl);
     curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, NULL);
     curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, NULL);
+#ifdef _MSC_VER
+	ReleaseMutex(service->mutex);
+#else
     pthread_mutex_unlock(&service->mutex);
+#endif
     curl_slist_free_all(headers);
     free(url);
     if(res != CURLE_OK)
@@ -189,7 +197,11 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     headers = curl_slist_append(headers, "Transfer-Encoding:");
     headers = curl_slist_append(headers, "Expect:");
 
-    pthread_mutex_lock(&service->mutex);
+#ifdef _MSC_VER
+	WaitForSingleObject(service->mutex, INFINITE);
+#else
+	pthread_mutex_lock(&service->mutex);
+#endif
     curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(service->curl, CURLOPT_INFILESIZE, writeChunk.size);
     curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, "PATCH");
@@ -203,7 +215,11 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, NULL);
     curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, NULL);
     curl_easy_setopt(service->curl, CURLOPT_READDATA, NULL);
-    pthread_mutex_unlock(&service->mutex);
+#ifdef _MSC_VER
+	ReleaseMutex(service->mutex);
+#else
+	pthread_mutex_unlock(&service->mutex);
+#endif
     free(url);
     curl_slist_free_all(headers);
     if(res != CURLE_OK)
@@ -235,18 +251,34 @@ static size_t headerCallback(char* buffer, size_t size, size_t nitems, void* use
     {
         return nitems * size;
     }
-    if(strncasecmp(buffer, "Location:", 9) == 0)
+#ifdef _MSC_VER
+	if (_strnicmp(buffer, "Location:", 9) == 0)
+#else
+	if (strncasecmp(buffer, "Location:", 9) == 0)
+#endif
     {
+#ifdef _MSC_VER
+		headers->Location = _strdup(buffer + 10);
+#else
         headers->Location = strdup(buffer+10);
+#endif
         tmp = strchr(headers->Location, '\r');
         if(tmp)
         {
             tmp[0] = 0;
         }
     }
+#ifdef _MSC_VER
+	else if(_strnicmp(buffer, "X-Auth-Token:", 13) == 0)
+#else
     else if(strncasecmp(buffer, "X-Auth-Token:", 13) == 0)
+#endif
     {
+#ifdef _MSC_VER
+		headers->XAuthToken = _strdup(buffer + 14);
+#else
         headers->XAuthToken = strdup(buffer+14);
+#endif
         tmp = strchr(headers->XAuthToken, '\r');
         if(tmp)
         {
@@ -313,7 +345,11 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     }
     headers = curl_slist_append(headers, "Transfer-Encoding:");
 
-    pthread_mutex_lock(&service->mutex);
+#ifdef _MSC_VER
+	WaitForSingleObject(service->mutex, INFINITE);
+#else
+	pthread_mutex_lock(&service->mutex);
+#endif
     curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(service->curl, CURLOPT_INFILESIZE, writeChunk.size);
     curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, "POST");
@@ -329,7 +365,11 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     curl_easy_setopt(service->curl, CURLOPT_HEADERFUNCTION, NULL);
     curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, NULL);
     curl_easy_setopt(service->curl, CURLOPT_INFILESIZE, -1);
-    pthread_mutex_unlock(&service->mutex);
+#ifdef _MSC_VER
+	ReleaseMutex(service->mutex);
+#else
+	pthread_mutex_unlock(&service->mutex);
+#endif
     curl_slist_free_all(headers);
     free(url);
     if(res != CURLE_OK)
@@ -382,13 +422,13 @@ bool deleteUriFromService(redfishService* service, const char* uri)
 
     if(service == NULL || uri == NULL)
     {
-        return NULL;
+        return false;
     }
 
     url = makeUrlForService(service, uri);
     if(!url)
     {
-        return NULL;
+        return false;
     }
 
     readChunk.memory = (char*)malloc(1);
@@ -396,12 +436,20 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     readChunk.origin = readChunk.memory;
     readChunk.originalSize = readChunk.size;
 
-    pthread_mutex_lock(&service->mutex);
+#ifdef _MSC_VER
+	WaitForSingleObject(service->mutex, INFINITE);
+#else
+	pthread_mutex_lock(&service->mutex);
+#endif
     curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, "DELETE");
     curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, &readChunk);
     curl_easy_setopt(service->curl, CURLOPT_URL, url);
     res = curl_easy_perform(service->curl);
-    pthread_mutex_unlock(&service->mutex);
+#ifdef _MSC_VER
+	ReleaseMutex(service->mutex);
+#else
+	pthread_mutex_unlock(&service->mutex);
+#endif
     free(url);
     free(readChunk.memory);
     if(res != CURLE_OK)
@@ -695,7 +743,11 @@ static int initCurl(redfishService* service)
     curl_easy_setopt(service->curl, CURLOPT_HEADERFUNCTION, curlHeaderCallback);
     curl_easy_setopt(service->curl, CURLOPT_SEEKFUNCTION, curlSeekMemory);
     curl_easy_setopt(service->curl, CURLOPT_TIMEOUT, 20L);
+#ifdef _MSC_VER
+	service->mutex = CreateMutex(NULL, FALSE, NULL);
+#else
     pthread_mutex_init(&(service->mutex), NULL);
+#endif
     return 0;
 }
 
@@ -777,7 +829,11 @@ static size_t curlHeaderCallback(char* buffer, size_t size, size_t nitems, void*
     }
     if(strncmp(buffer, "Location: ", 10) == 0)
     {
+#ifdef _MSC_VER
+		*((char**)userp) = _strdup(buffer + 10);
+#else
         *((char**)userp) = strdup(buffer+10);
+#endif
         header = *((char**)userp);
     }
     if(header)
@@ -806,7 +862,11 @@ static redfishService* createServiceEnumeratorNoAuth(const char* host, const cha
         free(ret);
         return NULL;
     }
+#ifdef _MSC_VER
+	ret->host = _strdup(host);
+#else
     ret->host = strdup(host);
+#endif
     ret->flags = flags;
     if(enumerate)
     {

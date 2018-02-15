@@ -11,23 +11,23 @@
 
 #include "redpath.h"
 
-redfishPayload* createRedfishPayload(json_t* value, redfishService* service);
-redfishPayload* createRedfishPayloadFromString(const char* value, redfishService* service);
-bool            isPayloadCollection(redfishPayload* payload);
+REDFISH_EXPORT redfishPayload* createRedfishPayload(json_t* value, redfishService* service);
+REDFISH_EXPORT redfishPayload* createRedfishPayloadFromString(const char* value, redfishService* service);
+REDFISH_EXPORT bool            isPayloadCollection(redfishPayload* payload);
 
-char*           getPayloadStringValue(redfishPayload* payload);
-int             getPayloadIntValue(redfishPayload* payload);
+REDFISH_EXPORT char*           getPayloadStringValue(redfishPayload* payload);
+REDFISH_EXPORT int             getPayloadIntValue(redfishPayload* payload);
 
-redfishPayload* getPayloadByNodeName(redfishPayload* payload, const char* nodeName);
-redfishPayload* getPayloadByIndex(redfishPayload* payload, size_t index);
-redfishPayload* getPayloadForPath(redfishPayload* payload, redPathNode* redpath);
-redfishPayload* getPayloadForPathString(redfishPayload* payload, const char* string);
-size_t          getCollectionSize(redfishPayload* payload);
-redfishPayload* patchPayloadStringProperty(redfishPayload* payload, const char* propertyName, const char* value);
-redfishPayload* postContentToPayload(redfishPayload* target, const char* data, size_t dataSize, const char* contentType);
-redfishPayload* postPayload(redfishPayload* target, redfishPayload* payload);
-bool            deletePayload(redfishPayload* payload);
-char*           payloadToString(redfishPayload* payload, bool prettyPrint);
-void            cleanupPayload(redfishPayload* payload);
+REDFISH_EXPORT redfishPayload* getPayloadByNodeName(redfishPayload* payload, const char* nodeName);
+REDFISH_EXPORT redfishPayload* getPayloadByIndex(redfishPayload* payload, size_t index);
+REDFISH_EXPORT redfishPayload* getPayloadForPath(redfishPayload* payload, redPathNode* redpath);
+REDFISH_EXPORT redfishPayload* getPayloadForPathString(redfishPayload* payload, const char* string);
+REDFISH_EXPORT size_t          getCollectionSize(redfishPayload* payload);
+REDFISH_EXPORT redfishPayload* patchPayloadStringProperty(redfishPayload* payload, const char* propertyName, const char* value);
+REDFISH_EXPORT redfishPayload* postContentToPayload(redfishPayload* target, const char* data, size_t dataSize, const char* contentType);
+REDFISH_EXPORT redfishPayload* postPayload(redfishPayload* target, redfishPayload* payload);
+REDFISH_EXPORT bool            deletePayload(redfishPayload* payload);
+REDFISH_EXPORT char*           payloadToString(redfishPayload* payload, bool prettyPrint);
+REDFISH_EXPORT void            cleanupPayload(redfishPayload* payload);
 
 #endif

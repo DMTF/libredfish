@@ -9,13 +9,23 @@
 #include <curl/curl.h>
 #include <stdbool.h>
 
+#ifdef _MSC_VER
+#define REDFISH_EXPORT __declspec(dllexport)
+#else
+#define REDFISH_EXPORT
+#endif
+
 typedef struct {
     char* host;
     CURL* curl;
     json_t* versions;
     unsigned int flags;
     char* sessionToken;
+#ifdef _MSC_VER
+	HANDLE mutex;
+#else
     pthread_mutex_t mutex;
+#endif
 } redfishService;
 
 typedef struct {
@@ -63,14 +73,14 @@ typedef void (*redfishEventCallback)(redfishPayload* event, enumeratorAuthentica
 #define REDFISH_FLAG_SERVICE_NO_VERSION_DOC 0x00000001 //The Redfish Service lacks the version document (in violation of the Redfish spec)
 
 
-redfishService* createServiceEnumerator(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags);
-json_t* getUriFromService(redfishService* service, const char* uri);
-json_t* patchUriFromService(redfishService* service, const char* uri, const char* content);
-json_t* postUriFromService(redfishService* service, const char* uri, const char* content, size_t contentLength, const char* contentType);
-bool    deleteUriFromService(redfishService* service, const char* uri);
-bool    registerForEvents(redfishService* service, const char* postbackUri, unsigned int eventTypes, redfishEventCallback callback, const char* context);
-redfishPayload* getRedfishServiceRoot(redfishService* service, const char* version);
-redfishPayload* getPayloadByPath(redfishService* service, const char* path);
-void cleanupServiceEnumerator(redfishService* service);
+REDFISH_EXPORT redfishService* createServiceEnumerator(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags);
+REDFISH_EXPORT json_t* getUriFromService(redfishService* service, const char* uri);
+REDFISH_EXPORT json_t* patchUriFromService(redfishService* service, const char* uri, const char* content);
+REDFISH_EXPORT json_t* postUriFromService(redfishService* service, const char* uri, const char* content, size_t contentLength, const char* contentType);
+REDFISH_EXPORT bool    deleteUriFromService(redfishService* service, const char* uri);
+REDFISH_EXPORT bool    registerForEvents(redfishService* service, const char* postbackUri, unsigned int eventTypes, redfishEventCallback callback, const char* context);
+REDFISH_EXPORT redfishPayload* getRedfishServiceRoot(redfishService* service, const char* version);
+REDFISH_EXPORT redfishPayload* getPayloadByPath(redfishService* service, const char* path);
+REDFISH_EXPORT void cleanupServiceEnumerator(redfishService* service);
 
 #endif

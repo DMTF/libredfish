@@ -136,7 +136,11 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
     if(opChars == NULL)
     {
         //TODO handle last() and position()
+#ifdef _MSC_VER
+		node->next->op = _strdup("exists");
+#else
         node->next->op = strdup("exists");
+#endif
         node->next->propName = index;
         return;
     }
@@ -159,7 +163,11 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
     memcpy(node->next->op, opChars, tmpIndex);
     node->next->op[tmpIndex] = 0;
 
+#ifdef _MSC_VER
+	node->next->value = _strdup(opChars + tmpIndex);
+#else
     node->next->value = strdup(opChars+tmpIndex);
+#endif
     free(index);
 }
 
@@ -175,7 +183,11 @@ static char* getStringTill(const char* string, const char* terminator, char** re
     if(end == NULL)
     {
         //No terminator
+#ifdef _MSC_VER
+		return _strdup(string);
+#else
         return strdup(string);
+#endif
     }
     ret = (char*)malloc((end-string)+1);
     memcpy(ret, string, (end-string));
