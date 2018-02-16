@@ -32,6 +32,7 @@ static struct option long_options[] =
 
 void inthand(int signum)
 {
+    (void)signum;
     stop = 1;
 }
 
@@ -115,6 +116,9 @@ char* getFileContents(const char* filename)
 void printRedfishEvent(redfishPayload* event, enumeratorAuthentication* auth, const char* context)
 {
     char* string;
+
+    (void)context;
+
     printf("%s: Called!\n", __FUNCTION__);
     if(auth == NULL)
     {
