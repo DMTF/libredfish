@@ -53,10 +53,10 @@ static char* getEventSubscriptionUri(redfishService* service);
 static bool registerCallback(redfishService* service, redfishEventCallback callback, unsigned int eventTypes, const char* context);
 static bool unregisterCallback(redfishEventCallback callback, unsigned int eventTypes, const char* context);
 static void eventActorTask(zsock_t* pipe, void* args);
-#endif
 static void cleanupEventActor();
-static void addStringToJsonObject(json_t* object, const char* key, const char* value);
 static void addStringToJsonArray(json_t* array, const char* value);
+#endif
+static void addStringToJsonObject(json_t* object, const char* key, const char* value);
 
 redfishService* createServiceEnumerator(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags)
 {
@@ -806,6 +806,7 @@ static size_t curlReadMemory(void *ptr, size_t size, size_t nmemb, void *userp)
 static int curlSeekMemory(void *userp, curl_off_t offset, int origin)
 {
     struct MemoryStruct* pooh = (struct MemoryStruct *)userp;
+    (void)origin;
 
     if(pooh == NULL)
     {
@@ -1411,25 +1412,13 @@ static void eventActorTask(zsock_t* pipe, void* args)
     zsock_destroy(&remote);
     zlist_destroy(&state.registrations);
 }
-#endif
 
 static void cleanupEventActor()
 {
-#if CZMQ_VERSION_MAJOR >= 3
     if(eventActor && zactor_is(eventActor))
     {
         zactor_destroy(&eventActor);
     }
-#endif
-}
-
-static void addStringToJsonObject(json_t* object, const char* key, const char* value)
-{
-    json_t* jValue = json_string(value);
-
-    json_object_set(object, key, jValue);
-
-    json_decref(jValue);
 }
 
 static void addStringToJsonArray(json_t* array, const char* value)
@@ -1437,6 +1426,16 @@ static void addStringToJsonArray(json_t* array, const char* value)
     json_t* jValue = json_string(value);
 
     json_array_append(array, jValue);
+
+    json_decref(jValue);
+}
+#endif
+
+static void addStringToJsonObject(json_t* object, const char* key, const char* value)
+{
+    json_t* jValue = json_string(value);
+
+    json_object_set(object, key, jValue);
 
     json_decref(jValue);
 }

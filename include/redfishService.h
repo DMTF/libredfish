@@ -10,9 +10,12 @@
 #include <stdbool.h>
 
 #ifdef _MSC_VER
+//Windows
 #define REDFISH_EXPORT __declspec(dllexport)
 #else
+//Linux
 #define REDFISH_EXPORT
+#include <pthread.h>
 #endif
 
 typedef struct {
@@ -22,7 +25,7 @@ typedef struct {
     unsigned int flags;
     char* sessionToken;
 #ifdef _MSC_VER
-	HANDLE mutex;
+    HANDLE mutex;
 #else
     pthread_mutex_t mutex;
 #endif
