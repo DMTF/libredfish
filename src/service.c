@@ -109,27 +109,30 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     chunk.origin = chunk.memory;
     chunk.originalSize = chunk.size;
 
+    headers = curl_slist_append(headers, "OData-Version: 4.0");
+    headers = curl_slist_append(headers, "Accept: application/json");
+    headers = curl_slist_append(headers, "User-Agent: libredfish");
+
+#ifdef _MSC_VER
+    WaitForSingleObject(service->mutex, INFINITE);
+#else
+    pthread_mutex_lock(&service->mutex);
+#endif
     if(service->sessionToken)
     {
         snprintf(tokenHeader, sizeof(tokenHeader), "X-Auth-Token: %s", service->sessionToken);
         headers = curl_slist_append(headers, tokenHeader);
     }
 
-    headers = curl_slist_append(headers, "OData-Version: 4.0");
-    headers = curl_slist_append(headers, "Accept: application/json");
-    headers = curl_slist_append(headers, "User-Agent: libredfish");
-#ifdef _MSC_VER
-	WaitForSingleObject(service->mutex, INFINITE);
-#else
-    pthread_mutex_lock(&service->mutex);
-#endif
     curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, "GET");
     curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(service->curl, CURLOPT_HTTPGET, 1L);
     curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, &chunk);
     curl_easy_setopt(service->curl, CURLOPT_URL, url);
     res = curl_easy_perform(service->curl);
+    curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, NULL);
     curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, NULL);
+    curl_easy_setopt(service->curl, CURLOPT_HTTPGET, 0L);
     curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, NULL);
 #ifdef _MSC_VER
 	ReleaseMutex(service->mutex);
@@ -206,15 +209,16 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     curl_easy_setopt(service->curl, CURLOPT_INFILESIZE, writeChunk.size);
     curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, "PATCH");
     curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, &readChunk);
-    curl_easy_setopt(service->curl, CURLOPT_URL, url);
     curl_easy_setopt(service->curl, CURLOPT_READDATA, &writeChunk);
     curl_easy_setopt(service->curl, CURLOPT_UPLOAD, 1L);
+    curl_easy_setopt(service->curl, CURLOPT_URL, url);
     res = curl_easy_perform(service->curl);
-    curl_easy_setopt(service->curl, CURLOPT_UPLOAD, 0L);
-    curl_easy_setopt(service->curl, CURLOPT_INFILESIZE, -1);
     curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, NULL);
+    curl_easy_setopt(service->curl, CURLOPT_INFILESIZE, -1);
+    curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, NULL);
     curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, NULL);
     curl_easy_setopt(service->curl, CURLOPT_READDATA, NULL);
+    curl_easy_setopt(service->curl, CURLOPT_UPLOAD, 0L);
 #ifdef _MSC_VER
 	ReleaseMutex(service->mutex);
 #else
@@ -354,17 +358,20 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     curl_easy_setopt(service->curl, CURLOPT_INFILESIZE, writeChunk.size);
     curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, &readChunk);
-    curl_easy_setopt(service->curl, CURLOPT_URL, url);
     curl_easy_setopt(service->curl, CURLOPT_READDATA, &writeChunk);
     curl_easy_setopt(service->curl, CURLOPT_HEADERDATA, &headerValues);
     curl_easy_setopt(service->curl, CURLOPT_HEADERFUNCTION, headerCallback);
     curl_easy_setopt(service->curl, CURLOPT_UPLOAD, 1L);
+    curl_easy_setopt(service->curl, CURLOPT_URL, url);
     res = curl_easy_perform(service->curl);
-    curl_easy_setopt(service->curl, CURLOPT_UPLOAD, 0L);
-    curl_easy_setopt(service->curl, CURLOPT_HEADERDATA, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_HEADERFUNCTION, NULL);
     curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, NULL);
     curl_easy_setopt(service->curl, CURLOPT_INFILESIZE, -1);
+    curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, NULL);
+    curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, NULL);
+    curl_easy_setopt(service->curl, CURLOPT_READDATA, NULL);
+    curl_easy_setopt(service->curl, CURLOPT_HEADERDATA, NULL);
+    curl_easy_setopt(service->curl, CURLOPT_HEADERFUNCTION, NULL);
+    curl_easy_setopt(service->curl, CURLOPT_UPLOAD, 0L);
 #ifdef _MSC_VER
 	ReleaseMutex(service->mutex);
 #else
@@ -419,6 +426,8 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     char*               url;
     CURLcode            res;
     struct MemoryStruct readChunk;
+    struct curl_slist*  headers = NULL;
+    char tokenHeader[1024];
 
     if(service == NULL || uri == NULL)
     {
@@ -429,6 +438,12 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     if(!url)
     {
         return false;
+    }
+
+    if(service->sessionToken)
+    {
+        snprintf(tokenHeader, sizeof(tokenHeader), "X-Auth-Token: %s", service->sessionToken);
+        headers = curl_slist_append(headers, tokenHeader);
     }
 
     readChunk.memory = (char*)malloc(1);
@@ -445,6 +460,9 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, &readChunk);
     curl_easy_setopt(service->curl, CURLOPT_URL, url);
     res = curl_easy_perform(service->curl);
+    curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, NULL);
+    curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, NULL);
+    curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, NULL);
 #ifdef _MSC_VER
 	ReleaseMutex(service->mutex);
 #else
@@ -638,13 +656,30 @@ void cleanupServiceEnumerator(redfishService* service)
     {
         return;
     }
+    //Get the mutex to make sure we aren't in the middle of an operation while cleaning up...
+#ifdef _MSC_VER
+    WaitForSingleObject(service->mutex, INFINITE);
+#else
+    pthread_mutex_lock(&service->mutex);
+#endif
     free(service->host);
+    service->host = NULL;
     curl_easy_cleanup(service->curl);
+    service->curl = NULL;
     json_decref(service->versions);
+    service->versions = NULL;
     if(service->sessionToken != NULL)
     {
         free(service->sessionToken);
+        service->sessionToken = NULL;
     }
+#ifdef _MSC_VER
+    ReleaseMutex(service->mutex);
+    CloseHandle(service->mutex);
+#else
+    pthread_mutex_unlock(&service->mutex);
+    pthread_mutex_destroy(&service->mutex);
+#endif
     free(service);
     curl_global_cleanup();
 }
