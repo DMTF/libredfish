@@ -24,6 +24,7 @@ typedef struct {
     json_t* versions;
     unsigned int flags;
     char* sessionToken;
+    char* bearerToken;
 #ifdef _MSC_VER
     HANDLE mutex;
 #else
@@ -85,5 +86,60 @@ REDFISH_EXPORT bool    registerForEvents(redfishService* service, const char* po
 REDFISH_EXPORT redfishPayload* getRedfishServiceRoot(redfishService* service, const char* version);
 REDFISH_EXPORT redfishPayload* getPayloadByPath(redfishService* service, const char* path);
 REDFISH_EXPORT void cleanupServiceEnumerator(redfishService* service);
+
+//Async API
+#define HTTP_GET    0
+#define HTTP_PUT    1
+#define HTTP_PATCH  2
+#define HTTP_POST   3
+#define HTTP_DELETE 4
+
+typedef struct {
+    unsigned int operation;
+    const char*  uri;
+    size_t       headerCount;
+    char**       headers;
+    char*        body;
+} httpRequest;
+
+typedef struct {
+    size_t       headerCount;
+    char**       headers;
+    char*        body;
+    size_t       responseCode;
+} httpResponse;
+
+typedef struct {
+    unsigned int operation;
+    const char*  uri;
+    size_t       headerCount;
+    char**       headers;
+    json_t*      body;
+} redfishRequest;
+
+typedef struct {
+    size_t       headerCount;
+    char**       headers;
+    json_t*      body;
+    size_t       responseCode;
+} redfishResponse;
+
+typedef void (*redfishRawHttpCallback)(redfishService* service, httpResponse* response, void* context);
+typedef void (*redfishHttpCallback)(redfishService* service, redfishResponse* response, void* context);
+
+REDFISH_EXPORT int     asyncRawSendHTTPOperation(redfishService* service, httpRequest* request, redfishRawHttpCallback callback, void* context);
+REDFISH_EXPORT int     asyncRedfishSendHTTPOperation(redfishService* service, redfishRequest* request, redfishHttpCallback callback, void* context);
+REDFISH_EXPORT int     asyncRedfishSimpleGet(redfishService* service, const char* uri, redfishHttpCallback callback, void* context);
+REDFISH_EXPORT int     asyncRedfishSimplePut(redfishService* service, const char* uri, json_t* body, redfishHttpCallback callback, void* context);
+REDFISH_EXPORT int     asyncRedfishSimplePatch(redfishService* service, const char* uri, json_t* body, redfishHttpCallback callback, void* context);
+REDFISH_EXPORT int     asyncRedfishSimplePost(redfishService* service, const char* uri, json_t* body, redfishHttpCallback callback, void* context);
+REDFISH_EXPORT int     asyncRedfishSimpleDelete(redfishService* service, const char* uri, redfishHttpCallback callback, void* context);
+
+void deleteRawRequest(httpRequest* request);
+void deleteRawResponse(httpResponse* response);
+
+void deleteRedfishRequest(redfishRequest* request);
+void deleteRedfishResponse(redfishResponse* response);
+
 
 #endif
