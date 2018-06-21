@@ -24,6 +24,7 @@ typedef struct {
     json_t* versions;
     unsigned int flags;
     char* sessionToken;
+    char* bearerToken;
 #ifdef _MSC_VER
     HANDLE mutex;
 #else

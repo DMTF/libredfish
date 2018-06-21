@@ -10,6 +10,8 @@
 #include <redpath.h>
 #include <redfishEvent.h>
 
+#include "debug.h"
+
 struct MemoryStruct
 {
   char *memory;
@@ -60,6 +62,7 @@ static void addStringToJsonObject(json_t* object, const char* key, const char* v
 
 redfishService* createServiceEnumerator(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags)
 {
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. host = %s, rootUri = %s, auth = %p, flags = %x\n", __FUNCTION__, host, rootUri, auth, flags);
     if(auth == NULL)
     {
         return createServiceEnumeratorNoAuth(host, rootUri, true, flags);
@@ -92,8 +95,11 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     struct curl_slist* headers = NULL;
     char tokenHeader[1024];
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. serivce = %p, uri = %s\n", __FUNCTION__, service, uri);
+
     if(service == NULL || uri == NULL)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Exit. Invalid call. Service is %p and uri is %p\n", __FUNCTION__, service, uri);
         return NULL;
     }
 
@@ -121,6 +127,11 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     if(service->sessionToken)
     {
         snprintf(tokenHeader, sizeof(tokenHeader), "X-Auth-Token: %s", service->sessionToken);
+        headers = curl_slist_append(headers, tokenHeader);
+    }
+    else if(service->bearerToken)
+    {
+        snprintf(tokenHeader, sizeof(tokenHeader), "Authorization:  Bearer %s", service->bearerToken);
         headers = curl_slist_append(headers, tokenHeader);
     }
 
@@ -170,8 +181,11 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     struct curl_slist* headers = NULL;
     char tokenHeader[1024];
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. serivce = %p, uri = %s, content %s\n", __FUNCTION__, service, uri, content);
+
     if(service == NULL || uri == NULL || !content)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Exit. Invalid call. Service is %p, uri is %p, and content is %p\n", __FUNCTION__, service, uri, content);
         return NULL;
     }
 
@@ -193,6 +207,11 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     if(service->sessionToken)
     {
         snprintf(tokenHeader, sizeof(tokenHeader), "X-Auth-Token: %s", service->sessionToken);
+        headers = curl_slist_append(headers, tokenHeader);
+    }
+    else if(service->bearerToken)
+    {
+        snprintf(tokenHeader, sizeof(tokenHeader), "Authorization:  Bearer %s", service->bearerToken);
         headers = curl_slist_append(headers, tokenHeader);
     }
     headers = curl_slist_append(headers, "Accept: application/json");
@@ -307,8 +326,11 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     knownHeaders        headerValues;
     char tokenHeader[1024];
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. serivce = %p, uri = %s, content %s\n", __FUNCTION__, service, uri, content);
+
     if(service == NULL || uri == NULL || !content)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Exit. Invalid call. Service is %p, uri is %p, and content is %p\n", __FUNCTION__, service, uri, content);
         return NULL;
     }
 
@@ -335,6 +357,11 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     if(service->sessionToken)
     {
         snprintf(tokenHeader, sizeof(tokenHeader), "X-Auth-Token: %s", service->sessionToken);
+        headers = curl_slist_append(headers, tokenHeader);
+    }
+    else if(service->bearerToken)
+    {
+        snprintf(tokenHeader, sizeof(tokenHeader), "Authorization:  Bearer %s", service->bearerToken);
         headers = curl_slist_append(headers, tokenHeader);
     }
 
@@ -429,8 +456,11 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     struct curl_slist*  headers = NULL;
     char tokenHeader[1024];
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. serivce = %p, uri = %s\n", __FUNCTION__, service, uri);
+
     if(service == NULL || uri == NULL)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Exit. Invalid call. Service is %p and uri is %p\n", __FUNCTION__, service, uri);
         return false;
     }
 
@@ -443,6 +473,11 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     if(service->sessionToken)
     {
         snprintf(tokenHeader, sizeof(tokenHeader), "X-Auth-Token: %s", service->sessionToken);
+        headers = curl_slist_append(headers, tokenHeader);
+    }
+    else if(service->bearerToken)
+    {
+        snprintf(tokenHeader, sizeof(tokenHeader), "Authorization:  Bearer %s", service->bearerToken);
         headers = curl_slist_append(headers, tokenHeader);
     }
 
@@ -991,14 +1026,13 @@ static redfishService* createServiceEnumeratorSessionAuth(const char* host, cons
 static redfishService* createServiceEnumeratorToken(const char* host, const char* rootUri, const char* token, unsigned int flags)
 {
     redfishService* ret;
-    char header[256];
-    struct curl_slist *headers = NULL;
 
     ret = createServiceEnumeratorNoAuth(host, rootUri, false, flags);
-
-    snprintf(header, sizeof(header), "Authorization:  Bearer %s", token);
-    headers = curl_slist_append(headers, header);
-    curl_easy_setopt(ret->curl, CURLOPT_HTTPHEADER, headers);
+    if(ret == NULL)
+    {
+        return ret;
+    }
+    ret->bearerToken = strdup(token);
     ret->versions = getVersions(ret, rootUri);
     return ret;
 }
@@ -1018,6 +1052,8 @@ static char* makeUrlForService(redfishService* service, const char* uri)
 
 static json_t* getVersions(redfishService* service, const char* rootUri)
 {
+    json_t* data;
+
     if(service->flags & REDFISH_FLAG_SERVICE_NO_VERSION_DOC)
     {
         service->versions = json_object();
@@ -1034,7 +1070,13 @@ static json_t* getVersions(redfishService* service, const char* rootUri)
     }
     else
     {
-        return getUriFromService(service, "/redfish");
+        data = getUriFromService(service, "/redfish");
+        if(data == NULL)
+        {
+            //Some redfish services don't respond here, but do respond at /redfish/
+            data = getUriFromService(service, "/redfish/");
+        }
+        return data;
     }
 }
 
