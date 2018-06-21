@@ -10,4 +10,17 @@
 #include <redfishPayload.h>
 #include <redpath.h>
 
+/**
+ * syslog style function used to debug libredfish.
+ */
+typedef void (*libRedfishDebugFunc)(int priority, const char* message, ...);
+
+/**
+ * Set the debug function to be used for libredfish. NOTE: This will do nothing unless
+ * the _DEBUG macro is set during compilation time of the library.
+ *
+ * @param debugFunc The debug function to use, NULL disables debug.
+ */
+void libredfishSetDebugFunction(libRedfishDebugFunc debugFunc);
+
 #endif

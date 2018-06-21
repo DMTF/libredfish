@@ -10,6 +10,8 @@
 #include <redpath.h>
 #include <redfishEvent.h>
 
+#include "debug.h"
+
 struct MemoryStruct
 {
   char *memory;
@@ -60,6 +62,7 @@ static void addStringToJsonObject(json_t* object, const char* key, const char* v
 
 redfishService* createServiceEnumerator(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags)
 {
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. host = %s, rootUri = %s, auth = %p, flags = %x\n", __FUNCTION__, host, rootUri, auth, flags);
     if(auth == NULL)
     {
         return createServiceEnumeratorNoAuth(host, rootUri, true, flags);
@@ -92,8 +95,11 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     struct curl_slist* headers = NULL;
     char tokenHeader[1024];
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. serivce = %p, uri = %s\n", __FUNCTION__, service, uri);
+
     if(service == NULL || uri == NULL)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Exit. Invalid call. Service is %p and uri is %p\n", __FUNCTION__, service, uri);
         return NULL;
     }
 
@@ -175,8 +181,11 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     struct curl_slist* headers = NULL;
     char tokenHeader[1024];
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. serivce = %p, uri = %s, content %s\n", __FUNCTION__, service, uri, content);
+
     if(service == NULL || uri == NULL || !content)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Exit. Invalid call. Service is %p, uri is %p, and content is %p\n", __FUNCTION__, service, uri, content);
         return NULL;
     }
 
@@ -317,8 +326,11 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     knownHeaders        headerValues;
     char tokenHeader[1024];
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. serivce = %p, uri = %s, content %s\n", __FUNCTION__, service, uri, content);
+
     if(service == NULL || uri == NULL || !content)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Exit. Invalid call. Service is %p, uri is %p, and content is %p\n", __FUNCTION__, service, uri, content);
         return NULL;
     }
 
@@ -444,8 +456,11 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     struct curl_slist*  headers = NULL;
     char tokenHeader[1024];
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. serivce = %p, uri = %s\n", __FUNCTION__, service, uri);
+
     if(service == NULL || uri == NULL)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Exit. Invalid call. Service is %p and uri is %p\n", __FUNCTION__, service, uri);
         return false;
     }
 

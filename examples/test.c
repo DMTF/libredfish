@@ -13,7 +13,23 @@
 
 #include <redfish.h>
 
+#ifdef _MSC_VER
+//The defines are the same as linux's syslog.h
+#define	LOG_EMERG	0
+#define	LOG_ALERT	1
+#define	LOG_CRIT	2
+#define	LOG_ERR		3
+#define	LOG_WARNING	4
+#define	LOG_NOTICE	5
+#define	LOG_INFO	6
+#define	LOG_DEBUG	7
+#else
+#include <syslog.h>
+#endif
+
 volatile sig_atomic_t stop = 0;
+
+int verbose = LOG_CRIT;
 
 static struct option long_options[] =
 {
@@ -27,6 +43,7 @@ static struct option long_options[] =
     {"username",   required_argument, 0,      'u'},
     {"password",   required_argument, 0,      'p'},
     {"session",    no_argument,       0,      'S'},
+    {"verbose",    no_argument,       0,      'v'},
     {"token",      required_argument, 0,      'T'},
     {0, 0, 0, 0}
 };
@@ -37,6 +54,17 @@ void inthand(int signum)
     stop = 1;
 }
 
+void syslogPrintf(int priority, const char* message, ...)
+{
+    va_list args;
+    va_start(args, message);
+
+    if(priority <= verbose)
+    {
+        vfprintf(stderr, message, args);
+    }
+    va_end(args);
+}
 
 void print_usage(const char* name)
 {
@@ -49,6 +77,7 @@ void print_usage(const char* name)
     printf("  -H, --host                 The host to query\n");
     printf("  -f, --file [filename]      The file to send as a POST payload\n");
     printf("  -e, --events [event URI]   Register for events and send them to the specified URI\n");
+    printf("  -v, --verbose              Log more information\n");
     printf("  -T, --token [bearer token] A bearer token to use instead of standard redfish auth\n");
     printf("  -u, --username [user]      The username to authenticate with\n");
     printf("  -p, --password [pass]      The password to authenticate with\n");
@@ -166,7 +195,7 @@ int main(int argc, char** argv)
 
     memset(&auth, 0, sizeof(auth));
 
-    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:T:", long_options, &opt_index)) != -1)
+    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:", long_options, &opt_index)) != -1)
     {
         switch(arg)
         {
@@ -229,6 +258,9 @@ int main(int argc, char** argv)
             case 'S':
                 auth.authType = REDFISH_AUTH_SESSION;
                 break;
+            case 'v':
+                verbose++;
+                break;
         }
     }
     if(host == NULL)
@@ -236,6 +268,9 @@ int main(int argc, char** argv)
         print_usage(argv[0]);
         return 1;
     }
+
+    libredfishSetDebugFunction(syslogPrintf);
+
     if(username && password)
     {
         auth.authCodes.userPass.username = username;
@@ -251,7 +286,7 @@ int main(int argc, char** argv)
     else
     {
         redfish = createServiceEnumerator(host, NULL, NULL, flags);
-    }
+    } 
 
     if(eventUri != NULL)
     {

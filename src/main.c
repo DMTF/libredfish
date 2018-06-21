@@ -8,6 +8,17 @@
 
 #include <redfish.h>
 
+libRedfishDebugFunc gDebugFunc = NULL;
+
+void libredfishSetDebugFunction(libRedfishDebugFunc debugFunc)
+{
+#ifdef _DEBUG
+    gDebugFunc = debugFunc;
+#else
+    (void)debugFunc;
+#endif
+}
+
 #ifdef STANDALONE
 #include <iostream>
 #include <getopt.h>
