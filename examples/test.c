@@ -44,6 +44,7 @@ static struct option long_options[] =
     {"password",   required_argument, 0,      'p'},
     {"session",    no_argument,       0,      'S'},
     {"verbose",    no_argument,       0,      'v'},
+    {"token",      required_argument, 0,      'T'},
     {0, 0, 0, 0}
 };
 
@@ -77,6 +78,10 @@ void print_usage(const char* name)
     printf("  -f, --file [filename]      The file to send as a POST payload\n");
     printf("  -e, --events [event URI]   Register for events and send them to the specified URI\n");
     printf("  -v, --verbose              Log more information\n");
+    printf("  -T, --token [bearer token] A bearer token to use instead of standard redfish auth\n");
+    printf("  -u, --username [user]      The username to authenticate with\n");
+    printf("  -p, --password [pass]      The password to authenticate with\n");
+    printf("  -S, --session              Use session based auth, as opposed to basic auth\n");
     printf("\nQuery:\n");
     printf(" Optional: /vXX - Where XX is the version to use. Defaults to v1.\n");
     printf(" /Name          - Where Name is the name of a JSON tag. If it contains an odata.id only\n");
@@ -185,11 +190,12 @@ int main(int argc, char** argv)
     unsigned int     flags = 0;
     char*            username = NULL;
     char*            password = NULL;
+    char*            token = NULL;
     enumeratorAuthentication auth;
 
     memset(&auth, 0, sizeof(auth));
 
-    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:v", long_options, &opt_index)) != -1)
+    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:", long_options, &opt_index)) != -1)
     {
         switch(arg)
         {
@@ -246,6 +252,9 @@ int main(int argc, char** argv)
             case 'p':
                 password = strdup(optarg);
                 break;
+            case 'T':
+                token = strdup(optarg);
+                break;
             case 'S':
                 auth.authType = REDFISH_AUTH_SESSION;
                 break;
@@ -266,6 +275,12 @@ int main(int argc, char** argv)
     {
         auth.authCodes.userPass.username = username;
         auth.authCodes.userPass.password = password;
+        redfish = createServiceEnumerator(host, NULL, &auth, flags);
+    }
+    else if(token)
+    {
+        auth.authCodes.authToken.token = token;
+        auth.authType = REDFISH_AUTH_BEARER_TOKEN;
         redfish = createServiceEnumerator(host, NULL, &auth, flags);
     }
     else
@@ -393,6 +408,10 @@ int main(int argc, char** argv)
     if(filename)
     {
         free(filename);
+    }
+    if(token)
+    {
+        free(token);
     }
     return 0;
 }
