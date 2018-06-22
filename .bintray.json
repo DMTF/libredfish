@@ -26,6 +26,6 @@
     },
 
     "files":
-        [{"includePattern": "/build/(.*\.rpm)", "uploadPattern": "rpm/$1"}],
+        [{"includePattern": "build/(.*\.rpm)", "uploadPattern": "rpm/$1"}],
     "publish": true
 }
