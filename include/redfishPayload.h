@@ -13,7 +13,14 @@
 
 REDFISH_EXPORT redfishPayload* createRedfishPayload(json_t* value, redfishService* service);
 REDFISH_EXPORT redfishPayload* createRedfishPayloadFromString(const char* value, redfishService* service);
+REDFISH_EXPORT redfishPayload* createRedfishPayloadFromContent(const char* content, size_t contentLength, const char* contentType, redfishService* service);
+
 REDFISH_EXPORT bool            isPayloadCollection(redfishPayload* payload);
+REDFISH_EXPORT bool            isPayloadArray(redfishPayload* payload);
+
+REDFISH_EXPORT size_t          getPayloadSize(redfishPayload* payload);
+REDFISH_EXPORT char*           getPayloadBody(redfishPayload* payload);
+REDFISH_EXPORT char*           getPayloadContentType(redfishPayload* payload);
 
 REDFISH_EXPORT char*           getPayloadStringValue(redfishPayload* payload);
 REDFISH_EXPORT int             getPayloadIntValue(redfishPayload* payload);

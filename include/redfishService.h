@@ -18,23 +18,22 @@
 #include <pthread.h>
 #endif
 
-typedef struct {
-    char* host;
-    CURL* curl;
-    json_t* versions;
-    unsigned int flags;
-    char* sessionToken;
-    char* bearerToken;
-#ifdef _MSC_VER
-    HANDLE mutex;
-#else
-    pthread_mutex_t mutex;
+#ifndef _INT_SERVICE_H_
+typedef struct _redfishService redfishService;
 #endif
-} redfishService;
+
+typedef enum {
+    PAYLOAD_CONTENT_JSON,
+    PAYLOAD_CONTENT_OTHER = 0xFF
+} redfishContentType;
 
 typedef struct {
     json_t* json;
     redfishService* service;
+    char* content;
+    size_t contentLength;
+    redfishContentType contentType;
+    char* contentTypeStr;
 } redfishPayload;
 
 #define REDFISH_AUTH_BASIC        0
@@ -86,5 +85,24 @@ REDFISH_EXPORT bool    registerForEvents(redfishService* service, const char* po
 REDFISH_EXPORT redfishPayload* getRedfishServiceRoot(redfishService* service, const char* version);
 REDFISH_EXPORT redfishPayload* getPayloadByPath(redfishService* service, const char* path);
 REDFISH_EXPORT void cleanupServiceEnumerator(redfishService* service);
+
+REDFISH_EXPORT void serviceIncRef(redfishService* service);
+REDFISH_EXPORT void serviceDecRef(redfishService* service);
+
+#define REDFISH_ACCEPT_ALL  0xFFFFFFFF
+#define REDFISH_ACCEPT_JSON 1
+#define REDFISH_ACCEPT_XML  2
+
+typedef struct
+{
+    int accept;
+} redfishAsyncOptions;
+
+typedef void (*redfishAsyncCallback)(bool success, unsigned short httpCode, redfishPayload* payload, void* context); 
+
+REDFISH_EXPORT bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+REDFISH_EXPORT bool patchUriFromServiceAsync(redfishService* service, const char* uri, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+REDFISH_EXPORT bool postUriFromServiceAsync(redfishService* service, const char* uri, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+REDFISH_EXPORT bool deleteUriFromServiceAsync(redfishService* service, const char* uri, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 
 #endif

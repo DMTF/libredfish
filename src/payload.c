@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "redfishPayload.h"
+#include "debug.h"
 
 static redfishPayload* getOpResult(redfishPayload* payload, const char* propName, const char* op, const char* value);
 static redfishPayload* collectionEvalOp(redfishPayload* payload, const char* propName, const char* op, const char* value);
@@ -16,11 +17,12 @@ static json_t*         json_object_get_by_index(json_t* json, size_t index);
 redfishPayload* createRedfishPayload(json_t* value, redfishService* service)
 {
     redfishPayload* payload;
-    payload = (redfishPayload*)malloc(sizeof(redfishPayload));
+    payload = (redfishPayload*)calloc(sizeof(redfishPayload), 1);
     if(payload != NULL)
     {
         payload->json = value;
         payload->service = service;
+        payload->contentType = PAYLOAD_CONTENT_JSON;
     }
     return payload;
 }
@@ -33,6 +35,39 @@ redfishPayload* createRedfishPayloadFromString(const char* value, redfishService
         return NULL;
     }
     return createRedfishPayload(jValue, service);
+}
+
+#ifdef _MSC_VER
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#endif
+
+REDFISH_EXPORT redfishPayload* createRedfishPayloadFromContent(const char* content, size_t contentLength, const char* contentType, redfishService* service)
+{
+    redfishPayload* ret;
+    if(contentType == NULL || strncasecmp(contentType, "application/json", 16) == 0)
+    {
+        return createRedfishPayloadFromString(content, service);
+    }
+    //Other payload, treat as binary for now...
+    ret = (redfishPayload*)calloc(sizeof(redfishPayload), 1);
+    if(ret != NULL)
+    {
+        if(contentLength == 0)
+        {
+            ret->content = NULL;
+        }
+        else
+        {
+            ret->content = malloc(contentLength);
+            memcpy(ret->content, content, contentLength);
+        } 
+        ret->contentLength = contentLength;
+        ret->contentType = PAYLOAD_CONTENT_OTHER;
+        ret->contentTypeStr = strdup(contentType);
+        ret->service = service;
+    }
+    return ret;
 }
 
 bool isPayloadCollection(redfishPayload* payload)
@@ -56,6 +91,38 @@ bool isPayloadArray(redfishPayload* payload)
         return false;
     }
     return true;
+}
+
+size_t getPayloadSize(redfishPayload* payload)
+{
+    char* body;
+    size_t len;
+    if(payload->contentType != PAYLOAD_CONTENT_JSON)
+    {
+        return payload->contentLength;
+    }
+    body = payloadToString(payload, false);
+    len = strlen(body)+1;
+    free(body);
+    return len;
+}
+
+char* getPayloadBody(redfishPayload* payload)
+{
+    if(payload->contentType != PAYLOAD_CONTENT_JSON)
+    {
+        return payload->content;
+    }
+    return payloadToString(payload, false);
+}
+
+char* getPayloadContentType(redfishPayload* payload)
+{
+    if(payload->contentType != PAYLOAD_CONTENT_OTHER)
+    {
+        return payload->contentTypeStr;
+    }
+    return "application/json";
 }
 
 char* getPayloadStringValue(redfishPayload* payload)

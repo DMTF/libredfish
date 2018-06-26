@@ -31,6 +31,8 @@ volatile sig_atomic_t stop = 0;
 
 int verbose = LOG_CRIT;
 
+static void safeFree(void* ptr);
+
 static struct option long_options[] =
 {
     {"help",       no_argument,       0,      '?'},
@@ -286,7 +288,7 @@ int main(int argc, char** argv)
     else
     {
         redfish = createServiceEnumerator(host, NULL, NULL, flags);
-    } 
+    }
 
     if(eventUri != NULL)
     {
@@ -400,20 +402,21 @@ int main(int argc, char** argv)
             break;
     }
     cleanupPayload(payload);
-    cleanupServiceEnumerator(redfish);
-    if(host)
-    {
-        free(host);
-    }
-    if(filename)
-    {
-        free(filename);
-    }
-    if(token)
-    {
-        free(token);
-    }
+    serviceDecRef(redfish);
+    safeFree(host);
+    safeFree(filename);
+    safeFree(token);
+    safeFree(username);
+    safeFree(password);
     return 0;
+}
+
+static void safeFree(void* ptr)
+{
+    if(ptr)
+    {
+        free(ptr);
+    }
 }
 
 /* vim: set tabstop=4 shiftwidth=4 expandtab: */
