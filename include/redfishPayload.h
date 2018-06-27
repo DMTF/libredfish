@@ -37,4 +37,8 @@ REDFISH_EXPORT bool            deletePayload(redfishPayload* payload);
 REDFISH_EXPORT char*           payloadToString(redfishPayload* payload, bool prettyPrint);
 REDFISH_EXPORT void            cleanupPayload(redfishPayload* payload);
 
+REDFISH_EXPORT bool            getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+REDFISH_EXPORT bool            getPayloadByIndexAsync(redfishPayload* payload, size_t index, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+REDFISH_EXPORT bool            getPayloadForPathAsync(redfishPayload* payload, redPathNode* redpath, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+
 #endif

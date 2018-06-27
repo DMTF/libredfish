@@ -88,6 +88,7 @@ REDFISH_EXPORT void cleanupServiceEnumerator(redfishService* service);
 
 REDFISH_EXPORT void serviceIncRef(redfishService* service);
 REDFISH_EXPORT void serviceDecRef(redfishService* service);
+REDFISH_EXPORT void serviceDecRefAndWait(redfishService* service);
 
 #define REDFISH_ACCEPT_ALL  0xFFFFFFFF
 #define REDFISH_ACCEPT_JSON 1
@@ -104,5 +105,8 @@ REDFISH_EXPORT bool getUriFromServiceAsync(redfishService* service, const char* 
 REDFISH_EXPORT bool patchUriFromServiceAsync(redfishService* service, const char* uri, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 REDFISH_EXPORT bool postUriFromServiceAsync(redfishService* service, const char* uri, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 REDFISH_EXPORT bool deleteUriFromServiceAsync(redfishService* service, const char* uri, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+
+REDFISH_EXPORT bool getRedfishServiceRootAsync(redfishService* service, const char* version, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+REDFISH_EXPORT bool getPayloadByPathAsync(redfishService* service, const char* path, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 
 #endif

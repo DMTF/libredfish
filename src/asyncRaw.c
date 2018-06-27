@@ -7,13 +7,14 @@
 #include <redfishRawAsync.h>
 
 #include <string.h>
+#include <unistd.h>
 
 #include "debug.h"
 
 static void safeFree(void* ptr);
 static void freeHeaders(httpHeader* headers);
 static void initAsyncThread(redfishService* service);
-static thread startAsyncThread(queue* q);
+static void startAsyncThread(redfishService* service);
 static size_t asyncHeaderCallback(char* buffer, size_t size, size_t nitems, void* userdata);
 static size_t curlWriteMemory(void *contents, size_t size, size_t nmemb, void *userp);
 static size_t curlReadMemory(void *ptr, size_t size, size_t nmemb, void *userp);
@@ -101,6 +102,9 @@ bool startRawAsyncRequest(redfishService* service, asyncHttpRequest* request, as
 void terminateAsyncThread(redfishService* service)
 {
     asyncWorkItem* workItem;
+#ifndef _MSC_VER
+    int x;
+#endif
 
     if(service == NULL || service->queue == NULL)
     {
@@ -116,7 +120,12 @@ void terminateAsyncThread(redfishService* service)
 #ifdef _MSC_VER
     WaitForSingleObject(service->asyncThread, INFINITE);
 #else
-    pthread_join(service->asyncThread, NULL);
+    x = pthread_join(service->asyncThread, NULL);
+    if(x == 35)
+    {
+        //Workaround for valgrind
+        sleep(10);
+    }
 #endif
     freeQueue(service->queue);
     service->queue = NULL;
@@ -336,26 +345,22 @@ static void freeHeaders(httpHeader* headers)
 static void initAsyncThread(redfishService* service)
 {
     queue* q = newQueue();
-    thread threadId = startAsyncThread(q);
 
     serviceIncRef(service);
 
     service->queue = q;
-    service->asyncThread = threadId;
+    startAsyncThread(service);
 
     serviceDecRef(service);
 }
 
-static thread startAsyncThread(queue* q)
+static void startAsyncThread(redfishService* service)
 {
-    thread ret;
-
 #ifdef _MSC_VER
-    ret = CreateThread(NULL, 0, rawAsyncWorkThread, q, 0, NULL);
+    service->asyncThread = CreateThread(NULL, 0, rawAsyncWorkThread, service->queue, 0, NULL);
 #else
-    pthread_create(&ret, NULL, rawAsyncWorkThread, q);
+    pthread_create(&(service->asyncThread), NULL, rawAsyncWorkThread, service->queue);
 #endif
-    return ret;
 }
 
 static size_t asyncHeaderCallback(char* buffer, size_t size, size_t nitems, void* userdata)

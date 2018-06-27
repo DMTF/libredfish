@@ -496,6 +496,110 @@ bool deleteUriFromServiceAsync(redfishService* service, const char* uri, redfish
     return ret;
 }
 
+bool getRedfishServiceRootAsync(redfishService* service, const char* version, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    json_t* versionNode;
+    const char* verUrl;
+    bool ret;
+
+    if(version == NULL)
+    {
+        versionNode = json_object_get(service->versions, "v1");
+    }
+    else
+    {
+        versionNode = json_object_get(service->versions, version);
+    }
+    if(versionNode == NULL)
+    {
+        return false;
+    }
+    verUrl = json_string_value(versionNode);
+    if(verUrl == NULL)
+    {
+        return false;
+    }
+    ret = getUriFromServiceAsync(service, verUrl, options, callback, context);
+    return ret;
+}
+
+typedef struct
+{
+    redfishAsyncCallback callback;
+    void* originalContext;
+    redPathNode* redpath;
+    redfishAsyncOptions* options;
+} redpathAsyncContext;
+
+void gotServiceRootAsync(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    redpathAsyncContext* myContext = (redpathAsyncContext*)context;
+    redfishPayload* root = payload;
+    bool ret;
+
+    if(success == false || httpCode >= 400 || myContext->redpath->next == NULL)
+    {
+        myContext->callback(success, httpCode, payload, myContext->originalContext);
+        cleanupRedPath(myContext->redpath);
+        free(context);
+        return;
+    }
+    ret = getPayloadForPathAsync(root, myContext->redpath->next, myContext->options, myContext->callback, myContext->originalContext);
+    cleanupPayload(root);
+    if(ret == false)
+    { 
+        myContext->callback(ret, 0xFFFF, NULL, myContext->originalContext);
+        cleanupRedPath(myContext->redpath);
+    }
+    else
+    {
+        //Free just this redpath node...
+        myContext->redpath->next = NULL;
+        cleanupRedPath(myContext->redpath);
+    }
+    free(context);
+}
+
+bool getPayloadByPathAsync(redfishService* service, const char* path, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    redPathNode* redpath;
+    bool ret;
+    redpathAsyncContext* myContext;
+
+    if(!service || !path)
+    {
+        return false;
+    }
+
+    redpath = parseRedPath(path);
+    if(!redpath)
+    {
+        return false;
+    }
+    if(!redpath->isRoot)
+    {
+        cleanupRedPath(redpath);
+        return false;
+    }
+    myContext = malloc(sizeof(redpathAsyncContext));
+    if(!myContext)
+    {
+        cleanupRedPath(redpath);
+        return false;
+    }
+    myContext->callback = callback;
+    myContext->originalContext = context;
+    myContext->redpath = redpath;
+    myContext->options = options;
+    ret = getRedfishServiceRootAsync(service, redpath->version, options, gotServiceRootAsync, myContext);
+    if(ret == false)
+    {
+        free(myContext);
+        cleanupRedPath(redpath);
+    }
+    return ret;
+}
+
 bool registerForEvents(redfishService* service, const char* postbackUri, unsigned int eventTypes, redfishEventCallback callback, const char* context)
 {
 #if CZMQ_VERSION_MAJOR >= 3
@@ -693,6 +797,31 @@ void serviceIncRef(redfishService* service)
 
 void terminateAsyncThread(redfishService* service);
 
+static void freeServicePtr(redfishService* service)
+{
+    free(service->host);
+    service->host = NULL;
+    json_decref(service->versions);
+    service->versions = NULL;
+    if(service->sessionToken != NULL)
+    {
+        free(service->sessionToken);
+        service->sessionToken = NULL;
+    }
+    if(service->bearerToken != NULL)
+    {
+        free(service->bearerToken);
+        service->bearerToken = NULL;
+    }
+    if(service->otherAuth != NULL)
+    {
+        free(service->otherAuth);
+        service->otherAuth = NULL;
+    }
+    terminateAsyncThread(service);
+    free(service);
+}
+
 void serviceDecRef(redfishService* service)
 {
     if(service == NULL)
@@ -710,28 +839,41 @@ void serviceDecRef(redfishService* service)
 #endif
     if(service->refCount == 0)
     {
-        //TODO... free
-        free(service->host);
-        service->host = NULL;
-        json_decref(service->versions);
-        service->versions = NULL;
-        if(service->sessionToken != NULL)
+        freeServicePtr(service);
+    }
+}
+
+void serviceDecRefAndWait(redfishService* service)
+{
+    size_t newCount;
+
+    if(service == NULL)
+    {
+        return;
+    }
+#ifdef _MSC_VER
+#if WIN64
+    newCount = InterlockedDecrement64(&(service->refCount));
+#else
+    newCount = InterlockedDecrement(&(service->refCount));
+#endif
+#else
+    newCount = __sync_sub_and_fetch(&(service->refCount), 1);
+#endif
+    if(newCount == 0)
+    {
+        freeServicePtr(service);
+    }
+    else
+    {
+        while(service->refCount != 0)
         {
-            free(service->sessionToken);
-            service->sessionToken = NULL;
+#ifdef _MSC_VER
+            SwitchToThread();
+#else
+            sched_yield();
+#endif
         }
-        if(service->bearerToken != NULL)
-        {
-            free(service->bearerToken);
-            service->bearerToken = NULL;
-        }
-        if(service->otherAuth != NULL)
-        {
-            free(service->otherAuth);
-            service->otherAuth = NULL;
-        }
-        terminateAsyncThread(service);
-        free(service);
     }
 }
 
