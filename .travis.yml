@@ -1,0 +1,25 @@
+sudo: required
+services:
+- docker
+cache:
+  directories:
+  - $HOME/.cache
+language: C
+env:
+  matrix:
+  - OS=el DIST=6
+  - OS=el DIST=7
+  - OS=fedora DIST=27
+  - OS=fedora DIST=26
+script:
+- git submodule update --init --recursive
+- git describe --long || true
+- git clone https://github.com/packpack/packpack.git packpack
+- packpack/packpack
+deploy:
+  provider: bintray
+  file: ".bintray.json"
+  user: "pboyd04"
+  skip_cleanup: true # to upload artifacts created during the build
+  key:
+    secure: Y50tSa/3i8FmCMXVG9OOa/7fZgALozuA+wIkjsz3NpxbAWHGashxtpCRMQ1crEyu2FoFMMSlVuxIp2/t8x3/729r93mZino8nSkJryxqnGI9FD6zZe2hld06ba6J8MwX8yL8OeN2aEZpKBtR+I/tNn7LkELlMJzvbQg07KeTA61A3KUQ1zBWvPQ9oLYU3VGtNePlBio+s0hfY/GbyUiAbBu0sc4QJBv+QSUiIzrBoYq1WneVM9Hl7z7z/9DQemPV6QHk2SB5R1omhsWe/7xXvEFdNX+mRt/B1n/YKwkwXv1oibjafzs+MkcP+csVfVfEma1/dbyqF1nVbrBI3hCoWPF5TNVSa6wF/RW/Sj2tz7+GuuXE3102cfRzgS7S7APJOXKd7x1/ODanLD8e9bUCkGKlVQttzAA7yvdoSRT5nzvxR58Zl3QxEQq6DW4VXOB73gXBEOMBX4MmFT5nwFsdx6vZj/RhpbJ0xHS8S4/6fwuMor+pxuCq06imDz2MxZLS01UOAXmSSDETCw/iiKnGRNFtx2ki9pXG7mKyAPoJlBCXFWoBm6LYCXaJKtBlQydYyynQtl3+GhSDh/TmNpoVQzOvreSNZn/7U9wu8QMJ2K9ZsuGyjwARUSPASO87kFOlPRzfNYKuGR1m4NGonHcNV9pkN33pBUvNIi2cFTtr8E4=
