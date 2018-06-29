@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.4] - 2018-06-29
+- Fixed Python binding support
+- Added asynchronous operations
+
 ## [1.0.3] - 2018-06-22
 - Fixed bearer token support
 - Added debug print capabilities
