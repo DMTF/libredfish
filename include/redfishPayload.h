@@ -13,7 +13,14 @@
 
 REDFISH_EXPORT redfishPayload* createRedfishPayload(json_t* value, redfishService* service);
 REDFISH_EXPORT redfishPayload* createRedfishPayloadFromString(const char* value, redfishService* service);
+REDFISH_EXPORT redfishPayload* createRedfishPayloadFromContent(const char* content, size_t contentLength, const char* contentType, redfishService* service);
+
 REDFISH_EXPORT bool            isPayloadCollection(redfishPayload* payload);
+REDFISH_EXPORT bool            isPayloadArray(redfishPayload* payload);
+
+REDFISH_EXPORT size_t          getPayloadSize(redfishPayload* payload);
+REDFISH_EXPORT char*           getPayloadBody(redfishPayload* payload);
+REDFISH_EXPORT char*           getPayloadContentType(redfishPayload* payload);
 
 REDFISH_EXPORT char*           getPayloadStringValue(redfishPayload* payload);
 REDFISH_EXPORT int             getPayloadIntValue(redfishPayload* payload);
@@ -29,5 +36,9 @@ REDFISH_EXPORT redfishPayload* postPayload(redfishPayload* target, redfishPayloa
 REDFISH_EXPORT bool            deletePayload(redfishPayload* payload);
 REDFISH_EXPORT char*           payloadToString(redfishPayload* payload, bool prettyPrint);
 REDFISH_EXPORT void            cleanupPayload(redfishPayload* payload);
+
+REDFISH_EXPORT bool            getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+REDFISH_EXPORT bool            getPayloadByIndexAsync(redfishPayload* payload, size_t index, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+REDFISH_EXPORT bool            getPayloadForPathAsync(redfishPayload* payload, redPathNode* redpath, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 
 #endif

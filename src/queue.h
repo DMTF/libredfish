@@ -11,6 +11,8 @@
 #include <windows.h>
 #define mutex             SRWLOCK
 #define condition         CONDITION_VARIABLE
+#define thread            HANDLE
+#define threadRet         DWORD
 
 #define mutex_init        InitializeSRWLock
 #define mutex_lock        AcquireSRWLockExclusive
@@ -35,6 +37,8 @@ inline bool cas(void* ptr, size_t comp, size_t replace)
 #include <pthread.h>
 #define mutex             pthread_mutex_t
 #define condition         pthread_cond_t
+#define thread            pthread_t
+#define threadRet         void*
 
 #define mutex_init(m)     pthread_mutex_init((m), NULL)
 #define mutex_lock        pthread_mutex_lock

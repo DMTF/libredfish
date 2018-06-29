@@ -5,10 +5,12 @@
 //----------------------------------------------------------------------------
 #include <string.h>
 
+#include "internal_service.h"
 #include <redfishService.h>
 #include <redfishPayload.h>
 #include <redpath.h>
 #include <redfishEvent.h>
+#include <redfishRawAsync.h>
 
 #include "debug.h"
 
@@ -39,11 +41,10 @@ struct EventActorState
 static zactor_t* eventActor = NULL;
 #endif
 
-static int initCurl(redfishService* service);
-static size_t curlWriteMemory(void *buffer, size_t size, size_t nmemb, void *userp);
-static size_t curlReadMemory(void *buffer, size_t size, size_t nmemb, void *userp);
-static int curlSeekMemory(void *userp, curl_off_t offset, int origin);
-static size_t curlHeaderCallback(char* buffer, size_t size, size_t nitems, void* userp);
+redfishAsyncOptions gDefaultOptions = {
+    .accept = REDFISH_ACCEPT_JSON
+};
+
 static redfishService* createServiceEnumeratorNoAuth(const char* host, const char* rootUri, bool enumerate, unsigned int flags);
 static redfishService* createServiceEnumeratorBasicAuth(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags);
 static redfishService* createServiceEnumeratorSessionAuth(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags);
@@ -59,6 +60,8 @@ static void cleanupEventActor();
 static void addStringToJsonArray(json_t* array, const char* value);
 #endif
 static void addStringToJsonObject(json_t* object, const char* key, const char* value);
+static redfishPayload* getPayloadFromAsyncResponse(asyncHttpResponse* response, redfishService* service);
+static unsigned char* base64_encode(const unsigned char* src, size_t len, size_t* out_len);
 
 redfishService* createServiceEnumerator(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags)
 {
@@ -85,431 +88,516 @@ redfishService* createServiceEnumerator(const char* host, const char* rootUri, e
     }
 }
 
+typedef struct
+{
+    mutex spinLock;
+    condition waitForIt;
+    redfishPayload* data;
+    bool success;
+} asyncToSyncContext;
+
+static asyncToSyncContext* makeAsyncToSyncContext()
+{
+    asyncToSyncContext* context;
+
+    context = malloc(sizeof(asyncToSyncContext));
+    if(context)
+    {
+        mutex_init(&context->spinLock);
+        cond_init(&context->waitForIt);
+        //We start out locked...
+        mutex_lock(&context->spinLock);
+    }
+    return context;
+}
+
+static void cleanupAsyncToSyncContext(asyncToSyncContext* context)
+{
+    mutex_destroy(&context->spinLock);
+    cond_destroy(&context->waitForIt);
+    free(context);
+}
+
+void asyncToSyncConverter(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    asyncToSyncContext* myContext = (asyncToSyncContext*)context;
+    (void)httpCode;
+    myContext->success = success;
+    myContext->data = payload;
+    if(payload != NULL && payload->content != NULL)
+    {
+        REDFISH_DEBUG_DEBUG_PRINT("%s: Got non-json response to old sync operation %s\n", __FUNCTION__, payload->content);
+    }
+    cond_broadcast(&myContext->waitForIt);
+}
+
 json_t* getUriFromService(redfishService* service, const char* uri)
 {
-    char* url;
-    char* string;
-    CURLcode res;
-    struct MemoryStruct chunk;
-    json_t* ret;
-    struct curl_slist* headers = NULL;
-    char tokenHeader[1024];
+    json_t* json;
+    asyncToSyncContext* context;
+    bool tmp;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. serivce = %p, uri = %s\n", __FUNCTION__, service, uri);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s\n", __FUNCTION__, service, uri);
 
-    if(service == NULL || uri == NULL)
+    context = makeAsyncToSyncContext();
+    if(context == NULL)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Exit. Invalid call. Service is %p and uri is %p\n", __FUNCTION__, service, uri);
+        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __FUNCTION__);
         return NULL;
     }
-
-    url = makeUrlForService(service, uri);
-    if(!url)
+    tmp = getUriFromServiceAsync(service,uri, NULL, asyncToSyncConverter, context);
+    if(tmp == false)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
+        cleanupAsyncToSyncContext(context);
         return NULL;
     }
-
-    //Allocate initial memory chunk
-    chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
-    chunk.size = 0;    /* no data at this point */
-    chunk.origin = chunk.memory;
-    chunk.originalSize = chunk.size;
-
-    headers = curl_slist_append(headers, "OData-Version: 4.0");
-    headers = curl_slist_append(headers, "Accept: application/json");
-    headers = curl_slist_append(headers, "User-Agent: libredfish");
-
-#ifdef _MSC_VER
-    WaitForSingleObject(service->mutex, INFINITE);
-#else
-    pthread_mutex_lock(&service->mutex);
-#endif
-    if(service->sessionToken)
+    //Wait for the condition
+    cond_wait(&context->waitForIt, &context->spinLock);
+    if(context->data)
     {
-        snprintf(tokenHeader, sizeof(tokenHeader), "X-Auth-Token: %s", service->sessionToken);
-        headers = curl_slist_append(headers, tokenHeader);
+        json = context->data->json;
+        free(context->data);
     }
-    else if(service->bearerToken)
+    else
     {
-        snprintf(tokenHeader, sizeof(tokenHeader), "Authorization:  Bearer %s", service->bearerToken);
-        headers = curl_slist_append(headers, tokenHeader);
+        json = NULL;
     }
-
-    curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, "GET");
-    curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(service->curl, CURLOPT_HTTPGET, 1L);
-    curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, &chunk);
-    curl_easy_setopt(service->curl, CURLOPT_URL, url);
-    res = curl_easy_perform(service->curl);
-    curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_HTTPGET, 0L);
-    curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, NULL);
-#ifdef _MSC_VER
-	ReleaseMutex(service->mutex);
-#else
-    pthread_mutex_unlock(&service->mutex);
-#endif
-    curl_slist_free_all(headers);
-    free(url);
-    if(res != CURLE_OK)
-    {
-        free(chunk.memory);
-        return NULL;
-    }
-
-    string = chunk.memory;
-    //There is a bug in certain version of CURL where this will contain the header data too (on redirects)
-    if(string[0] == 'H' && string[1] == 'T' && string[2] == 'T' && string[3] == 'P')
-    {
-        string = strstr(string, "\r\n\r\n");
-	string+=4;
-    }
-    ret = json_loads(string, 0, NULL);
-    free(chunk.memory);
-    return ret;
+    cleanupAsyncToSyncContext(context);
+    return json;
 }
 
 json_t* patchUriFromService(redfishService* service, const char* uri, const char* content)
 {
-    char*               url;
-    char*               resStr;
-    json_t*             ret;
-    CURLcode            res;
-    struct MemoryStruct readChunk;
-    struct MemoryStruct writeChunk;
-    struct curl_slist* headers = NULL;
-    char tokenHeader[1024];
+    json_t* json;
+    asyncToSyncContext* context;
+    bool tmp;
+    redfishPayload* payload;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. serivce = %p, uri = %s, content %s\n", __FUNCTION__, service, uri, content);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, content = %s\n", __FUNCTION__, service, uri, content);
 
-    if(service == NULL || uri == NULL || !content)
+    context = makeAsyncToSyncContext();
+    if(context == NULL)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Exit. Invalid call. Service is %p, uri is %p, and content is %p\n", __FUNCTION__, service, uri, content);
+        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __FUNCTION__);
         return NULL;
     }
-
-    url = makeUrlForService(service, uri);
-    if(!url)
+    payload = createRedfishPayloadFromString(content, service);
+    tmp = patchUriFromServiceAsync(service, uri, payload, NULL, asyncToSyncConverter, context);
+    if(tmp == false)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
+        cleanupAsyncToSyncContext(context);
         return NULL;
     }
-
-    writeChunk.memory = (char*)content;
-    writeChunk.size = strlen(content);
-    writeChunk.origin = writeChunk.memory;
-    writeChunk.originalSize = writeChunk.size;
-    readChunk.memory = (char*)malloc(1);
-    readChunk.size = 0;
-    readChunk.origin = readChunk.memory;
-    readChunk.originalSize = readChunk.size;
-
-    if(service->sessionToken)
+    //Wait for the condition
+    cond_wait(&context->waitForIt, &context->spinLock);
+    if(context->data)
     {
-        snprintf(tokenHeader, sizeof(tokenHeader), "X-Auth-Token: %s", service->sessionToken);
-        headers = curl_slist_append(headers, tokenHeader);
-    }
-    else if(service->bearerToken)
-    {
-        snprintf(tokenHeader, sizeof(tokenHeader), "Authorization:  Bearer %s", service->bearerToken);
-        headers = curl_slist_append(headers, tokenHeader);
-    }
-    headers = curl_slist_append(headers, "Accept: application/json");
-    headers = curl_slist_append(headers, "Content-Type: application/json");
-    headers = curl_slist_append(headers, "Transfer-Encoding:");
-    headers = curl_slist_append(headers, "Expect:");
-
-#ifdef _MSC_VER
-	WaitForSingleObject(service->mutex, INFINITE);
-#else
-	pthread_mutex_lock(&service->mutex);
-#endif
-    curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(service->curl, CURLOPT_INFILESIZE, writeChunk.size);
-    curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, "PATCH");
-    curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, &readChunk);
-    curl_easy_setopt(service->curl, CURLOPT_READDATA, &writeChunk);
-    curl_easy_setopt(service->curl, CURLOPT_UPLOAD, 1L);
-    curl_easy_setopt(service->curl, CURLOPT_URL, url);
-    res = curl_easy_perform(service->curl);
-    curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_INFILESIZE, -1);
-    curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_READDATA, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_UPLOAD, 0L);
-#ifdef _MSC_VER
-	ReleaseMutex(service->mutex);
-#else
-	pthread_mutex_unlock(&service->mutex);
-#endif
-    free(url);
-    curl_slist_free_all(headers);
-    if(res != CURLE_OK)
-    {
-        free(readChunk.memory);
-        return NULL;
-    }
-    if(readChunk.size == 0)
-    {
-        free(readChunk.memory);
-        return NULL;
-    }
-    resStr = readChunk.memory;
-    ret = json_loads(resStr, 0, NULL);
-    free(resStr);
-    return ret;
-}
-
-typedef struct {
-    char* Location;
-    char* XAuthToken;
-} knownHeaders;
-
-static size_t headerCallback(char* buffer, size_t size, size_t nitems, void* userdata)
-{
-    char* tmp;
-    knownHeaders* headers = (knownHeaders*)userdata;
-    if(headers == NULL)
-    {
-        return nitems * size;
-    }
-#ifdef _MSC_VER
-	if (_strnicmp(buffer, "Location:", 9) == 0)
-#else
-	if (strncasecmp(buffer, "Location:", 9) == 0)
-#endif
-    {
-#ifdef _MSC_VER
-		headers->Location = _strdup(buffer + 10);
-#else
-        headers->Location = strdup(buffer+10);
-#endif
-        tmp = strchr(headers->Location, '\r');
-        if(tmp)
-        {
-            tmp[0] = 0;
-        }
-    }
-#ifdef _MSC_VER
-	else if(_strnicmp(buffer, "X-Auth-Token:", 13) == 0)
-#else
-    else if(strncasecmp(buffer, "X-Auth-Token:", 13) == 0)
-#endif
-    {
-#ifdef _MSC_VER
-		headers->XAuthToken = _strdup(buffer + 14);
-#else
-        headers->XAuthToken = strdup(buffer+14);
-#endif
-        tmp = strchr(headers->XAuthToken, '\r');
-        if(tmp)
-        {
-            tmp[0] = 0;
-        }
-    }
-
-    return nitems * size;
-}
-
-
-json_t* postUriFromService(redfishService* service, const char* uri, const char* content, size_t contentLength, const char* contentType)
-{
-    char*               url;
-    char*               resStr;
-    json_t*             ret;
-    CURLcode            res;
-    struct MemoryStruct readChunk;
-    struct MemoryStruct writeChunk;
-    struct curl_slist*  headers = NULL;
-    long                http_code;
-    knownHeaders        headerValues;
-    char tokenHeader[1024];
-
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. serivce = %p, uri = %s, content %s\n", __FUNCTION__, service, uri, content);
-
-    if(service == NULL || uri == NULL || !content)
-    {
-        REDFISH_DEBUG_ERR_PRINT("%s: Exit. Invalid call. Service is %p, uri is %p, and content is %p\n", __FUNCTION__, service, uri, content);
-        return NULL;
-    }
-
-    url = makeUrlForService(service, uri);
-    if(!url)
-    {
-        return NULL;
-    }
-    if(contentLength == 0)
-    {
-        contentLength = strlen(content);
-    }
-
-    memset(&headerValues, 0, sizeof(headerValues));
-    writeChunk.memory = (char*)content;
-    writeChunk.size = contentLength;
-    writeChunk.origin = writeChunk.memory;
-    writeChunk.originalSize = writeChunk.size;
-    readChunk.memory = (char*)malloc(1);
-    readChunk.size = 0;
-    readChunk.origin = readChunk.memory;
-    readChunk.originalSize = readChunk.size;
-
-    if(service->sessionToken)
-    {
-        snprintf(tokenHeader, sizeof(tokenHeader), "X-Auth-Token: %s", service->sessionToken);
-        headers = curl_slist_append(headers, tokenHeader);
-    }
-    else if(service->bearerToken)
-    {
-        snprintf(tokenHeader, sizeof(tokenHeader), "Authorization:  Bearer %s", service->bearerToken);
-        headers = curl_slist_append(headers, tokenHeader);
-    }
-
-    if(contentType == NULL)
-    {
-        headers = curl_slist_append(headers, "Content-Type: application/json");
+        json = context->data->json;
+        free(context->data);
     }
     else
     {
-        snprintf(tokenHeader, sizeof(tokenHeader), "Content-Type: %s", contentType);
-        headers = curl_slist_append(headers, tokenHeader);
+        json = NULL;
     }
-    headers = curl_slist_append(headers, "Transfer-Encoding:");
+    cleanupAsyncToSyncContext(context);
+    return json;
+}
 
-#ifdef _MSC_VER
-	WaitForSingleObject(service->mutex, INFINITE);
-#else
-	pthread_mutex_lock(&service->mutex);
-#endif
-    curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(service->curl, CURLOPT_INFILESIZE, writeChunk.size);
-    curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, &readChunk);
-    curl_easy_setopt(service->curl, CURLOPT_READDATA, &writeChunk);
-    curl_easy_setopt(service->curl, CURLOPT_HEADERDATA, &headerValues);
-    curl_easy_setopt(service->curl, CURLOPT_HEADERFUNCTION, headerCallback);
-    curl_easy_setopt(service->curl, CURLOPT_UPLOAD, 1L);
-    curl_easy_setopt(service->curl, CURLOPT_URL, url);
-    res = curl_easy_perform(service->curl);
-    curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_INFILESIZE, -1);
-    curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_READDATA, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_HEADERDATA, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_HEADERFUNCTION, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_UPLOAD, 0L);
-#ifdef _MSC_VER
-	ReleaseMutex(service->mutex);
-#else
-	pthread_mutex_unlock(&service->mutex);
-#endif
-    curl_slist_free_all(headers);
-    free(url);
-    if(res != CURLE_OK)
+json_t* postUriFromService(redfishService* service, const char* uri, const char* content, size_t contentLength, const char* contentType)
+{
+    json_t* json;
+    asyncToSyncContext* context;
+    bool tmp;
+    redfishPayload* payload;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, content = %s\n", __FUNCTION__, service, uri, content);
+
+    context = makeAsyncToSyncContext();
+    if(context == NULL)
     {
-        free(readChunk.memory);
+        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __FUNCTION__);
         return NULL;
     }
-    if(readChunk.size == 0)
+    payload = createRedfishPayloadFromContent(content, contentLength, contentType, service);
+    tmp = postUriFromServiceAsync(service, uri, payload, NULL, asyncToSyncConverter, context);
+    if(tmp == false)
     {
-        free(readChunk.memory);
+        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
+        cleanupAsyncToSyncContext(context);
         return NULL;
     }
-    curl_easy_getinfo(service->curl, CURLINFO_RESPONSE_CODE, &http_code);
-    if(http_code >= 400)
+    //Wait for the condition
+    cond_wait(&context->waitForIt, &context->spinLock);
+    if(context->data)
     {
-        //Error!
-        free(readChunk.memory);
-        return NULL;
+        json = context->data->json;
+        free(context->data);
     }
-    if(headerValues.XAuthToken)
+    else
     {
-        if(service->sessionToken)
-        {
-            free(service->sessionToken);
-        }
-        service->sessionToken = headerValues.XAuthToken;
+        json = NULL;
     }
-    if(http_code == 201 && headerValues.Location)
-    {
-        free(readChunk.memory);
-        ret = getUriFromService(service, headerValues.Location);
-        free(headerValues.Location);
-        return ret;
-    }
-    if(headerValues.Location)
-    {
-        free(headerValues.Location);
-    }
-    resStr = readChunk.memory;
-    ret = json_loads(resStr, 0, NULL);
-    free(resStr);
-    return ret;
+    cleanupAsyncToSyncContext(context);
+    return json;
 }
 
 bool deleteUriFromService(redfishService* service, const char* uri)
 {
-    char*               url;
-    CURLcode            res;
-    struct MemoryStruct readChunk;
-    struct curl_slist*  headers = NULL;
-    char tokenHeader[1024];
+    asyncToSyncContext* context;
+    bool tmp;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. serivce = %p, uri = %s\n", __FUNCTION__, service, uri);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s\n", __FUNCTION__, service, uri);
 
-    if(service == NULL || uri == NULL)
+    context = makeAsyncToSyncContext();
+    if(context == NULL)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Exit. Invalid call. Service is %p and uri is %p\n", __FUNCTION__, service, uri);
-        return false;
+        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __FUNCTION__);
+        return NULL;
     }
+    tmp = deleteUriFromServiceAsync(service, uri, NULL, asyncToSyncConverter, context);
+    if(tmp == false)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
+        cleanupAsyncToSyncContext(context);
+        return tmp;
+    }
+    //Wait for the condition
+    cond_wait(&context->waitForIt, &context->spinLock);
+    tmp = context->success;
+    cleanupAsyncToSyncContext(context);
+    return tmp;
+}
+
+typedef struct
+{
+    redfishAsyncCallback callback;
+    void*                originalContext;
+    redfishAsyncOptions* originalOptions;
+    redfishService*      service;
+} rawAsyncCallbackContextWrapper;
+
+static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* response, void* context)
+{
+    bool success = false;
+    rawAsyncCallbackContextWrapper* myContext = (rawAsyncCallbackContextWrapper*)context;
+    redfishPayload* payload;
+    httpHeader* header;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. request = %p, response = %p, context = %p\n", __FUNCTION__, request, response, context);
+
+    header = responseGetHeader(response, "X-Auth-Token");
+    if(header)
+    {
+        if(myContext->service->sessionToken)
+        {
+            free(myContext->service->sessionToken);
+        }
+        myContext->service->sessionToken = strdup(header->value);
+    }
+    if(response->httpResponseCode == 201)
+    {
+        //This is a created response, go get the actual payload...
+        header = responseGetHeader(response, "Location");
+        getUriFromServiceAsync(myContext->service, header->value, myContext->originalOptions, myContext->callback, myContext->originalContext);
+        freeAsyncRequest(request);
+        freeAsyncResponse(response);
+        serviceDecRef(myContext->service);
+        free(context);
+        return;
+    }
+    if(myContext->callback)
+    {
+        if(response->connectError == 0 && response->httpResponseCode >= 200 && response->httpResponseCode < 300)
+        {
+            success = true;
+        }
+        payload = getPayloadFromAsyncResponse(response, myContext->service);
+        myContext->callback(success, (unsigned short)response->httpResponseCode, payload, myContext->originalContext);
+    }
+    freeAsyncRequest(request);
+    freeAsyncResponse(response);
+    serviceDecRef(myContext->service);
+    free(context);
+}
+
+static void setupRequestFromOptions(asyncHttpRequest* request, redfishService* service, redfishAsyncOptions* options)
+{
+    char tmp[1024];
+
+    if(options == NULL)
+    {
+        options = &gDefaultOptions;
+    }
+    switch(options->accept)
+    {
+        default:
+        case REDFISH_ACCEPT_ALL:
+            addRequestHeader(request, "Accept", "*/*");
+            break;
+        case REDFISH_ACCEPT_JSON:
+            addRequestHeader(request, "Accept", "application/json");
+            break;
+        case REDFISH_ACCEPT_XML:
+            addRequestHeader(request, "Accept", "application/xml");
+            break;
+    }
+    addRequestHeader(request, "OData-Version", "4.0");
+    addRequestHeader(request, "User-Agent", "libredfish");
+
+    if(service->sessionToken)
+    {
+        addRequestHeader(request, "X-Auth-Token", service->sessionToken);
+    }
+    else if(service->bearerToken)
+    {
+        tmp[sizeof(tmp)-1] = 0;
+        snprintf(tmp, sizeof(tmp)-1, "Bearer %s", service->bearerToken);
+        addRequestHeader(request, "Authorization", tmp);
+    }
+    else if(service->otherAuth)
+    {
+        addRequestHeader(request, "Authorization", service->otherAuth);
+    }
+}
+
+bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    char* url;
+    asyncHttpRequest* request; 
+    rawAsyncCallbackContextWrapper* myContext;
+    bool ret;
+
+    serviceIncRef(service);
 
     url = makeUrlForService(service, uri);
     if(!url)
     {
-        return false;
+        serviceDecRef(service);
+        return NULL;
     }
 
-    if(service->sessionToken)
-    {
-        snprintf(tokenHeader, sizeof(tokenHeader), "X-Auth-Token: %s", service->sessionToken);
-        headers = curl_slist_append(headers, tokenHeader);
-    }
-    else if(service->bearerToken)
-    {
-        snprintf(tokenHeader, sizeof(tokenHeader), "Authorization:  Bearer %s", service->bearerToken);
-        headers = curl_slist_append(headers, tokenHeader);
-    }
-
-    readChunk.memory = (char*)malloc(1);
-    readChunk.size = 0;
-    readChunk.origin = readChunk.memory;
-    readChunk.originalSize = readChunk.size;
-
-#ifdef _MSC_VER
-	WaitForSingleObject(service->mutex, INFINITE);
-#else
-	pthread_mutex_lock(&service->mutex);
-#endif
-    curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-    curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, &readChunk);
-    curl_easy_setopt(service->curl, CURLOPT_URL, url);
-    res = curl_easy_perform(service->curl);
-    curl_easy_setopt(service->curl, CURLOPT_HTTPHEADER, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_CUSTOMREQUEST, NULL);
-    curl_easy_setopt(service->curl, CURLOPT_WRITEDATA, NULL);
-#ifdef _MSC_VER
-	ReleaseMutex(service->mutex);
-#else
-	pthread_mutex_unlock(&service->mutex);
-#endif
+    request = createRequest(url, GET, 0, NULL);
     free(url);
-    free(readChunk.memory);
-    if(res != CURLE_OK)
+    setupRequestFromOptions(request, service, options);
+    
+    myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
+    myContext->callback = callback;
+    myContext->originalContext = context;
+    myContext->originalOptions = options;
+    myContext->service = service;
+    ret = startRawAsyncRequest(service, request, rawCallbackWrapper, myContext);
+    if(ret == false)
+    {
+        free(myContext);
+    }
+    return ret;
+}
+
+bool patchUriFromServiceAsync(redfishService* service, const char* uri, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    char* url;
+    asyncHttpRequest* request;
+    rawAsyncCallbackContextWrapper* myContext;
+    bool ret;
+
+    serviceIncRef(service);
+
+    url = makeUrlForService(service, uri);
+    if(!url)
+    {
+        serviceDecRef(service);
+        return NULL;
+    }
+
+    request = createRequest(url, PATCH, getPayloadSize(payload), getPayloadBody(payload));
+    free(url);
+    setupRequestFromOptions(request, service, options);
+    addRequestHeader(request, "Content-Type", getPayloadContentType(payload));
+    
+    myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
+    myContext->callback = callback;
+    myContext->originalContext = context;
+    myContext->originalOptions = options;
+    myContext->service = service;
+    ret = startRawAsyncRequest(service, request, rawCallbackWrapper, myContext);
+    if(ret == false)
+    {
+        free(myContext);
+    }
+    return ret;
+}
+
+bool postUriFromServiceAsync(redfishService* service, const char* uri, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    char* url;
+    asyncHttpRequest* request;
+    rawAsyncCallbackContextWrapper* myContext;
+    bool ret;
+
+    serviceIncRef(service);
+
+    url = makeUrlForService(service, uri);
+    if(!url)
+    {
+        serviceDecRef(service);
+        return NULL;
+    }
+
+    request = createRequest(url, POST, getPayloadSize(payload), getPayloadBody(payload));
+    free(url);
+    setupRequestFromOptions(request, service, options);
+    addRequestHeader(request, "Content-Type", getPayloadContentType(payload));
+    
+    myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
+    myContext->callback = callback;
+    myContext->originalContext = context;
+    myContext->originalOptions = options;
+    myContext->service = service;
+    ret = startRawAsyncRequest(service, request, rawCallbackWrapper, myContext);
+    if(ret == false)
+    {
+        free(myContext);
+    }
+    return ret;
+}
+
+bool deleteUriFromServiceAsync(redfishService* service, const char* uri, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    char* url;
+    asyncHttpRequest* request;
+    rawAsyncCallbackContextWrapper* myContext;
+    bool ret;
+
+    serviceIncRef(service);
+
+    url = makeUrlForService(service, uri);
+    if(!url)
+    {
+        serviceDecRef(service);
+        return NULL;
+    }
+
+    request = createRequest(url, DELETE, 0, NULL);
+    free(url);
+    setupRequestFromOptions(request, service, options);
+    
+    myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
+    myContext->callback = callback;
+    myContext->originalContext = context;
+    myContext->originalOptions = options;
+    myContext->service = service;
+    ret = startRawAsyncRequest(service, request, rawCallbackWrapper, myContext);
+    if(ret == false)
+    {
+        free(myContext);
+    }
+    return ret;
+}
+
+bool getRedfishServiceRootAsync(redfishService* service, const char* version, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    json_t* versionNode;
+    const char* verUrl;
+    bool ret;
+
+    if(version == NULL)
+    {
+        versionNode = json_object_get(service->versions, "v1");
+    }
+    else
+    {
+        versionNode = json_object_get(service->versions, version);
+    }
+    if(versionNode == NULL)
     {
         return false;
     }
-    return true;
+    verUrl = json_string_value(versionNode);
+    if(verUrl == NULL)
+    {
+        return false;
+    }
+    ret = getUriFromServiceAsync(service, verUrl, options, callback, context);
+    return ret;
+}
+
+typedef struct
+{
+    redfishAsyncCallback callback;
+    void* originalContext;
+    redPathNode* redpath;
+    redfishAsyncOptions* options;
+} redpathAsyncContext;
+
+void gotServiceRootAsync(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    redpathAsyncContext* myContext = (redpathAsyncContext*)context;
+    redfishPayload* root = payload;
+    bool ret;
+
+    if(success == false || httpCode >= 400 || myContext->redpath->next == NULL)
+    {
+        myContext->callback(success, httpCode, payload, myContext->originalContext);
+        cleanupRedPath(myContext->redpath);
+        free(context);
+        return;
+    }
+    ret = getPayloadForPathAsync(root, myContext->redpath->next, myContext->options, myContext->callback, myContext->originalContext);
+    cleanupPayload(root);
+    if(ret == false)
+    { 
+        myContext->callback(ret, 0xFFFF, NULL, myContext->originalContext);
+        cleanupRedPath(myContext->redpath);
+    }
+    else
+    {
+        //Free just this redpath node...
+        myContext->redpath->next = NULL;
+        cleanupRedPath(myContext->redpath);
+    }
+    free(context);
+}
+
+bool getPayloadByPathAsync(redfishService* service, const char* path, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    redPathNode* redpath;
+    bool ret;
+    redpathAsyncContext* myContext;
+
+    if(!service || !path)
+    {
+        return false;
+    }
+
+    redpath = parseRedPath(path);
+    if(!redpath)
+    {
+        return false;
+    }
+    if(!redpath->isRoot)
+    {
+        cleanupRedPath(redpath);
+        return false;
+    }
+    myContext = malloc(sizeof(redpathAsyncContext));
+    if(!myContext)
+    {
+        cleanupRedPath(redpath);
+        return false;
+    }
+    myContext->callback = callback;
+    myContext->originalContext = context;
+    myContext->redpath = redpath;
+    myContext->options = options;
+    ret = getRedfishServiceRootAsync(service, redpath->version, options, gotServiceRootAsync, myContext);
+    if(ret == false)
+    {
+        free(myContext);
+        cleanupRedPath(redpath);
+    }
+    return ret;
 }
 
 bool registerForEvents(redfishService* service, const char* postbackUri, unsigned int eventTypes, redfishEventCallback callback, const char* context)
@@ -691,16 +779,28 @@ void cleanupServiceEnumerator(redfishService* service)
     {
         return;
     }
-    //Get the mutex to make sure we aren't in the middle of an operation while cleaning up...
+    serviceDecRef(service);
+}
+
+void serviceIncRef(redfishService* service)
+{
 #ifdef _MSC_VER
-    WaitForSingleObject(service->mutex, INFINITE);
+#if WIN64
+    InterlockedIncrement64(&(service->refCount));
 #else
-    pthread_mutex_lock(&service->mutex);
+    InterlockedIncrement(&(service->refCount));
 #endif
+#else
+    __sync_fetch_and_add(&(service->refCount), 1);
+#endif
+}
+
+void terminateAsyncThread(redfishService* service);
+
+static void freeServicePtr(redfishService* service)
+{
     free(service->host);
     service->host = NULL;
-    curl_easy_cleanup(service->curl);
-    service->curl = NULL;
     json_decref(service->versions);
     service->versions = NULL;
     if(service->sessionToken != NULL)
@@ -708,231 +808,81 @@ void cleanupServiceEnumerator(redfishService* service)
         free(service->sessionToken);
         service->sessionToken = NULL;
     }
-#ifdef _MSC_VER
-    ReleaseMutex(service->mutex);
-    CloseHandle(service->mutex);
-#else
-    pthread_mutex_unlock(&service->mutex);
-    pthread_mutex_destroy(&service->mutex);
-#endif
+    if(service->bearerToken != NULL)
+    {
+        free(service->bearerToken);
+        service->bearerToken = NULL;
+    }
+    if(service->otherAuth != NULL)
+    {
+        free(service->otherAuth);
+        service->otherAuth = NULL;
+    }
+    terminateAsyncThread(service);
     free(service);
-    curl_global_cleanup();
 }
 
-#if 0
-static
-void dump(const char *text,
-          FILE *stream, unsigned char *ptr, size_t size)
+void serviceDecRef(redfishService* service)
 {
-  size_t i;
-  size_t c;
-  unsigned int width=0x10;
-
-  fprintf(stream, "%s, %10.10ld bytes (0x%8.8lx)\n",
-          text, (long)size, (long)size);
-
-  for(i=0; i<size; i+= width) {
-    fprintf(stream, "%4.4lx: ", (long)i);
-
-    /* show hex to the left */
-    for(c = 0; c < width; c++) {
-      if(i+c < size)
-        fprintf(stream, "%02x ", ptr[i+c]);
-      else
-        fputs("   ", stream);
-    }
-
-    /* show data on the right */
-    for(c = 0; (c < width) && (i+c < size); c++) {
-      char x = (ptr[i+c] >= 0x20 && ptr[i+c] < 0x80) ? ptr[i+c] : '.';
-      fputc(x, stream);
-    }
-
-    fputc('\n', stream); /* newline */
-  }
-}
-
-static
-int my_trace(CURL *handle, curl_infotype type,
-             char *data, size_t size,
-             void *userp)
-{
-  const char *text;
-  (void)handle; /* prevent compiler warning */
-  FILE* stream = (FILE*)userp;
-
-  switch (type) {
-  case CURLINFO_TEXT:
-    fprintf(stream, "== Info: %s", data);
-  default: /* in case a new one is introduced to shock us */
-    return 0;
-
-  case CURLINFO_HEADER_OUT:
-    text = "=> Send header";
-    break;
-  case CURLINFO_DATA_OUT:
-    text = "=> Send data";
-    break;
-  case CURLINFO_SSL_DATA_OUT:
-    text = "=> Send SSL data";
-    break;
-  case CURLINFO_HEADER_IN:
-    text = "<= Recv header";
-    break;
-  case CURLINFO_DATA_IN:
-    text = "<= Recv data";
-    break;
-  case CURLINFO_SSL_DATA_IN:
-    text = "<= Recv SSL data";
-    break;
-  }
-
-  dump(text, stream, (unsigned char *)data, size);
-  return 0;
-}
-#endif
-
-static int initCurl(redfishService* service)
-{
-    //char* filename = tempnam("/mnt/persistent_data/", "curl.");
-    //FILE* fp = fopen(filename, "wb");
-    curl_global_init(CURL_GLOBAL_DEFAULT);
-    service->curl = curl_easy_init();
-    if(!service->curl)
+    if(service == NULL)
     {
-        return -1;
+        return;
     }
-    //curl_easy_setopt(service->curl, CURLOPT_DEBUGFUNCTION, my_trace);
-    //curl_easy_setopt(service->curl, CURLOPT_VERBOSE, true);
-    //curl_easy_setopt(service->curl, CURLOPT_DEBUGDATA, fp);
-    curl_easy_setopt(service->curl, CURLOPT_FOLLOWLOCATION, 1L);
-    curl_easy_setopt(service->curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    curl_easy_setopt(service->curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    curl_easy_setopt(service->curl, CURLOPT_WRITEFUNCTION, curlWriteMemory);
-    curl_easy_setopt(service->curl, CURLOPT_READFUNCTION, curlReadMemory);
-    curl_easy_setopt(service->curl, CURLOPT_HEADERFUNCTION, curlHeaderCallback);
-    curl_easy_setopt(service->curl, CURLOPT_SEEKFUNCTION, curlSeekMemory);
-    curl_easy_setopt(service->curl, CURLOPT_TIMEOUT, 20L);
 #ifdef _MSC_VER
-	service->mutex = CreateMutex(NULL, FALSE, NULL);
+#if WIN64
+    InterlockedDecrement64(&(service->refCount));
 #else
-    pthread_mutex_init(&(service->mutex), NULL);
+    InterlockedDecrement(&(service->refCount));
 #endif
-    return 0;
+#else
+    __sync_fetch_and_sub(&(service->refCount), 1);
+#endif
+    if(service->refCount == 0)
+    {
+        freeServicePtr(service);
+    }
 }
 
-static size_t curlWriteMemory(void *contents, size_t size, size_t nmemb, void *userp)
+void serviceDecRefAndWait(redfishService* service)
 {
-  size_t realsize = size * nmemb;
-  struct MemoryStruct *mem = (struct MemoryStruct *)userp;
-  void* tmp;
+    size_t newCount;
 
-  tmp = (char*)realloc(mem->memory, mem->size + realsize + 1);
-  if(tmp == NULL)
-  {
-      free(mem->memory);
-      mem->memory = NULL;
-      mem->size = 0;
-      return 0;
-  }
-  mem->memory = tmp;
-
-  memcpy(&(mem->memory[mem->size]), contents, realsize);
-  mem->size += realsize;
-  mem->memory[mem->size] = 0;
-
-  return realsize;
-}
-
-static size_t curlReadMemory(void *ptr, size_t size, size_t nmemb, void *userp)
-{
-    size_t fullsize = size*nmemb;
-    struct MemoryStruct* pooh = (struct MemoryStruct *)userp;
-
-    if(fullsize < 1)
+    if(service == NULL)
     {
-        return 0;
+        return;
     }
-
-    if(pooh->size > fullsize)
-    {
-        memcpy(ptr, pooh->memory, fullsize);
-        pooh->memory += fullsize;
-        pooh->size -= fullsize;
-        return fullsize;
-    }
-    else if(pooh->size)
-    {
-        memcpy(ptr, pooh->memory, pooh->size);
-        pooh->memory += pooh->size;
-        fullsize = pooh->size;
-        pooh->size = 0;
-        return fullsize;
-    }
-
-    return 0;                          /* no more data left to deliver */
-}
-
-static int curlSeekMemory(void *userp, curl_off_t offset, int origin)
-{
-    struct MemoryStruct* pooh = (struct MemoryStruct *)userp;
-    (void)origin;
-
-    if(pooh == NULL)
-    {
-        return CURL_SEEKFUNC_CANTSEEK;
-    }
-
-    pooh->memory = pooh->origin+offset;
-    pooh->size = pooh->originalSize-offset;
-
-    return CURL_SEEKFUNC_OK;
-}
-
-static size_t curlHeaderCallback(char* buffer, size_t size, size_t nitems, void* userp)
-{
-    char* header = NULL;
-    char* tmp;
-
-    if(userp == NULL)
-    {
-        return nitems * size;
-    }
-    if(strncmp(buffer, "Location: ", 10) == 0)
-    {
 #ifdef _MSC_VER
-		*((char**)userp) = _strdup(buffer + 10);
+#if WIN64
+    newCount = InterlockedDecrement64(&(service->refCount));
 #else
-        *((char**)userp) = strdup(buffer+10);
+    newCount = InterlockedDecrement(&(service->refCount));
 #endif
-        header = *((char**)userp);
-    }
-    if(header)
+#else
+    newCount = __sync_sub_and_fetch(&(service->refCount), 1);
+#endif
+    if(newCount == 0)
     {
-        tmp = strchr(header, '\r');
-        if(tmp)
+        freeServicePtr(service);
+    }
+    else
+    {
+        while(service->refCount != 0)
         {
-            *tmp = 0;
-        }
-        tmp = strchr(header, '\n');
-        if(tmp)
-        {
-            *tmp = 0;
+#ifdef _MSC_VER
+            SwitchToThread();
+#else
+            sched_yield();
+#endif
         }
     }
-    return nitems * size;
 }
 
 static redfishService* createServiceEnumeratorNoAuth(const char* host, const char* rootUri, bool enumerate, unsigned int flags)
 {
     redfishService* ret;
 
-    ret = (redfishService*)calloc(1, sizeof(redfishService));
-    if(initCurl(ret) != 0)
-    {
-        free(ret);
-        return NULL;
-    }
+    ret = (redfishService*)calloc(1, sizeof(redfishService)); 
+    serviceIncRef(ret);
 #ifdef _MSC_VER
 	ret->host = _strdup(host);
 #else
@@ -950,10 +900,22 @@ static redfishService* createServiceEnumeratorNoAuth(const char* host, const cha
 static redfishService* createServiceEnumeratorBasicAuth(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags)
 {
     redfishService* ret;
+    char userPass[1024] = {0};
+    char* base64;
+    size_t original;
+    size_t newSize;
+
+    original = snprintf(userPass, sizeof(userPass), "%s:%s", username, password);
+    base64 = (char*)base64_encode((unsigned char*)userPass, original, &newSize);
+    if(base64 == NULL)
+    {
+        return NULL;
+    }
+    snprintf(userPass, sizeof(userPass), "Basic %s", base64);
+    free(base64);
 
     ret = createServiceEnumeratorNoAuth(host, rootUri, false, flags);
-    curl_easy_setopt(ret->curl, CURLOPT_USERNAME, username);
-    curl_easy_setopt(ret->curl, CURLOPT_PASSWORD, password);
+    ret->otherAuth = strdup(userPass);
     ret->versions = getVersions(ret, rootUri);
     return ret;
 }
@@ -1515,4 +1477,93 @@ static void addStringToJsonObject(json_t* object, const char* key, const char* v
     json_object_set(object, key, jValue);
 
     json_decref(jValue);
+}
+
+static redfishPayload* getPayloadFromAsyncResponse(asyncHttpResponse* response, redfishService* service)
+{
+    httpHeader* header;
+    size_t length = 0;
+    char* type = NULL;
+
+    if(response == NULL || response->bodySize == 0 || response->body == NULL)
+    {
+        return NULL;
+    }
+    header = responseGetHeader(response, "Content-Length");
+    if(header)
+    {
+        length = (size_t)strtoull(header->value, NULL, 10);
+    }
+    header = responseGetHeader(response, "Content-Type");
+    if(header)
+    {
+        type = header->value;
+    }
+    return createRedfishPayloadFromContent(response->body, length, type, service);
+}
+
+static const unsigned char base64_table[65] =
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+static unsigned char* base64_encode(const unsigned char* src, size_t len, size_t* out_len)
+{
+	unsigned char* out;
+    unsigned char* pos;
+	const unsigned char* end;
+    const unsigned char* in;
+	size_t olen;
+	int line_len;
+
+	olen = len * 4 / 3 + 4; /* 3-byte blocks to 4-byte */
+	olen += olen / 72; /* line feeds */
+	olen++; /* null termination */
+	if (olen < len)
+    {
+        //Overflow
+		return NULL;
+    }
+	out = malloc(olen);
+	if (out == NULL)
+    {
+		return NULL;
+    }
+
+	end = src + len;
+	in = src;
+	pos = out;
+	line_len = 0;
+	while (end - in >= 3)
+    {
+		*pos++ = base64_table[in[0] >> 2];
+		*pos++ = base64_table[((in[0] & 0x03) << 4) | (in[1] >> 4)];
+		*pos++ = base64_table[((in[1] & 0x0f) << 2) | (in[2] >> 6)];
+		*pos++ = base64_table[in[2] & 0x3f];
+		in += 3;
+		line_len += 4;
+	}
+
+	if (end - in)
+    {
+		*pos++ = base64_table[in[0] >> 2];
+		if (end - in == 1)
+        {
+			*pos++ = base64_table[(in[0] & 0x03) << 4];
+			*pos++ = '=';
+		}
+        else
+        {
+			*pos++ = base64_table[((in[0] & 0x03) << 4) |
+					      (in[1] >> 4)];
+			*pos++ = base64_table[(in[1] & 0x0f) << 2];
+		}
+		*pos++ = '=';
+		line_len += 4;
+	}
+
+	*pos = '\0';
+	if (out_len)
+    {
+		*out_len = pos - out;
+    }
+	return out;
 }

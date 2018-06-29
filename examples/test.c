@@ -31,6 +31,8 @@ volatile sig_atomic_t stop = 0;
 
 int verbose = LOG_CRIT;
 
+static void safeFree(void* ptr);
+
 static struct option long_options[] =
 {
     {"help",       no_argument,       0,      '?'},
@@ -171,6 +173,87 @@ void printRedfishEvent(redfishPayload* event, enumeratorAuthentication* auth, co
 #define strcasecmp _stricmp
 #endif
 
+typedef struct
+{
+    unsigned int method;
+    char*        leaf;
+    char*        query;
+    char*        filename;
+    redfishService*  redfish;
+    int          argc;
+    char**       argv;
+} gotPayloadContext;
+
+void gotPayload(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    gotPayloadContext* myContext = context;
+    redfishPayload*  res;
+    redfishPayload*  post;
+    bool             deleteRes;
+    char*            contents; 
+
+    if(success == false)
+    {
+        printf("Got a failure, httpCode = %u\n", httpCode);
+    }
+    if(payload)
+    {
+        switch(myContext->method)
+        {
+            case 0:
+            default:
+                printPayload(payload);
+                break;
+            case 1:
+                if(myContext->leaf && optind < myContext->argc)
+                {
+                    res = patchPayloadStringProperty(payload, myContext->leaf, myContext->argv[optind]);
+                    printf("PATCH to %s: %s\n", myContext->query, (res?"Success":"Failed!"));
+                    printPayload(res);
+                    cleanupPayload(res);
+                }
+                else if(myContext->leaf)
+                {
+                    fprintf(stderr, "Missing value for PATCH!\n");
+                }
+                else
+                {
+                    fprintf(stderr, "Missing property for PATCH!\n");
+                }
+                break;
+            case 2:
+                if(!myContext->filename)
+                {
+                    fprintf(stderr, "Missing POST payload!\n");
+                }
+                else
+                {
+                    contents = getFileContents(myContext->filename);
+                    if(contents)
+                    {
+                        post = createRedfishPayloadFromString(contents, myContext->redfish);
+                        res = postPayload(payload, post);
+                        cleanupPayload(post);
+                        printf("POST to %s: %s\n", myContext->query, (res?"Success":"Failed!"));
+                        cleanupPayload(res);
+                        free(contents);
+                    }
+                    else
+                    {
+                        fprintf(stderr, "Unable to obtain POST payload!\n");
+                    }
+                }
+                break;
+            case 3:
+                deleteRes = deletePayload(payload);
+                printf("DELETE to %s: %s\n", myContext->query, (deleteRes?"Success":"Failed!"));
+                break;
+        }
+        cleanupPayload(payload);
+    }
+    free(context);
+}
+
 int main(int argc, char** argv)
 {
     int              arg;
@@ -178,20 +261,16 @@ int main(int argc, char** argv)
     unsigned int     method = 0;
     char*            host = NULL;
     char*            filename = NULL;
-    redfishService*  redfish = NULL;
-    redfishPayload*  payload;
-    redfishPayload*  res;
-    char*            query      = NULL;
-    char*            leaf = NULL;
-    char*            contents;
-    redfishPayload*  post;
-    bool             deleteRes;
+    redfishService*  redfish = NULL; 
+    char*            query = NULL;
+    char*            leaf = NULL; 
     char*            eventUri = NULL;
     unsigned int     flags = 0;
     char*            username = NULL;
     char*            password = NULL;
     char*            token = NULL;
     enumeratorAuthentication auth;
+    gotPayloadContext* context;
 
     memset(&auth, 0, sizeof(auth));
 
@@ -286,7 +365,7 @@ int main(int argc, char** argv)
     else
     {
         redfish = createServiceEnumerator(host, NULL, NULL, flags);
-    } 
+    }
 
     if(eventUri != NULL)
     {
@@ -340,80 +419,37 @@ int main(int argc, char** argv)
             }
             break;
     }
+    context = malloc(sizeof(gotPayloadContext));
+    context->method = method;
+    context->leaf = leaf;
+    context->query = query;
+    context->filename = filename;
+    context->redfish = redfish;
+    context->argc = argc;
+    context->argv = argv;
     if(query)
     {
-        payload = getPayloadByPath(redfish, query);
+        getPayloadByPathAsync(redfish, query, NULL, gotPayload, context);
     }
     else
     {
-        payload = getPayloadByPath(redfish, "/");;
+        getPayloadByPathAsync(redfish, "/", NULL, gotPayload, context);
     }
-    switch(method)
-    {
-        case 0:
-        default:
-            printPayload(payload);
-            break;
-        case 1:
-            if(leaf && optind < argc)
-            {
-                res = patchPayloadStringProperty(payload, leaf, argv[optind]);
-                printf("PATCH to %s: %s\n", query, (res?"Success":"Failed!"));
-                printPayload(res);
-                cleanupPayload(res);
-            }
-            else if(leaf)
-            {
-                fprintf(stderr, "Missing value for PATCH!\n");
-            }
-            else
-            {
-                fprintf(stderr, "Missing property for PATCH!\n");
-            }
-            break;
-        case 2:
-            if(!filename)
-            {
-                fprintf(stderr, "Missing POST payload!\n");
-            }
-            else
-            {
-                contents = getFileContents(filename);
-                if(contents)
-                {
-                    post = createRedfishPayloadFromString(contents, redfish);
-                    res = postPayload(payload, post);
-                    cleanupPayload(post);
-                    printf("POST to %s: %s\n", query, (res?"Success":"Failed!"));
-                    cleanupPayload(res);
-                    free(contents);
-                }
-                else
-                {
-                    fprintf(stderr, "Unable to obtain POST payload!\n");
-                }
-            }
-            break;
-        case 3:
-            deleteRes = deletePayload(payload);
-            printf("DELETE to %s: %s\n", query, (deleteRes?"Success":"Failed!"));
-            break;
-    }
-    cleanupPayload(payload);
-    cleanupServiceEnumerator(redfish);
-    if(host)
-    {
-        free(host);
-    }
-    if(filename)
-    {
-        free(filename);
-    }
-    if(token)
-    {
-        free(token);
-    }
+    serviceDecRefAndWait(redfish);
+    safeFree(host);
+    safeFree(filename);
+    safeFree(token);
+    safeFree(username);
+    safeFree(password);
     return 0;
+}
+
+static void safeFree(void* ptr)
+{
+    if(ptr)
+    {
+        free(ptr);
+    }
 }
 
 /* vim: set tabstop=4 shiftwidth=4 expandtab: */
