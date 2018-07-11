@@ -9,6 +9,7 @@
 #include <redfishService.h>
 #include <redfishPayload.h>
 #include <redpath.h>
+#include <entities/resource.h>
 
 /**
  * syslog style function used to debug libredfish.

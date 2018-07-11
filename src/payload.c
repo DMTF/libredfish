@@ -203,6 +203,32 @@ redfishPayload* getPayloadByNodeName(redfishPayload* payload, const char* nodeNa
     return createRedfishPayload(value, payload->service);
 }
 
+redfishPayload* getPayloadByNodeNameNoNetwork(redfishPayload* payload, const char* nodeName)
+{
+    json_t* value;
+    json_t* odataId;
+
+    if(!payload || !nodeName)
+    {
+        return NULL;
+    }
+
+    value = json_object_get(payload->json, nodeName);
+    if(value == NULL)
+    {
+        return NULL;
+    }
+    json_incref(value);
+    if(json_is_string(value))
+    {
+        odataId = json_object();
+        json_object_set(odataId, nodeName, value);
+        json_decref(value);
+        value = odataId;
+    }
+    return createRedfishPayload(value, payload->service);
+}
+
 redfishPayload* getPayloadByIndex(redfishPayload* payload, size_t index)
 {
     json_t* value = NULL;

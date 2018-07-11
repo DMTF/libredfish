@@ -41,4 +41,6 @@ REDFISH_EXPORT bool            getPayloadByNodeNameAsync(redfishPayload* payload
 REDFISH_EXPORT bool            getPayloadByIndexAsync(redfishPayload* payload, size_t index, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 REDFISH_EXPORT bool            getPayloadForPathAsync(redfishPayload* payload, redPathNode* redpath, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 
+REDFISH_EXPORT redfishPayload* getPayloadByNodeNameNoNetwork(redfishPayload* payload, const char* nodeName);
+
 #endif
