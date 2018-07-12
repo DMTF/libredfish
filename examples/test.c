@@ -47,7 +47,26 @@ static struct option long_options[] =
     {"session",    no_argument,       0,      'S'},
     {"verbose",    no_argument,       0,      'v'},
     {"token",      required_argument, 0,      'T'},
+    {"command",    required_argument, 0,      'c'},
     {0, 0, 0, 0}
+};
+
+typedef void (*commandFunc)(redfishPayload* payload);
+
+typedef struct {
+    const char* commandName;
+    commandFunc function;
+} commandMapping;
+
+static void getHealth(redfishPayload* payload);
+static void getRollup(redfishPayload* payload);
+static void getState(redfishPayload* payload);
+
+static commandMapping commands[] = {
+    {"getHealth", getHealth},
+    {"getRollup", getRollup},
+    {"getState", getState},
+    {NULL, NULL}
 };
 
 void inthand(int signum)
@@ -84,6 +103,7 @@ void print_usage(const char* name)
     printf("  -u, --username [user]      The username to authenticate with\n");
     printf("  -p, --password [pass]      The password to authenticate with\n");
     printf("  -S, --session              Use session based auth, as opposed to basic auth\n");
+    printf("  -c, --command [command]    Run the specified command on the resource\n");
     printf("\nQuery:\n");
     printf(" Optional: /vXX - Where XX is the version to use. Defaults to v1.\n");
     printf(" /Name          - Where Name is the name of a JSON tag. If it contains an odata.id only\n");
@@ -182,6 +202,7 @@ typedef struct
     redfishService*  redfish;
     int          argc;
     char**       argv;
+    commandMapping* command;
 } gotPayloadContext;
 
 void gotPayload(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
@@ -198,6 +219,13 @@ void gotPayload(bool success, unsigned short httpCode, redfishPayload* payload, 
     }
     if(payload)
     {
+        if(myContext->command)
+        {
+            myContext->command->function(payload);
+            cleanupPayload(payload);
+            free(context);
+            return;
+        }
         switch(myContext->method)
         {
             case 0:
@@ -254,6 +282,19 @@ void gotPayload(bool success, unsigned short httpCode, redfishPayload* payload, 
     free(context);
 }
 
+static commandMapping* getCommandByString(const char* name)
+{
+    size_t i;
+    for(i = 0; commands[i].commandName; i++)
+    {
+        if(strcasecmp(name, commands[i].commandName) == 0)
+        {
+            return &(commands[i]);
+        }
+    }
+    return NULL;
+}
+
 int main(int argc, char** argv)
 {
     int              arg;
@@ -271,10 +312,11 @@ int main(int argc, char** argv)
     char*            token = NULL;
     enumeratorAuthentication auth;
     gotPayloadContext* context;
+    commandMapping* command = NULL;
 
     memset(&auth, 0, sizeof(auth));
 
-    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:", long_options, &opt_index)) != -1)
+    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:", long_options, &opt_index)) != -1)
     {
         switch(arg)
         {
@@ -339,6 +381,9 @@ int main(int argc, char** argv)
                 break;
             case 'v':
                 verbose++;
+                break;
+            case 'c':
+                command = getCommandByString(optarg);
                 break;
         }
     }
@@ -427,6 +472,7 @@ int main(int argc, char** argv)
     context->redfish = redfish;
     context->argc = argc;
     context->argv = argv;
+    context->command = command;
     if(query)
     {
         getPayloadByPathAsync(redfish, query, NULL, gotPayload, context);
@@ -450,6 +496,115 @@ static void safeFree(void* ptr)
     {
         free(ptr);
     }
+}
+
+static void printHealth(redfishHealth health, const char* healthType)
+{
+    const char* healthStr;
+    switch(health)
+    {
+        case RedfishHealthError:
+            healthStr = "Error";
+            break;
+        case RedfishHealthUnknown:
+            healthStr = "Unknown";
+            break;
+        case RedfishHealthOK:
+            healthStr = "OK";
+            break;
+        case RedfishHealthWarning:
+            healthStr = "Warning";
+            break;
+        case RedfishHealthCritical:
+            healthStr = "Critical";
+            break;
+        default:
+            healthStr = "Non-enum value";
+            break;
+    }
+    printf("Resource %s is %s (%d)\n", healthType, healthStr, health);
+}
+
+static void getHealth(redfishPayload* payload)
+{
+    redfishHealth health;
+    if(payload == NULL)
+    {
+        fprintf(stderr, "Payload is NULL!\n");
+        return;
+    }
+    health = getResourceHealth(payload);
+    printHealth(health, "health");
+}
+
+static void getRollup(redfishPayload* payload)
+{
+    redfishHealth health;
+    if(payload == NULL)
+    {
+        fprintf(stderr, "Payload is NULL!\n");
+        return;
+    }
+    health = getResourceRollupHealth(payload);
+    printHealth(health, "rollup health");
+}
+
+static void getState(redfishPayload* payload)
+{
+    redfishState state;
+    const char* stateStr;
+    if(payload == NULL)
+    {
+        fprintf(stderr, "Payload is NULL!\n");
+        return;
+    }
+    state = getResourceState(payload);
+    switch(state)
+    {
+        case RedfishStateError:
+            stateStr = "Error";
+            break;
+        case RedfishStateUnknown:
+            stateStr = "Unknown";
+            break;
+        case RedfishStateEnabled:
+            stateStr = "Enabled";
+            break;
+        case RedfishStateDisabled:
+            stateStr = "Disabled";
+            break;
+        case RedfishStateStandbyOffline:
+            stateStr = "StandbyOffline";
+            break;
+        case RedfishStateStandbySpare:
+            stateStr = "StandbySpare";
+            break;
+        case RedfishStateInTest:
+            stateStr = "InTest";
+            break;
+        case RedfishStateStarting:
+            stateStr = "Starting";
+            break;
+        case RedfishStateAbsent:
+            stateStr = "Absent";
+            break;
+        case RedfishStateUnavailableOffline:
+            stateStr = "UnavailableOffline";
+            break;
+        case RedfishStateDeferring:
+            stateStr = "Deferring";
+            break;
+        case RedfishStateQuiesced:
+            stateStr = "Quiesced";
+            break;
+        case RedfishStateUpdating:
+            stateStr = "Updating";
+            break;
+        default:
+            stateStr = "Non-enum value";
+            break;
+    }
+    printf("Resource state is %s (%d)\n", stateStr, state);
 }
 
 /* vim: set tabstop=4 shiftwidth=4 expandtab: */
