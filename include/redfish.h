@@ -1,8 +1,16 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017 Distributed Management Task Force, Inc. All rights reserved.
+// Copyright 2018 Distributed Management Task Force, Inc. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
+
+/**
+ * @file redfish.h
+ * @author Patrick Boyd
+ * @brief File containing the interface for the library level interactions.
+ *
+ * This file explains the interface for interacting with the libredfish library and includes all external interfaces.
+ */
 #ifndef _REDFISH_H_
 #define _REDFISH_H_
 

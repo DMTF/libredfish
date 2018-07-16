@@ -65,11 +65,20 @@ httpHeader* responseGetHeader(asyncHttpResponse* response, const char* name)
     return NULL;
 }
 
+/**
+ * @brief A work item for the async queue.
+ *
+ * An item representing work for the async queue. This is usually a async HTTP request, but could also be a command for the thread.
+ */
 typedef struct
 {
+    /** This work item instructs the thread to terminate **/
     bool term;
+    /** This is the request to process if term is false **/
     asyncHttpRequest* request;
+    /** The callback for the request **/
     asyncRawCallback callback;
+    /** The context for the request **/
     void* context;
 } asyncWorkItem;
 
@@ -152,11 +161,40 @@ void freeAsyncResponse(asyncHttpResponse* response)
     }
 }
 
+/**
+ * @brief A representation of memory for CURL callbacks.
+ *
+ * An item representing memory for use in CURL callbacks allowing for movement through the buffer as data is sent/receieved.
+ */
 struct MemoryStruct
 {
+  /**
+   * @brief The memory pointer
+   *
+   * On data sent to the server this pointer will be incremented as data is sent and will always point to the next byte to be sent.
+   * On data receieved from the server this pointer will always point to the first data byte receieved and be reallocated as needed.
+   */
   char* memory;
+  /** 
+   * @brief The size of the memory region pointed to by memory.
+   *
+   * On data sent to the server this value will be reduced as the memory pointer is incremented.
+   * On data received from the server this value will be increased to represent the total size of the memory pointer 
+   */
   size_t size;
+  /**
+   * @brief The original memory pointer
+   *
+   * On data sent to the server this pointer will point to the first byte sent allowing the buffer to be freed when complete.
+   * This pointer is not used on receive.
+   */
   char* origin;
+  /**
+   * @brief The original size of the memory pointer
+   *
+   * On data sent to the server this will contain the original value of size. This is used when seeking back in the buffer to resent part of the payload.
+   * This pointer is not used on receive.
+   */
   size_t originalSize;
 };
 
