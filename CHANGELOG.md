@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.0.5] - 2018-07-16
+- Added helpers to get Health, HealthRollup, and State from resources
+
 ## [1.0.4] - 2018-06-29
 - Fixed Python binding support
 - Added asynchronous operations
