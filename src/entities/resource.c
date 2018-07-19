@@ -25,8 +25,11 @@ redfishHealth getResourceRollupHealth(redfishPayload* payload)
     return _getResourceHealth(payload, "HealthRollup", __FUNCTION__);
 }
 
+/** A struct to help map the string enum values produced by a redfish service to more C friendly enum values **/
 typedef struct {
+    /** The redfish string enum value **/
     const char* string;
+    /** The C enum value **/
     redfishState state;
 } stringToStateMap;
 

@@ -586,11 +586,16 @@ bool getPayloadByIndexAsync(redfishPayload* payload, size_t index, redfishAsyncO
     return true;
 }
 
+/** Internal structure used for callbacks involving redpath **/
 typedef struct
 {
+    /** The original callback to be called when the redpath traversal has finished or an error has occurred **/
     redfishAsyncCallback callback;
+    /** The original context for the original callback **/
     void* originalContext;
+    /** The current redpath for this call **/
     redPathNode* redpath;
+    /** The options passed to the original call **/
     redfishAsyncOptions* options;
 } redpathAsyncContext;
 
@@ -751,18 +756,30 @@ static redfishPayload* getOpResult(redfishPayload* payload, const char* propName
     }
 }
 
+/** Internal structure used for callbacks involving redpath operations **/
 typedef struct
 {
+    /** The original callback to be called when the redpath traversal has finished or an error has occurred **/
     redfishAsyncCallback callback;
+    /** The original context for the original callback **/
     void* originalContext;
+    /** The options passed to the original call **/
     redfishAsyncOptions* options;
+    /** The payload the operation was called on **/
     redfishPayload* payload;
+    /** The property name to retrieve **/
     char* propName;
+    /** The operation to perform on the property **/
     char* op;
+    /** The value for the operation **/
     char* value;
+    /** The number of operations to perform (i.e. a collection or array has to perform the operation on each element) **/
     size_t count;
+    /** The number of operations left **/
     size_t left;
+    /** The number of operations that returned valid for the operation **/
     size_t validCount;
+    /** A set of payloads for the collection **/
     redfishPayload** payloads;
 } redpathAsyncOpContext;
 

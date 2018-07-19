@@ -14,33 +14,44 @@
 
 #include "debug.h"
 
-struct MemoryStruct
-{
-  char *memory;
-  size_t size;
-  char* origin;
-  size_t originalSize;
-};
-
+/**
+ * @brief A representation of event registrations.
+ *
+ * A structure representing a redfish event registration
+ */
 struct EventCallbackRegister
 {
+    /** If true, the event actor thread will remove this registration the next time it processes **/
     bool unregister;
+    /** The function to call each time an event meeting the requirements is received **/
     redfishEventCallback callback;
+    /** The event types for this registration **/
     unsigned int eventTypes;
+    /** The context to pass to the callback **/
     char* context;
+    /** The service associated with this registration **/
     redfishService* service;
 };
 
 #if CZMQ_VERSION_MAJOR >= 3
+/**
+ * @brief A representation of event actor state.
+ *
+ * A structure representing state of the event actor
+ */
 struct EventActorState
 {
+    /** If true, terminate the thread **/
     bool terminate;
+    /** A linked list of struct EventCallbackRegister for each registration **/
     zlist_t* registrations;
 };
 
+/** The event actor thread **/
 static zactor_t* eventActor = NULL;
 #endif
 
+/** Default asynchronous options for Redfish calls **/
 redfishAsyncOptions gDefaultOptions = {
     .accept = REDFISH_ACCEPT_JSON
 };
@@ -88,11 +99,20 @@ redfishService* createServiceEnumerator(const char* host, const char* rootUri, e
     }
 }
 
+/**
+ * @brief An internal structure used to convert a call from async to sync.
+ *
+ * An internal structure used to convert a call from the new asynchronous to the old synchronous calls
+ */
 typedef struct
 {
+    /** A lock to control access to the condition variable **/
     mutex spinLock;
+    /** The condition variable to be signalled on the async call completion **/
     condition waitForIt;
+    /** The redfishPayload that was returned **/
     redfishPayload* data;
+    /** True means the callback returned success, otherwise false **/
     bool success;
 } asyncToSyncContext;
 
@@ -270,11 +290,20 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     return tmp;
 }
 
+/**
+ * @brief An internal structure used to convert Redfish calls to raw async HTTP(s) calls.
+ *
+ * An internal structure used to convert a call from the Redfish call interface to the raw HTTP(s) interface
+ */
 typedef struct
 {
+    /** The redfish style callback to call when the async HTTP(s) call is complete **/
     redfishAsyncCallback callback;
+    /** The original caller provided context to pass to the callback **/
     void*                originalContext;
+    /** The original options passed to the call so that child calls can use the same options **/
     redfishAsyncOptions* originalOptions;
+    /** The redfish service the call was made on **/
     redfishService*      service;
 } rawAsyncCallbackContextWrapper;
 
