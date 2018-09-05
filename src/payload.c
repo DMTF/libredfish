@@ -522,6 +522,7 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
     value = json_object_get(payload->json, nodeName);
     if(value == NULL)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Payload contains no element named %s", __FUNCTION__, nodeName);
         return false;
     }
     if(isOdataIdNode(value, &uri))
@@ -631,6 +632,8 @@ bool getPayloadForPathAsync(redfishPayload* payload, redPathNode* redpath, redfi
 {
     redpathAsyncContext* myContext;
     bool ret;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, redpath = %p\n", __FUNCTION__, payload, redpath);
 
     if(!payload || !redpath)
     {
