@@ -210,6 +210,7 @@ threadRet rawAsyncWorkThread(void* data)
     struct curl_slist* headers = NULL;
     char headerStr[1024];
     httpHeader* current;
+    char* redirect;
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
@@ -223,7 +224,7 @@ threadRet rawAsyncWorkThread(void* data)
 #endif
     }
     //curl_easy_setopt(curl, CURLOPT_VERBOSE, true);
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    //curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteMemory);
@@ -309,6 +310,23 @@ threadRet rawAsyncWorkThread(void* data)
         curl_easy_setopt(curl, CURLOPT_URL, workItem->request->url);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
         res = curl_easy_perform(curl);
+        curl_easy_getinfo(curl, CURLINFO_REDIRECT_URL, &redirect);
+        if(redirect)
+        {
+            REDFISH_DEBUG_INFO_PRINT("%s: Redirect from %s to %s\n", __FUNCTION__, workItem->request->url, redirect);
+            if(response)
+            {
+                safeFree(readChunk.memory);
+                readChunk.memory = (char*)malloc(1);
+                readChunk.size = 0;
+                readChunk.origin = readChunk.memory;
+                readChunk.originalSize = readChunk.size;
+                freeHeaders(response->headers); 
+                response->headers = NULL;
+                curl_easy_setopt(curl, CURLOPT_URL, redirect);
+                res = curl_easy_perform(curl);
+            }
+        }
         curl_easy_setopt(curl, CURLOPT_HTTPGET, 0L);
         curl_easy_setopt(curl, CURLOPT_NOBODY, 0L);
         curl_easy_setopt(curl, CURLOPT_UPLOAD, 0L);

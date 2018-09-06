@@ -33,9 +33,11 @@ redfishPayload* createRedfishPayload(json_t* value, redfishService* service)
 
 redfishPayload* createRedfishPayloadFromString(const char* value, redfishService* service)
 {
-    json_t* jValue = json_loads(value, 0, NULL);
+    json_error_t err;
+    json_t* jValue = json_loads(value, 0, &err);
     if(jValue == NULL)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to parse json! %s %s\n", __FUNCTION__, err.text);
         return NULL;
     }
     return createRedfishPayload(jValue, service);
@@ -49,6 +51,7 @@ redfishPayload* createRedfishPayloadFromString(const char* value, redfishService
 REDFISH_EXPORT redfishPayload* createRedfishPayloadFromContent(const char* content, size_t contentLength, const char* contentType, redfishService* service)
 {
     redfishPayload* ret;
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. content = %p, contentLength = %lu, contentType = %s, service = %p\n", __FUNCTION__, content, contentLength, contentType, service);
     if(contentType == NULL || strncasecmp(contentType, "application/json", 16) == 0)
     {
         return createRedfishPayloadFromString(content, service);

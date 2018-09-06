@@ -1519,6 +1519,7 @@ static redfishPayload* getPayloadFromAsyncResponse(asyncHttpResponse* response, 
 
     if(response == NULL || response->bodySize == 0 || response->body == NULL)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error, called without response data...\n", __FUNCTION__);
         return NULL;
     }
     header = responseGetHeader(response, "Content-Length");
