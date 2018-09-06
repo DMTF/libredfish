@@ -566,6 +566,8 @@ void gotServiceRootAsync(bool success, unsigned short httpCode, redfishPayload* 
     redfishPayload* root = payload;
     bool ret;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %p, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+
     if(success == false || httpCode >= 400 || myContext->redpath->next == NULL)
     {
         myContext->callback(success, httpCode, payload, myContext->originalContext);
@@ -576,7 +578,8 @@ void gotServiceRootAsync(bool success, unsigned short httpCode, redfishPayload* 
     ret = getPayloadForPathAsync(root, myContext->redpath->next, myContext->options, myContext->callback, myContext->originalContext);
     cleanupPayload(root);
     if(ret == false)
-    { 
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Failed to get next path section immediately...", __FUNCTION__);
         myContext->callback(ret, 0xFFFF, NULL, myContext->originalContext);
         cleanupRedPath(myContext->redpath);
     }
@@ -1516,6 +1519,7 @@ static redfishPayload* getPayloadFromAsyncResponse(asyncHttpResponse* response, 
 
     if(response == NULL || response->bodySize == 0 || response->body == NULL)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error, called without response data...\n", __FUNCTION__);
         return NULL;
     }
     header = responseGetHeader(response, "Content-Length");
