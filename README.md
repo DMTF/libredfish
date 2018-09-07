@@ -1,6 +1,6 @@
 # libRedfish
 
-Copyright 2017 Distributed Management Task Force, Inc. All rights reserved.
+Copyright 2017-2018 DMTF. All rights reserved.
 
 ## About
 
@@ -58,3 +58,10 @@ int main(int argc, char** argv)
     cleanupEnumerator(service);
 }
 ```
+
+## Release Process
+
+1. Update `CHANGELOG.md` with the list of changes since the last release
+2. TODO: Add version string in the tool somewhere
+3. Push changes to Github
+4. Create a new release in Github
