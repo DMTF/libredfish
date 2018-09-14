@@ -109,7 +109,7 @@ size_t getPayloadSize(redfishPayload* payload)
         return payload->contentLength;
     }
     body = payloadToString(payload, false);
-    len = strlen(body)+1;
+    len = strlen(body);
     free(body);
     return len;
 }
@@ -125,7 +125,7 @@ char* getPayloadBody(redfishPayload* payload)
 
 char* getPayloadContentType(redfishPayload* payload)
 {
-    if(payload->contentType != PAYLOAD_CONTENT_OTHER)
+    if(payload->contentType == PAYLOAD_CONTENT_OTHER)
     {
         return payload->contentTypeStr;
     }
