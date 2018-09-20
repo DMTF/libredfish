@@ -292,6 +292,20 @@ REDFISH_EXPORT bool            getPayloadByIndexAsync(redfishPayload* payload, s
  * @see getPayloadForPath
  */
 REDFISH_EXPORT bool            getPayloadForPathAsync(redfishPayload* payload, redPathNode* redpath, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+/**
+ * @brief Obtain the child payload according to Redpath string
+ *
+ * Parse the redpath string and obtain a child node identified by redpath asynchronously.
+ *
+ * @param payload The payload to get the child node of
+ * @param string The string redpath to use to obtain the child
+ * @param options The redfish options to use if needing to obtain another URI or NULL for defaults
+ * @param callback The callback to use when the payload is obtained
+ * @param context An opaque data pointer to send to the callback
+ * @return True if the request could start. False otherwise.
+ * @see getPayloadForPathString
+ */
+REDFISH_EXPORT bool            getPayloadForPathStringAsync(redfishPayload* payload, const char* string, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 
 /**
  * @brief Obtain the node in the payload identified by the specified nodeName

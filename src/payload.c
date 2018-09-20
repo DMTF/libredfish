@@ -640,7 +640,7 @@ bool getPayloadForPathAsync(redfishPayload* payload, redPathNode* redpath, redfi
 
     if(!payload || !redpath)
     {
-        return NULL;
+        return false;
     }
 
     myContext = malloc(sizeof(redpathAsyncContext));
@@ -671,6 +671,28 @@ bool getPayloadForPathAsync(redfishPayload* payload, redPathNode* redpath, redfi
         free(myContext);
     }
     return ret; 
+}
+
+bool getPayloadForPathStringAsync(redfishPayload* payload, const char* string, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    redPathNode* redpath;
+    bool ret;
+
+    if(!payload || !string)
+    {
+        return false;
+    }
+    redpath = parseRedPath(string);
+    if(!redpath)
+    {
+        return false;
+    }
+    ret = getPayloadForPathAsync(payload, redpath, options, callback, context);
+    if(ret == false)
+    {
+        cleanupRedPath(redpath);
+    }
+    return ret;
 }
 
 static redfishPayload* getOpResult(redfishPayload* payload, const char* propName, const char* op, const char* value)
