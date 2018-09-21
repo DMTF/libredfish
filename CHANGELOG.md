@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.7] - 2018-09-21
+- Added helper to get the path string for asynchronous operations
+- Fixed size issue with synchronous POST operations
+
 ## [1.0.6] - 2018-09-07
 - Added fix for handling redirects from a Redfish service
 
