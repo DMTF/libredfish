@@ -133,7 +133,16 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
         return;
     }
     opChars = strpbrk(index, "<>=");
-    if(opChars == NULL)
+    if(opChars == NULL && index[0] == '*')
+    {
+#ifdef _MSC_VER
+		node->next->op = _strdup("any");
+#else
+        node->next->op = strdup("any");
+#endif
+        return;
+    }
+    else if(opChars == NULL)
     {
         //TODO handle last() and position()
 #ifdef _MSC_VER
