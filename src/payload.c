@@ -132,6 +132,27 @@ char* getPayloadContentType(redfishPayload* payload)
     return "application/json";
 }
 
+char* getPayloadUri(redfishPayload* payload)
+{
+    json_t* json;
+
+    if(!payload)
+    {
+        return NULL;
+    }
+
+    json = json_object_get(payload->json, "@odata.id");
+    if(json == NULL)
+    {
+        json = json_object_get(target->json, "target");
+        if(json == NULL)
+        {
+            return NULL;
+        }
+    }
+    return strdup(json_string_value(json));
+}
+
 char* getPayloadStringValue(redfishPayload* payload)
 {
     json_t* tmp;
@@ -388,13 +409,11 @@ redfishPayload* patchPayloadStringProperty(redfishPayload* payload, const char* 
     {
         return NULL;
     }
-
-    json = json_object_get(payload->json, "@odata.id");
-    if(json == NULL)
+    uri = getPayloadUri(payload);
+    if(uri == NULL)
     {
         return NULL;
     }
-    uri = strdup(json_string_value(json));
 
     json = json_object();
     json2 = json_string(value);
@@ -422,16 +441,11 @@ redfishPayload* postContentToPayload(redfishPayload* target, const char* data, s
     {
         return NULL;
     }
-    json = json_object_get(target->json, "@odata.id");
-    if(json == NULL)
+    uri = getPayloadUri(target);
+    if(uri == NULL)
     {
-        json = json_object_get(target->json, "target");
-        if(json == NULL)
-        {
-            return NULL;
-        }
+        return NULL;
     }
-    uri = strdup(json_string_value(json));
     json = postUriFromService(target->service, uri, data, dataSize, contentType);
     free(uri);
     if(json == NULL)
@@ -471,14 +485,11 @@ bool deletePayload(redfishPayload* payload)
     {
         return false;
     }
-
-    json = json_object_get(payload->json, "@odata.id");
-    if(json == NULL)
+    uri = getPayloadUri(payload);
+    if(uri == NULL)
     {
-        return false;
+        return NULL;
     }
-    uri = strdup(json_string_value(json));
-
     ret = deleteUriFromService(payload->service, uri);
     free(uri);
     return ret;

@@ -105,6 +105,16 @@ REDFISH_EXPORT char*           getPayloadBody(redfishPayload* payload);
 REDFISH_EXPORT char*           getPayloadContentType(redfishPayload* payload);
 
 /**
+ * @brief Get the payload uri
+ *
+ * Get the payload uri (the @odata.id)
+ *
+ * @param payload The payload to return the URI of
+ * @return The uri
+ */
+REDFISH_EXPORT char*           getPayloadUri(redfishPayload* payload);
+
+/**
  * @brief Get the string value for the payload
  *
  * If the value of the payload is not a string (i.e. is a number, object, array, etc.) Return NULL. Otherwise return the string contained in the payload
