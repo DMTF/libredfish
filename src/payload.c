@@ -916,6 +916,11 @@ static bool getOpResultAsync(redfishPayload* payload, const char* propName, cons
     {
         return arrayEvalOpAsync(payload, propName, op, value, options, callback, context);
     }
+    if(strcmp(op, "any") == 0)
+    {
+        callback(true, 200, payload, context);
+        return true;
+    }
     myContext = malloc(sizeof(redpathAsyncOpContext));
     if(myContext == NULL)
     {
@@ -1081,9 +1086,23 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
     myContext->callback = callback;
     myContext->originalContext = context;
     myContext->options = options;
-    myContext->propName = strdup(propName);
+    if(propName)
+    {
+        myContext->propName = strdup(propName);
+    }
+    else
+    {
+        myContext->propName = NULL;
+    }
     myContext->op = strdup(op);
-    myContext->value = strdup(value);
+    if(value)
+    {
+        myContext->value = strdup(value);
+    }
+    else
+    {
+        myContext->value = NULL;
+    }
     myContext->count = max;
     myContext->left = max;
     myContext->validCount = 0;
