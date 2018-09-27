@@ -144,7 +144,7 @@ char* getPayloadUri(redfishPayload* payload)
     json = json_object_get(payload->json, "@odata.id");
     if(json == NULL)
     {
-        json = json_object_get(target->json, "target");
+        json = json_object_get(payload->json, "target");
         if(json == NULL)
         {
             return NULL;
@@ -477,7 +477,6 @@ redfishPayload* postPayload(redfishPayload* target, redfishPayload* payload)
 
 bool deletePayload(redfishPayload* payload)
 {
-    json_t* json;
     char* uri;
     bool ret;
 
@@ -488,7 +487,7 @@ bool deletePayload(redfishPayload* payload)
     uri = getPayloadUri(payload);
     if(uri == NULL)
     {
-        return NULL;
+        return false;
     }
     ret = deleteUriFromService(payload->service, uri);
     free(uri);
