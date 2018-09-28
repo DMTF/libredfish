@@ -15,7 +15,7 @@ set(REDFISH_HDR_PUBLIC
    ${CMAKE_CURRENT_SOURCE_DIR}/include/redfishPayload.h
    ${CMAKE_CURRENT_SOURCE_DIR}/include/redpath.h)
 
-file(GLOB REDFISH_SRC src/*.c)
+file(GLOB REDFISH_SRC src/*.c src/entities/*.c)
 
 source_group("Library Sources" FILES ${REDFISH_SRC})
 

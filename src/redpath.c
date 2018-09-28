@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017 Distributed Management Task Force, Inc. All rights reserved.
+// Copyright 2017 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <stdlib.h>
@@ -133,7 +133,16 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
         return;
     }
     opChars = strpbrk(index, "<>=");
-    if(opChars == NULL)
+    if(opChars == NULL && index[0] == '*')
+    {
+#ifdef _MSC_VER
+		node->next->op = _strdup("any");
+#else
+        node->next->op = strdup("any");
+#endif
+        return;
+    }
+    else if(opChars == NULL)
     {
         //TODO handle last() and position()
 #ifdef _MSC_VER

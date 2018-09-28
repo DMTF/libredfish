@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017 Distributed Management Task Force, Inc. All rights reserved.
+// Copyright 2017 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <Python.h>
@@ -181,16 +181,18 @@ static PyObject* pyPostUriFromService(PyObject *self, PyObject *args)
 {
     const char* uri;
     const char* content;
+    int contentLength;
+    char* contentType = NULL;
     redfishService* cService = ((pyRedfishService*)self)->cService;
     json_t* cJson;
     const char* retStr;
 
-    if(!PyArg_ParseTuple(args, "ss", &uri, &content))
+    if(!PyArg_ParseTuple(args, "ss#|S", &uri, &content, &contentLength, &contentType))
     {
         return NULL;
     }
 
-    cJson = postUriFromService(cService, uri, content);
+    cJson = postUriFromService(cService, uri, content, contentLength, contentType);
     retStr = json_dumps(cJson, 0);
     return Py_BuildValue("s", retStr);
 }
