@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.8] - 2018-09-28
+- Added redpath for all members of a collection
+- Added helper to get the URI for a payload
+
 ## [1.0.7] - 2018-09-21
 - Added helper to get the path string for asynchronous operations
 - Fixed size issue with synchronous POST operations
