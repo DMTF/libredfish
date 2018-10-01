@@ -26,6 +26,10 @@ redfishPayload* createRedfishPayload(json_t* value, redfishService* service)
     {
         payload->json = value;
         payload->service = service;
+        if(service)
+        {
+            serviceIncRef(service);
+        }
         payload->contentType = PAYLOAD_CONTENT_JSON;
     }
     return payload;
@@ -73,6 +77,10 @@ REDFISH_EXPORT redfishPayload* createRedfishPayloadFromContent(const char* conte
         ret->contentType = PAYLOAD_CONTENT_OTHER;
         ret->contentTypeStr = strdup(contentType);
         ret->service = service;
+        if(service)
+        {
+            serviceIncRef(service);
+        }
     }
     return ret;
 }
@@ -501,7 +509,10 @@ void cleanupPayload(redfishPayload* payload)
         return;
     }
     json_decref(payload->json);
-    //Don't free payload->service, let the caller handle cleaning up the service
+    if(payload->service)
+    {
+        serviceDecRef(payload->service);
+    }
     free(payload);
 }
 
