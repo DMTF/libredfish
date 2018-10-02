@@ -246,6 +246,7 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
         cleanupAsyncToSyncContext(context);
+        cleanupPayload(payload);
         return NULL;
     }
     //Wait for the condition
