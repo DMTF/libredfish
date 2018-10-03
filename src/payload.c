@@ -523,8 +523,13 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
 {
     json_t* value;
     json_t* odataId;
+    json_t* members;
+    json_t* member;
+    json_t* tmp;
     char* uri;
     bool ret;
+    size_t i;
+    size_t size;
     redfishPayload* retPayload;
 
     if(!payload || !nodeName)
@@ -535,8 +540,66 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
     value = json_object_get(payload->json, nodeName);
     if(value == NULL)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Payload contains no element named %s", __FUNCTION__, nodeName);
-        return false;
+        if(isPayloadCollection(payload))
+        {
+            members = json_object_get(payload->json, "Members");
+            if(members)
+            {
+                value = json_array();
+                size = json_array_size(members);
+                for(i = 0; i < size; i++)
+                {
+                    member = json_array_get(members, i);
+                    if(member)
+                    {
+                        tmp = json_object_get(member, nodeName);
+                        if(json_is_string(tmp))
+                        {
+                            odataId = json_object();
+                            json_object_set(odataId, nodeName, tmp);
+                            tmp = odataId;
+                        }
+                        json_array_append(value, tmp);
+                    }
+                }
+                if(json_array_size(value) == 0)
+                {
+                    json_decref(value);
+                    value = NULL;
+                }
+            }
+        }
+        else if(isPayloadArray(payload))
+        {
+            size = json_array_size(payload->json);
+            value = json_array();
+            for(i = 0; i < size; i++)
+            {
+                member = json_array_get(payload->json, i);
+                if(member)
+                {
+                    tmp = json_object_get(member, nodeName);
+                    if(json_is_string(tmp))
+                    {
+                        odataId = json_object();
+                        json_object_set(odataId, nodeName, tmp);
+                        tmp = odataId;
+                    }
+                    json_array_append(value, tmp);
+                }
+            }
+            if(json_array_size(value) == 0)
+            {
+                json_decref(value);
+                value = NULL;
+            }
+        }
+        if(value == NULL)
+        {
+            REDFISH_DEBUG_ERR_PRINT("%s: Payload contains no element named %s\n", __FUNCTION__, nodeName);
+            REDFISH_DEBUG_DEBUG_PRINT("%s: %s\n", __FUNCTION__, json_dumps(payload->json, 0));
+            return false;
+        }
     }
     if(isOdataIdNode(value, &uri))
     {
