@@ -597,7 +597,6 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
         if(value == NULL)
         {
             REDFISH_DEBUG_ERR_PRINT("%s: Payload contains no element named %s\n", __FUNCTION__, nodeName);
-            REDFISH_DEBUG_DEBUG_PRINT("%s: %s\n", __FUNCTION__, json_dumps(payload->json, 0));
             return false;
         }
     }
