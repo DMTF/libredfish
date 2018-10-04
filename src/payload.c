@@ -302,6 +302,39 @@ redfishPayload* getPayloadByIndex(redfishPayload* payload, size_t index)
     return createRedfishPayload(value, payload->service);
 }
 
+redfishPayload* getPayloadByIndexNoNetwork(redfishPayload* payload, size_t index)
+{
+    json_t* value = NULL;
+
+    if(!payload)
+    {
+        return NULL;
+    }
+    if(isPayloadCollection(payload))
+    {
+        redfishPayload* members = getPayloadByNodeNameNoNetwork(payload, "Members");
+        redfishPayload* ret = getPayloadByIndexNoNetwork(members, index);
+        cleanupPayload(members);
+        return ret;
+    }
+    if(json_is_array(payload->json))
+    {
+        value = json_array_get(payload->json, index);
+    }
+    else if(json_is_object(payload->json))
+    {
+        value = json_object_get_by_index(payload->json, index);
+    }
+
+    if(value == NULL)
+    {
+        return NULL;
+    }
+
+    json_incref(value);
+    return createRedfishPayload(value, payload->service);
+}
+
 size_t getValueCountFromPayload(redfishPayload* payload)
 {
     if(!payload)

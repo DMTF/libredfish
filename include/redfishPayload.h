@@ -160,6 +160,7 @@ REDFISH_EXPORT redfishPayload* getPayloadByNodeName(redfishPayload* payload, con
  * @param index The index of the payload to obtain
  * @return The child payload or NULL if it does not exist or could not be obtained.
  * @see getPayloadByIndexAsync
+ * @see getPayloadByIndexNoNetwork
  */
 REDFISH_EXPORT redfishPayload* getPayloadByIndex(redfishPayload* payload, size_t index);
 /**
@@ -329,5 +330,24 @@ REDFISH_EXPORT bool            getPayloadForPathStringAsync(redfishPayload* payl
  * @see getPayloadByNodeName
  */
 REDFISH_EXPORT redfishPayload* getPayloadByNodeNameNoNetwork(redfishPayload* payload, const char* nodeName);
+
+/**
+ * @brief Obtain the node in the payload by index
+ *
+ * Obtain the node in the payload by zero-based index. If the node in question is a navigation property to another URI then return the navigation property.
+ * - If the payload is an array it will be the Nth element of the array.
+ * - If the payload is a collection it will be the Nth element in the Members element.
+ * - If the payload is an object it will be the element at the Nth key in the object.
+ * - If the payload is any other type it will return NULL.
+ * - If the element obtained is a navigation property to another URI then the content of that URI will be obtained synchronously.
+ *
+ * @param payload The payload to get the child node of
+ * @param index The index of the payload to obtain
+ * @return The child payload or NULL if it does not exist or could not be obtained.
+ * @see getPayloadByIndexAsync
+ * @see getPayloadByIndex
+ */
+REDFISH_EXPORT redfishPayload* getPayloadByIndexNoNetwork(redfishPayload* payload, size_t index);
+
 
 #endif
