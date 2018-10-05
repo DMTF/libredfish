@@ -17,6 +17,7 @@ static bool            arrayEvalOpAsync(redfishPayload* payload, const char* pro
 static redfishPayload* createCollection(redfishService* service, size_t count, redfishPayload** payloads);
 static json_t*         json_object_get_by_index(json_t* json, size_t index);
 static bool            isOdataIdNode(json_t* json, char** uriPtr);
+static char*           safeStrdup(const char* str);
 
 redfishPayload* createRedfishPayload(json_t* value, redfishService* service)
 {
@@ -75,7 +76,7 @@ REDFISH_EXPORT redfishPayload* createRedfishPayloadFromContent(const char* conte
         } 
         ret->contentLength = contentLength;
         ret->contentType = PAYLOAD_CONTENT_OTHER;
-        ret->contentTypeStr = strdup(contentType);
+        ret->contentTypeStr = safeStrdup(contentType);
         ret->service = service;
         if(service)
         {
@@ -158,7 +159,7 @@ char* getPayloadUri(redfishPayload* payload)
             return NULL;
         }
     }
-    return strdup(json_string_value(json));
+    return safeStrdup(json_string_value(json));
 }
 
 char* getPayloadStringValue(redfishPayload* payload)
@@ -180,11 +181,7 @@ char* getPayloadStringValue(redfishPayload* payload)
             return NULL;
         }
     }
-#ifdef _MSC_VER
-	return _strdup(value);
-#else
-    return strdup(value);
-#endif
+    return safeStrdup(value);
 }
 
 int getPayloadIntValue(redfishPayload* payload)
@@ -1046,9 +1043,9 @@ static bool getOpResultAsync(redfishPayload* payload, const char* propName, cons
     myContext->originalContext = context;
     myContext->options = options;
     myContext->payload = payload;
-    myContext->propName = strdup(propName);
-    myContext->op = strdup(op);
-    myContext->value = strdup(value);
+    myContext->propName = safeStrdup(propName);
+    myContext->op = safeStrdup(op);
+    myContext->value = safeStrdup(value);
     ret = getPayloadByNodeNameAsync(payload, propName, options, opGotPayloadByNodeNameAsync, myContext);
     if(ret == false)
     {
@@ -1202,23 +1199,9 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
     myContext->callback = callback;
     myContext->originalContext = context;
     myContext->options = options;
-    if(propName)
-    {
-        myContext->propName = strdup(propName);
-    }
-    else
-    {
-        myContext->propName = NULL;
-    }
-    myContext->op = strdup(op);
-    if(value)
-    {
-        myContext->value = strdup(value);
-    }
-    else
-    {
-        myContext->value = NULL;
-    }
+    myContext->propName = safeStrdup(propName);
+    myContext->op = safeStrdup(op);
+    myContext->value = safeStrdup(value);
     myContext->count = max;
     myContext->left = max;
     myContext->validCount = 0;
@@ -1323,9 +1306,9 @@ static bool arrayEvalOpAsync(redfishPayload* payload, const char* propName, cons
     myContext->callback = callback;
     myContext->originalContext = context;
     myContext->options = options;
-    myContext->propName = strdup(propName);
-    myContext->op = strdup(op);
-    myContext->value = strdup(value);
+    myContext->propName = safeStrdup(propName);
+    myContext->op = safeStrdup(op);
+    myContext->value = safeStrdup(value);
     myContext->count = max;
     myContext->left = max;
     myContext->validCount = 0;
@@ -1423,7 +1406,20 @@ static bool isOdataIdNode(json_t* json, char** uriPtr)
     {
         return false;
     }
-    *uriPtr = strdup(uri);
+    *uriPtr = safeStrdup(uri);
     return true;
+}
+
+static char* safeStrdup(const char* str)
+{
+    if(str == NULL)
+    {
+        return NULL;
+    }
+#ifdef _MSC_VER
+	return _strdup(str);
+#else
+    return strdup(str);
+#endif
 }
 /* vim: set tabstop=4 shiftwidth=4 expandtab: */
