@@ -317,6 +317,35 @@ REDFISH_EXPORT bool            getPayloadForPathAsync(redfishPayload* payload, r
  * @see getPayloadForPathString
  */
 REDFISH_EXPORT bool            getPayloadForPathStringAsync(redfishPayload* payload, const char* string, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+/**
+ * @brief PATCH a payload to the URI reresented by a target asynchronously.
+ *
+ * Asynchronously PATCH a payload to the URI the target was obtained from.
+ *
+ * @param target The payload to update
+ * @param payload The payload to patch
+ * @return NULL if failure, the resulting redfishPayload on success. 
+ */
+REDFISH_EXPORT bool            patchPayloadAsync(redfishPayload* target, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+/**
+ * @brief POST a new payload to the URI reresented by a target asynchronously.
+ *
+ * Asynchronously POST a new payload to the URI the target was obtained from.
+ *
+ * @param target The payload to update
+ * @param payload The payload to write
+ * @return NULL if failure, the resulting redfishPayload on success. 
+ */
+REDFISH_EXPORT bool            postPayloadAsync(redfishPayload* target, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+/**
+ * @brief DELETE a redfish payload asynchronously
+ *
+ * Asynchronously send a DELETE operation to the URI the payload was obtained from.
+ *
+ * @param payload The payload to delete
+ * @return False if failure, true on success. 
+ */
+REDFISH_EXPORT bool            deletePayloadAsync(redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 
 /**
  * @brief Obtain the node in the payload identified by the specified nodeName

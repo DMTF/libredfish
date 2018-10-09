@@ -811,6 +811,75 @@ bool getPayloadForPathStringAsync(redfishPayload* payload, const char* string, r
     return ret;
 }
 
+bool patchPayloadAsync(redfishPayload* target, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    char* uri;
+    bool ret;
+    redfishService* service;
+
+    if(!target || !payload)
+    {
+        return false;
+    }
+    service = target->service;
+    if(!service)
+    {
+        service = payload->service;
+    }
+    uri = getPayloadUri(target);
+    if(!uri)
+    {
+        return false;
+    }
+    ret = patchUriFromServiceAsync(service, uri, payload, options, callback, context);
+    free(uri);
+    return ret;
+}
+
+bool postPayloadAsync(redfishPayload* target, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    char* uri;
+    bool ret;
+    redfishService* service;
+
+    if(!target || !payload)
+    {
+        return false;
+    }
+    service = target->service;
+    if(!service)
+    {
+        service = payload->service;
+    }
+    uri = getPayloadUri(target);
+    if(!uri)
+    {
+        return false;
+    }
+    ret = postUriFromServiceAsync(service, uri, payload, options, callback, context);
+    free(uri);
+    return ret;
+}
+
+bool deletePayloadAsync(redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    char* uri;
+    bool ret;
+
+    if(!payload)
+    {
+        return false;
+    }
+    uri = getPayloadUri(payload);
+    if(!uri)
+    {
+        return false;
+    }
+    ret = deleteUriFromServiceAsync(payload->service, uri, options, callback, context);
+    free(uri);
+    return ret;
+}
+
 static redfishPayload* getOpResult(redfishPayload* payload, const char* propName, const char* op, const char* value)
 {
     const char* propStr;
