@@ -91,5 +91,14 @@ REDFISH_EXPORT redfishHealth getResourceRollupHealth(redfishPayload* payload);
  * @see redfishState
  */
 REDFISH_EXPORT redfishState getResourceState(redfishPayload* payload);
+/**
+ * @brief Get the Name of the payload.
+ *
+ * Get the Name string of the Redfish Payload
+ *
+ * @param payload The payload to get the state of
+ * @return The Name string or NULL on failure.
+ */
+REDFISH_EXPORT char* getResourceName(redfishPayload* payload);
 
 #endif
