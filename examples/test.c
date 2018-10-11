@@ -61,11 +61,13 @@ typedef struct {
 static void getHealth(redfishPayload* payload);
 static void getRollup(redfishPayload* payload);
 static void getState(redfishPayload* payload);
+static void getName(redfishPayload* payload);
 
 static commandMapping commands[] = {
     {"getHealth", getHealth},
     {"getRollup", getRollup},
     {"getState", getState},
+    {"getName", getName},
     {NULL, NULL}
 };
 
@@ -605,6 +607,24 @@ static void getState(redfishPayload* payload)
             break;
     }
     printf("Resource state is %s (%d)\n", stateStr, state);
+}
+
+static void getName(redfishPayload* payload)
+{
+    char* name;
+    if(payload == NULL)
+    {
+        fprintf(stderr, "Payload is NULL!\n");
+        return;
+    }
+    name = getResourceName(payload);
+    if(name == NULL)
+    {
+        fprintf(stderr, "Name is NULL!\n");
+        return;
+    }
+    printf("Name is \"%s\"\n", name);
+    free(name);
 }
 
 /* vim: set tabstop=4 shiftwidth=4 expandtab: */
