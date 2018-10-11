@@ -119,6 +119,10 @@ static redfishHealth _getResourceHealth(redfishPayload* payload, const char* sub
     redfishPayload* health;
     char* healthStr;
 
+#ifndef _DEBUG
+    (void)function;
+#endif
+
     if(payload == NULL)
     {
         REDFISH_DEBUG_WARNING_PRINT("%s: Payload is NULL\n", function);

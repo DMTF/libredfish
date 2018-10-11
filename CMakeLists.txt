@@ -42,5 +42,5 @@ endif()
 ENABLE_TESTING()
 
 if(CMAKE_COMPILER_IS_GNUCC)
-    add_definitions(-Wall -Wextra -Wdeclaration-after-statement -ggdb3)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wdeclaration-after-statement -ggdb3")
 endif()
