@@ -560,6 +560,30 @@ char* payloadToString(redfishPayload* payload, bool prettyPrint)
     return json_dumps(payload->json, flags);
 }
 
+static char* getStringTill(const char* string, const char* terminator, char** retEnd)
+{
+    char* ret;
+    char* end;
+    end = strstr((char*)string, terminator);
+    if(retEnd)
+    {
+        *retEnd = end;
+    }
+    if(end == NULL)
+    {
+        //No terminator
+#ifdef _MSC_VER
+		return _strdup(string);
+#else
+        return strdup(string);
+#endif
+    }
+    ret = (char*)malloc((end-string)+1);
+    memcpy(ret, string, (end-string));
+    ret[(end-string)] = 0;
+    return ret;
+}
+
 bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
 {
     json_t* value;
@@ -572,6 +596,8 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
     size_t i;
     size_t size;
     redfishPayload* retPayload;
+    char* tmpStr;
+    char* tmpStr2;
 
     if(!payload || !nodeName)
     {
@@ -633,6 +659,16 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
             {
                 json_decref(value);
                 value = NULL;
+            }
+        }
+        else if(strchr(nodeName, '.'))
+        {
+            tmpStr = getStringTill(nodeName, ".", &tmpStr2);
+            value = json_object_get(payload->json, tmpStr);
+            free(tmpStr);
+            if(value)
+            {
+                value = json_object_get(value, tmpStr2+1);
             }
         }
         if(value == NULL)
@@ -895,7 +931,12 @@ static bool intCompareOpResult(long long int1, long long int2, RedPathOp op)
 
 static bool stringCompareOpResult(const char* str1, const char* str2, RedPathOp op)
 {
-    int tmp = strcmp(str1, str2);
+    int tmp;
+    if(op == REDPATH_OP_EXISTS)
+    {
+        return (str1 != NULL);
+    }
+    tmp = strcmp(str1, str2);
     return intCompareOpResult(tmp, 0, op);
 }
 
