@@ -37,6 +37,7 @@ libRedfish uses a query language based on XPath (https://www.w3.org/TR/1999/REC-
 | [*name*>=*value*] | Selects all the elements from an array or object where the property "name" is greater than or equal to "value" |
 | [*name*!=*value*] | Selects all the elements from an array or object where the property "name" does not equal "value"              |
 | [*]               | Selects all the elements from an array or object                                                               |
+| [*node*.*child*]  | Selects all the elements from an array or object that contain a property named "node" which contains "child"   |
 
 Some examples:
 
@@ -45,6 +46,8 @@ Some examples:
 * /Systems[Storage] - Will return all the System instances that have Storage field populated
 * /Systems[*] - Will return all the System instances
 * /SessionService/Sessions[last()] - Will return the last Session instance
+* /Chassis[Location.Info] - Will return all the Chassis instances that have a Location field and a Info subfield of Location
+* /Systems[Status.Health=OK] - Will return all System instances that have a Health of OK
 
 ## C Example
 
