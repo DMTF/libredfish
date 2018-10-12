@@ -80,10 +80,6 @@ void cleanupRedPath(redPathNode* node)
     {
         free(node->nodeName);
     }
-    if(node->op)
-    {
-        free(node->op);
-    }
     if(node->propName)
     {
         free(node->propName);
@@ -132,24 +128,16 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
         node->next->isIndex = true;
         return;
     }
-    opChars = strpbrk(index, "<>=");
+    opChars = strpbrk(index, "<>=!");
     if(opChars == NULL && index[0] == '*')
     {
-#ifdef _MSC_VER
-		node->next->op = _strdup("any");
-#else
-        node->next->op = strdup("any");
-#endif
+        node->next->op = REDPATH_OP_ANY;
         return;
     }
     else if(opChars == NULL)
     {
         //TODO handle last() and position()
-#ifdef _MSC_VER
-		node->next->op = _strdup("exists");
-#else
-        node->next->op = strdup("exists");
-#endif
+        node->next->op = REDPATH_OP_EXISTS;
         node->next->propName = index;
         return;
     }
@@ -157,20 +145,49 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
     memcpy(node->next->propName, index, (opChars - index));
     node->next->propName[(opChars - index)] = 0;
 
-    tmpIndex = 1;
-    while(1)
+    switch(opChars[0])
     {
-        if(opChars[tmpIndex] == '=' || opChars[tmpIndex] == '<' || opChars[tmpIndex] == '>')
-        {
-            tmpIndex++;
-            continue;
-        }
-        break;
+        case '=':
+            tmpIndex = 1;
+            node->next->op = REDPATH_OP_EQUAL;
+            break;
+        case '<':
+            if(opChars[1] == '=')
+            {
+                node->next->op = REDPATH_OP_LESS_EQUAL;
+                tmpIndex = 2;
+            }
+            else
+            {
+                node->next->op = REDPATH_OP_LESS;
+                tmpIndex = 1;
+            }
+            break;
+        case '>':
+            if(opChars[1] == '=')
+            {
+                node->next->op = REDPATH_OP_GREATER_EQUAL;
+                tmpIndex = 2;
+            }
+            else
+            {
+                node->next->op = REDPATH_OP_GREATER;
+                tmpIndex = 1;
+            }
+            break;
+        case '!':
+            if(opChars[1] != '=')
+            {
+                node->next->op = REDPATH_OP_ERROR;
+                return;
+            }
+            tmpIndex = 2;
+            node->next->op = REDPATH_OP_NOTEQUAL;
+            break;
+        default:
+            node->next->op = REDPATH_OP_ERROR;
+            return;
     }
-
-    node->next->op = (char*)malloc(tmpIndex+1);
-    memcpy(node->next->op, opChars, tmpIndex);
-    node->next->op[tmpIndex] = 0;
 
 #ifdef _MSC_VER
 	node->next->value = _strdup(opChars + tmpIndex);

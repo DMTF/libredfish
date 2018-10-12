@@ -17,6 +17,19 @@
 #define _REDPATH_H_
 #include <stdbool.h>
 
+typedef enum {
+    REDPATH_OP_EQUAL=0,
+    REDPATH_OP_NOTEQUAL,
+    REDPATH_OP_LESS,
+    REDPATH_OP_GREATER,
+    REDPATH_OP_LESS_EQUAL,
+    REDPATH_OP_GREATER_EQUAL,
+    REDPATH_OP_EXISTS,
+    REDPATH_OP_ANY,
+
+    REDPATH_OP_ERROR
+} RedPathOp;
+
 /**
  * @brief A redpath node.
  *
@@ -36,7 +49,7 @@ typedef struct _redPathNode
     /** The index requested. Only valid if isIndex is true **/
     size_t index;
     /** The operation to perform **/
-    char* op;
+    RedPathOp op;
     /** The property to perform the operation on **/
     char* propName;
     /** The value of the operation **/
