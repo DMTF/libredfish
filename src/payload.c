@@ -952,6 +952,19 @@ static redfishPayload* getOpResult(redfishPayload* payload, const char* propName
                 ret = (intPropVal >= intVal);
             }
             break;
+        case JSON_NULL:
+            if(strcmp(op, "=") == 0)
+            {
+                if(value == NULL)
+                {
+                    ret = true;
+                }
+                else
+                {
+                    ret = (strcasecmp(value, "null") == 0);
+                }
+            }
+            break;
         default:
             break;
     }
@@ -1065,6 +1078,19 @@ static void opGotPayloadByNodeNameAsync(bool success, unsigned short httpCode, r
             else if(strcmp(myContext->op, ">=") == 0)
             {
                 ret = (intPropVal >= intVal);
+            }
+            break;
+        case JSON_NULL:
+            if(strcmp(myContext->op, "=") == 0)
+            {
+                if(myContext->value == NULL)
+                {
+                    ret = true;
+                }
+                else
+                {
+                    ret = (strcasecmp(myContext->value, "null") == 0);
+                }
             }
             break;
         default:
