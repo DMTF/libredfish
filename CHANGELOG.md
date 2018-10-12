@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.1.0] - 2018-10-12
+- Fixed crash due to null passed to strdup
+- Added Payload PATCH/POST/DELETE helper functions
+- Added getResourceName function
+
 ## [1.0.9] - 2018-10-05
 - Various fixes for memory management
 - Allow paths inside of collections
