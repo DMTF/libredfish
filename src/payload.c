@@ -584,6 +584,23 @@ static char* getStringTill(const char* string, const char* terminator, char** re
     return ret;
 }
 
+static json_t* getEmbeddedJsonField(json_t* parent, const char* nodeName)
+{
+    json_t* ret;
+    char* tmpStr;
+    char* tmpStr2;
+
+    tmpStr = getStringTill(nodeName, ".", &tmpStr2);
+    ret = json_object_get(parent, tmpStr);
+    free(tmpStr);
+    if(tmpStr2 != NULL)
+    {
+        //Keep going...
+        return getEmbeddedJsonField(ret, tmpStr2+1);
+    }
+    return ret;
+}
+
 bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
 {
     json_t* value;
@@ -596,8 +613,6 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
     size_t i;
     size_t size;
     redfishPayload* retPayload;
-    char* tmpStr;
-    char* tmpStr2;
 
     if(!payload || !nodeName)
     {
@@ -663,13 +678,7 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
         }
         else if(strchr(nodeName, '.'))
         {
-            tmpStr = getStringTill(nodeName, ".", &tmpStr2);
-            value = json_object_get(payload->json, tmpStr);
-            free(tmpStr);
-            if(value)
-            {
-                value = json_object_get(value, tmpStr2+1);
-            }
+            value = getEmbeddedJsonField(payload->json, nodeName);
         }
         if(value == NULL)
         {
@@ -945,31 +954,48 @@ static bool getSimpleOpResult(json_t* json, const char* propName, RedPathOp op, 
     json_t* stringProp;
     const char* propStr;
     long long intVal, intPropVal;
+    bool ret;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. json = %p, propName = %s, op = %u, value = %s\n", __FUNCTION__, json, propName, op, value);
 
     switch(json_typeof(json))
     {
         case JSON_OBJECT:
-            stringProp = json_object_get(json, propName);
+            if(op == REDPATH_OP_EXISTS)
+            {
+                ret = (json != NULL);
+                break;
+            }
+            stringProp = json_object_get(json, propName); 
         case JSON_STRING:
             propStr = json_string_value(stringProp);
             if(propStr == NULL)
             {
-                return false;
+                ret = false;
+                break;
             }
-            return stringCompareOpResult(propStr, value, op);
+            ret = stringCompareOpResult(propStr, value, op);
+            break;
         case JSON_TRUE:
-            return stringCompareOpResult(value, "true", op);
+            ret = stringCompareOpResult(value, "true", op);
+            break;
         case JSON_FALSE:
-            return stringCompareOpResult(value, "false", op);
+            ret = stringCompareOpResult(value, "false", op);
+            break;
         case JSON_INTEGER:
             intPropVal = json_integer_value(json);
             intVal = strtoll(value, NULL, 0);
-            return intCompareOpResult(intPropVal, intVal, op);
+            ret = intCompareOpResult(intPropVal, intVal, op);
+            break;
         case JSON_NULL:
-            return stringCompareOpResult(value, "null", op);
+            ret = stringCompareOpResult(value, "null", op);
+            break;
         default:
-            return false;
+            ret = false;
+            break;
     }
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. %u\n", __FUNCTION__, ret);
+    return ret;
 }
 
 static redfishPayload* getOpResult(redfishPayload* payload, const char* propName, RedPathOp op, const char* value)
