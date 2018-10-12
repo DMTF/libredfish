@@ -136,9 +136,16 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
     }
     else if(opChars == NULL)
     {
-        //TODO handle last() and position()
-        node->next->op = REDPATH_OP_EXISTS;
-        node->next->propName = index;
+        if(strncmp(index, "last()", 6) == 0)
+        {
+            node->next->op = REDPATH_OP_LAST;
+        }
+        else
+        {
+            //TODO handle position()
+            node->next->op = REDPATH_OP_EXISTS;
+            node->next->propName = index;
+        }
         return;
     }
     node->next->propName = (char*)malloc((opChars - index)+1);

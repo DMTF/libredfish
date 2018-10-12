@@ -1029,7 +1029,7 @@ static bool getOpResultAsync(redfishPayload* payload, const char* propName, RedP
     {
         return arrayEvalOpAsync(payload, propName, op, value, options, callback, context);
     }
-    if(op == REDPATH_OP_ANY)
+    if(op == REDPATH_OP_ANY || op == REDPATH_OP_LAST)
     {
         callback(true, 200, payload, context);
         return true;
@@ -1195,21 +1195,21 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
     {
         return false;
     }
-    myContext->callback = callback;
-    myContext->originalContext = context;
-    myContext->options = options;
-    myContext->propName = safeStrdup(propName);
-    myContext->op = op;
-    myContext->value = safeStrdup(value);
-    myContext->count = max;
-    myContext->left = max;
-    myContext->validCount = 0;
-    myContext->payloads = calloc(sizeof(redfishPayload*), max);
     /*Technically getPayloadByIndex would do this, but this optimizes things*/
     members = getPayloadByNodeName(payload, "Members");
-    for(i = 0; i < max; i++)
+    if(op == REDPATH_OP_LAST)
     {
-        ret = getPayloadByIndexAsync(members, i, options, opGotPayloadByIndexAsync, myContext);
+        myContext->callback = callback;
+        myContext->originalContext = context;
+        myContext->options = options;
+        myContext->propName = safeStrdup(propName);
+        myContext->op = op;
+        myContext->value = safeStrdup(value);
+        myContext->count = 1;
+        myContext->left = 1;
+        myContext->validCount = 0;
+        myContext->payloads = calloc(sizeof(redfishPayload*), 1);
+        ret = getPayloadByIndexAsync(members, max-1, options, opGotPayloadByIndexAsync, myContext);
         if(ret == false)
         {
             myContext->left--;
@@ -1217,6 +1217,31 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
         else
         {
             anyWork = true;
+        }
+    }
+    else
+    {
+        myContext->callback = callback;
+        myContext->originalContext = context;
+        myContext->options = options;
+        myContext->propName = safeStrdup(propName);
+        myContext->op = op;
+        myContext->value = safeStrdup(value);
+        myContext->count = max;
+        myContext->left = max;
+        myContext->validCount = 0;
+        myContext->payloads = calloc(sizeof(redfishPayload*), max); 
+        for(i = 0; i < max; i++)
+        {
+            ret = getPayloadByIndexAsync(members, i, options, opGotPayloadByIndexAsync, myContext);
+            if(ret == false)
+            {
+                myContext->left--;
+            }
+            else
+            {
+                anyWork = true;
+            }
         }
     }
     cleanupPayload(members);

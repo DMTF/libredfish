@@ -26,6 +26,7 @@ typedef enum {
     REDPATH_OP_GREATER_EQUAL,
     REDPATH_OP_EXISTS,
     REDPATH_OP_ANY,
+    REDPATH_OP_LAST,
 
     REDPATH_OP_ERROR
 } RedPathOp;
