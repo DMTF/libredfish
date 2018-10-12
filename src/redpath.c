@@ -105,6 +105,12 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
     size_t tmpIndex;
     char* opChars;
 
+    if(strcmp(nodeName, "*") == 0)
+    {
+        node->op = REDPATH_OP_ANY;
+        *end = node;
+        return;
+    }
     node->nodeName = nodeName;
     if(indexStart == NULL)
     {
