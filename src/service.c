@@ -177,6 +177,7 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     if(context->data)
     {
         json = context->data->json;
+        serviceDecRef(context->data->service);
         free(context->data);
     }
     else
@@ -184,6 +185,7 @@ json_t* getUriFromService(redfishService* service, const char* uri)
         json = NULL;
     }
     cleanupAsyncToSyncContext(context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. json = %p\n", __FUNCTION__, json);
     return json;
 }
 
@@ -215,6 +217,7 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     if(context->data)
     {
         json = context->data->json;
+        serviceDecRef(context->data->service);
         free(context->data);
     }
     else
@@ -254,6 +257,7 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     if(context->data)
     {
         json = context->data->json;
+        serviceDecRef(context->data->service);
         free(context->data);
     }
     else
@@ -399,11 +403,14 @@ bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsy
     rawAsyncCallbackContextWrapper* myContext;
     bool ret;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, options = %p, callback = %p, context = %p\n", __FUNCTION__, service, uri, options, callback, context);
+
     serviceIncRef(service);
 
     url = makeUrlForService(service, uri);
     if(!url)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not make url for uri %s\n", __FUNCTION__, uri);
         serviceDecRef(service);
         return NULL;
     }
@@ -422,6 +429,7 @@ bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsy
     {
         free(myContext);
     }
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. ret = %u\n", __FUNCTION__, ret);
     return ret;
 }
 
@@ -826,6 +834,7 @@ void serviceIncRef(redfishService* service)
 #else
     __sync_fetch_and_add(&(service->refCount), 1);
 #endif
+    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __FUNCTION__, service->refCount);
 }
 
 void terminateAsyncThread(redfishService* service);
@@ -870,6 +879,7 @@ void serviceDecRef(redfishService* service)
 #else
     __sync_fetch_and_sub(&(service->refCount), 1);
 #endif
+    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __FUNCTION__, service->refCount);
     if(service->refCount == 0)
     {
         freeServicePtr(service);
@@ -1049,19 +1059,22 @@ static json_t* getVersions(redfishService* service, const char* rootUri)
 {
     json_t* data;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, rootUri = %s\n", __FUNCTION__, service, rootUri);
+
     if(service->flags & REDFISH_FLAG_SERVICE_NO_VERSION_DOC)
     {
         service->versions = json_object();
         if(service->versions == NULL)
         {
+            REDFISH_DEBUG_ERR_PRINT("%s: Error. Unable to allocate simple json object!\n", __FUNCTION__);
             return NULL;
         }
         addStringToJsonObject(service->versions, "v1", "/redfish/v1");
-        return service->versions;
+        data = service->versions;
     }
-    if(rootUri != NULL)
+    else if(rootUri != NULL)
     {
-        return getUriFromService(service, rootUri);
+        data = getUriFromService(service, rootUri);
     }
     else
     {
@@ -1071,8 +1084,9 @@ static json_t* getVersions(redfishService* service, const char* rootUri)
             //Some redfish services don't respond here, but do respond at /redfish/
             data = getUriFromService(service, "/redfish/");
         }
-        return data;
     }
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exited. data = %p\n", __FUNCTION__, data);
+    return data;
 }
 
 #if CZMQ_VERSION_MAJOR >= 3
