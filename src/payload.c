@@ -1190,7 +1190,7 @@ static void opFinishByIndexTransaction(redpathAsyncOpContext* myContext)
     {
         returnValue = NULL;
     }
-    else if(myContext->validCount == 1)
+    else if(myContext->validCount == 1 && myContext->op != REDPATH_OP_ANY)
     {
         returnValue = myContext->payloads[0];
     }
