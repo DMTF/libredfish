@@ -206,6 +206,7 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     }
     payload = createRedfishPayloadFromString(content, service);
     tmp = patchUriFromServiceAsync(service, uri, payload, NULL, asyncToSyncConverter, context);
+    cleanupPayload(payload);
     if(tmp == false)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
@@ -439,6 +440,8 @@ bool patchUriFromServiceAsync(redfishService* service, const char* uri, redfishP
     asyncHttpRequest* request;
     rawAsyncCallbackContextWrapper* myContext;
     bool ret;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, payload = %p\n", __FUNCTION__, service, uri, payload);
 
     serviceIncRef(service);
 

@@ -207,13 +207,31 @@ typedef struct
     commandMapping* command;
 } gotPayloadContext;
 
+void patchDone(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    gotPayloadContext* myContext = context;
+
+    printf("PATCH to %s: %s\n", myContext->query, (success?"Success":"Failed!"));
+    printPayload(payload);
+    cleanupPayload(payload);
+}
+
+void postDone(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    gotPayloadContext* myContext = context;
+
+    printf("POST to %s: %s\n", myContext->query, (success?"Success":"Failed!"));
+    printPayload(payload);
+    cleanupPayload(payload);
+}
+
 void gotPayload(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
 {
     gotPayloadContext* myContext = context;
-    redfishPayload*  res;
+    bool             res;
     redfishPayload*  post;
-    bool             deleteRes;
-    char*            contents; 
+    char*            contents;
+    char             tmp[1024];
 
     if(success == false)
     {
@@ -233,22 +251,29 @@ void gotPayload(bool success, unsigned short httpCode, redfishPayload* payload, 
             case 0:
             default:
                 printPayload(payload);
+                free(context);
                 break;
             case 1:
                 if(myContext->leaf && optind < myContext->argc)
                 {
-                    res = patchPayloadStringProperty(payload, myContext->leaf, myContext->argv[optind]);
-                    printf("PATCH to %s: %s\n", myContext->query, (res?"Success":"Failed!"));
-                    printPayload(res);
-                    cleanupPayload(res);
+                    snprintf(tmp, sizeof(tmp), "{\"%s\": \"%s\"}", myContext->leaf, myContext->argv[optind]);
+                    post = createRedfishPayloadFromString(tmp, myContext->redfish);
+                    res = patchPayloadAsync(payload, post, NULL, patchDone, context);
+                    cleanupPayload(post);
+                    if(res == false)
+                    {
+                        fprintf(stderr, "Unable to invoke async PATCH!\n");
+                    }
                 }
                 else if(myContext->leaf)
                 {
                     fprintf(stderr, "Missing value for PATCH!\n");
+                    free(context);
                 }
                 else
                 {
                     fprintf(stderr, "Missing property for PATCH!\n");
+                    free(context);
                 }
                 break;
             case 2:
@@ -262,10 +287,12 @@ void gotPayload(bool success, unsigned short httpCode, redfishPayload* payload, 
                     if(contents)
                     {
                         post = createRedfishPayloadFromString(contents, myContext->redfish);
-                        res = postPayload(payload, post);
+                        res = postPayloadAsync(payload, post, NULL, postDone, context);
                         cleanupPayload(post);
-                        printf("POST to %s: %s\n", myContext->query, (res?"Success":"Failed!"));
-                        cleanupPayload(res);
+                        if(res == false)
+                        {
+                            fprintf(stderr, "Unable to invoke async POST!\n");
+                        }
                         free(contents);
                     }
                     else
@@ -275,13 +302,13 @@ void gotPayload(bool success, unsigned short httpCode, redfishPayload* payload, 
                 }
                 break;
             case 3:
-                deleteRes = deletePayload(payload);
-                printf("DELETE to %s: %s\n", myContext->query, (deleteRes?"Success":"Failed!"));
+                res = deletePayload(payload);
+                printf("DELETE to %s: %s\n", myContext->query, (res?"Success":"Failed!"));
+                free(context);
                 break;
         }
         cleanupPayload(payload);
     }
-    free(context);
 }
 
 static commandMapping* getCommandByString(const char* name)
