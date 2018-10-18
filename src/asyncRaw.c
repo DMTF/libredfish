@@ -305,6 +305,7 @@ threadRet rawAsyncWorkThread(void* data)
                 break;
             case PATCH:
                 curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PATCH");
+                curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
                 break;
         }
         curl_easy_setopt(curl, CURLOPT_URL, workItem->request->url);
