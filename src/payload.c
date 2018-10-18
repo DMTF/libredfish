@@ -1001,6 +1001,8 @@ static void opGotPayloadByNodeNameAsync(bool success, unsigned short httpCode, r
     const char* propStr;
     long long intVal, intPropVal;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+
     if(success == false || httpCode >= 400 || payload == NULL)
     {
         myContext->callback(success, httpCode, payload, myContext->originalContext);
@@ -1077,7 +1079,8 @@ static void opGotPayloadByNodeNameAsync(bool success, unsigned short httpCode, r
     }
     else
     {
-        myContext->callback(ret, 0xFFFF, NULL, myContext->originalContext);
+        //Send the payload, that allows the callback to clean it up if needed
+        myContext->callback(ret, 0xFFFF, myContext->payload, myContext->originalContext);
     }
     free(myContext->propName);
     free(myContext->op);
@@ -1213,9 +1216,15 @@ static void opGotResultAsync(bool success, unsigned short httpCode, redfishPaylo
 {
     redpathAsyncOpContext* myContext = (redpathAsyncOpContext*)context;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+
     if(success == true && httpCode < 300 && payload != NULL)
     {
         myContext->payloads[myContext->validCount++] = payload;
+    }
+    else if(payload)
+    {
+        cleanupPayload(payload);
     }
 
     myContext->left--;
@@ -1230,6 +1239,8 @@ static void opGotPayloadByIndexAsync(bool success, unsigned short httpCode, redf
     redpathAsyncOpContext* myContext = (redpathAsyncOpContext*)context;
     bool ret;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+
     if(success == true && httpCode < 300 && payload != NULL)
     {
         ret = getOpResultAsync(payload, myContext->propName, myContext->op, myContext->value, myContext->options, opGotResultAsync, myContext);
@@ -1242,6 +1253,10 @@ static void opGotPayloadByIndexAsync(bool success, unsigned short httpCode, redf
     if(myContext->left == 0)
     {
         opFinishByIndexTransaction(myContext);
+    }
+    if(payload)
+    {
+        cleanupPayload(payload);
     }
 }
 
