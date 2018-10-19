@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.1.1] - 2018-10-19
+- Added support for != and null operators
+- Fixed reference count with several synchronous calls
+
 ## [1.1.0] - 2018-10-12
 - Fixed crash due to null passed to strdup
 - Added Payload PATCH/POST/DELETE helper functions
