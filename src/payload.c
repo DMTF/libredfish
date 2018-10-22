@@ -958,6 +958,12 @@ static bool getSimpleOpResult(json_t* json, const char* propName, RedPathOp op, 
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. json = %p, propName = %s, op = %u, value = %s\n", __FUNCTION__, json, propName, op, value);
 
+    if(json == NULL)
+    {
+        REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. Null JSON\n", __FUNCTION__);
+        return false;
+    }
+
     switch(json_typeof(json))
     {
         case JSON_OBJECT:
