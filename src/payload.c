@@ -951,7 +951,7 @@ static bool stringCompareOpResult(const char* str1, const char* str2, RedPathOp 
 
 static bool getSimpleOpResult(json_t* json, const char* propName, RedPathOp op, const char* value)
 {
-    json_t* stringProp;
+    json_t* stringProp = json;
     const char* propStr;
     long long intVal, intPropVal;
     bool ret;
