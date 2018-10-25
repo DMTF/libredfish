@@ -109,6 +109,7 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
     {
         node->op = REDPATH_OP_ANY;
         *end = node;
+        free(nodeName);
         return;
     }
     node->nodeName = nodeName;
