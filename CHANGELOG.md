@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.1.2] - 2018-10-26
+- Minor compiler warning fixes
+
 ## [1.1.1] - 2018-10-19
 - Added support for != and null operators
 - Fixed reference count with several synchronous calls
