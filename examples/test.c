@@ -211,7 +211,7 @@ void patchDone(bool success, unsigned short httpCode, redfishPayload* payload, v
 {
     gotPayloadContext* myContext = context;
 
-    printf("PATCH to %s: %s\n", myContext->query, (success?"Success":"Failed!"));
+    printf("PATCH to %s: %s (%u)\n", myContext->query, (success?"Success":"Failed!"), httpCode);
     printPayload(payload);
     cleanupPayload(payload);
 }
@@ -220,7 +220,7 @@ void postDone(bool success, unsigned short httpCode, redfishPayload* payload, vo
 {
     gotPayloadContext* myContext = context;
 
-    printf("POST to %s: %s\n", myContext->query, (success?"Success":"Failed!"));
+    printf("POST to %s: %s (%u)\n", myContext->query, (success?"Success":"Failed!"), httpCode);
     printPayload(payload);
     cleanupPayload(payload);
 }
