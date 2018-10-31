@@ -258,7 +258,7 @@ REDFISH_EXPORT void            cleanupPayload(redfishPayload* payload);
  * @brief Obtain the node in the payload identified by the specified nodeName
  *
  * Obtain the node in the payload identified by the specified nodeName. If the node in question is a navigation property to another URI then the 
- * content of that URI will be obtained asynchronously.
+ * content of that URI will be obtained asynchronously. It is the callback's responsibility to free the returned payload.
  *
  * @param payload The payload to get the child node of
  * @param nodeName The name of the node to obtain
@@ -268,6 +268,7 @@ REDFISH_EXPORT void            cleanupPayload(redfishPayload* payload);
  * @return True if the request could start. False otherwise.
  * @see getPayloadByNodeNameAsync
  * @see getPayloadByNodeName
+ * @see cleanupPayload
  */
 REDFISH_EXPORT bool            getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 /**
@@ -279,6 +280,7 @@ REDFISH_EXPORT bool            getPayloadByNodeNameAsync(redfishPayload* payload
  * - If the payload is an object it will be the element at the Nth key in the object.
  * - If the payload is any other type it will return NULL.
  * - If the element obtained is a navigation property to another URI then the content of that URI will be obtained asynchronously.
+ * It is the callback's responsibility to free the returned payload.
  *
  * @param payload The payload to get the child node of
  * @param index The index of the payload to obtain
@@ -287,12 +289,13 @@ REDFISH_EXPORT bool            getPayloadByNodeNameAsync(redfishPayload* payload
  * @param context An opaque data pointer to send to the callback
  * @return True if the request could start. False otherwise.
  * @see getPayloadByIndex
+ * @see cleanupPayload
  */
 REDFISH_EXPORT bool            getPayloadByIndexAsync(redfishPayload* payload, size_t index, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 /**
  * @brief Obtain the child payload according to Redpath
  *
- * Obtain a child node identified by redpath asynchronously.
+ * Obtain a child node identified by redpath asynchronously. It is the callback's responsibility to free the returned payload.
  *
  * @param payload The payload to get the child node of
  * @param redpath The parsed redpath to use to obtain the child
@@ -301,12 +304,13 @@ REDFISH_EXPORT bool            getPayloadByIndexAsync(redfishPayload* payload, s
  * @param context An opaque data pointer to send to the callback
  * @return True if the request could start. False otherwise.
  * @see getPayloadForPath
+ * @see cleanupPayload
  */
 REDFISH_EXPORT bool            getPayloadForPathAsync(redfishPayload* payload, redPathNode* redpath, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 /**
  * @brief Obtain the child payload according to Redpath string
  *
- * Parse the redpath string and obtain a child node identified by redpath asynchronously.
+ * Parse the redpath string and obtain a child node identified by redpath asynchronously. It is the callback's responsibility to free the returned payload.
  *
  * @param payload The payload to get the child node of
  * @param string The string redpath to use to obtain the child
@@ -315,35 +319,39 @@ REDFISH_EXPORT bool            getPayloadForPathAsync(redfishPayload* payload, r
  * @param context An opaque data pointer to send to the callback
  * @return True if the request could start. False otherwise.
  * @see getPayloadForPathString
+ * @see cleanupPayload
  */
 REDFISH_EXPORT bool            getPayloadForPathStringAsync(redfishPayload* payload, const char* string, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 /**
  * @brief PATCH a payload to the URI reresented by a target asynchronously.
  *
- * Asynchronously PATCH a payload to the URI the target was obtained from.
+ * Asynchronously PATCH a payload to the URI the target was obtained from. It is the callback's responsibility to free the returned payload.
  *
  * @param target The payload to update
  * @param payload The payload to patch
  * @return NULL if failure, the resulting redfishPayload on success. 
+ * @see cleanupPayload
  */
 REDFISH_EXPORT bool            patchPayloadAsync(redfishPayload* target, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 /**
  * @brief POST a new payload to the URI reresented by a target asynchronously.
  *
- * Asynchronously POST a new payload to the URI the target was obtained from.
+ * Asynchronously POST a new payload to the URI the target was obtained from. It is the callback's responsibility to free the returned payload.
  *
  * @param target The payload to update
  * @param payload The payload to write
  * @return NULL if failure, the resulting redfishPayload on success. 
+ * @see cleanupPayload
  */
 REDFISH_EXPORT bool            postPayloadAsync(redfishPayload* target, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 /**
  * @brief DELETE a redfish payload asynchronously
  *
- * Asynchronously send a DELETE operation to the URI the payload was obtained from.
+ * Asynchronously send a DELETE operation to the URI the payload was obtained from. It is the callback's responsibility to free the returned payload.
  *
  * @param payload The payload to delete
  * @return False if failure, true on success. 
+ * @see cleanupPayload
  */
 REDFISH_EXPORT bool            deletePayloadAsync(redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 
