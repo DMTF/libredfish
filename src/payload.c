@@ -97,6 +97,11 @@ bool isPayloadCollection(redfishPayload* payload)
     }
     members = json_object_get(payload->json, "Members");
     count = json_object_get(payload->json, "Members@odata.count");
+    if(count != NULL)
+    {
+        //Workaround bug in some implementations where they have a count of 0 and no Members element
+        return true;
+    }
     return ((members != NULL) && (count != NULL));
 }
 
