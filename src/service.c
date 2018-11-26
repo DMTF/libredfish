@@ -138,6 +138,19 @@ static void cleanupAsyncToSyncContext(asyncToSyncContext* context)
     free(context);
 }
 
+static bool isOnAsyncThread(redfishService* service)
+{
+    if(service == NULL)
+    {
+        return false;
+    }
+#ifdef _MSC_VER
+    return (GetThreadId(service->asyncThread) == GetCurrentThreadId());
+#else
+    return (service->asyncThread == pthread_self());
+#endif
+}
+
 void asyncToSyncConverter(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
 {
     asyncToSyncContext* myContext = (asyncToSyncContext*)context;
@@ -158,6 +171,15 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     bool tmp;
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s\n", __FUNCTION__, service, uri);
+
+    if(isOnAsyncThread(service))
+    {
+#ifdef _DEBUG
+        //Abort a debug build so there is a core file pointing to this function and it's caller
+        abort();
+#endif
+        return NULL;
+    }
 
     context = makeAsyncToSyncContext();
     if(context == NULL)
@@ -197,6 +219,15 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     redfishPayload* payload;
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, content = %s\n", __FUNCTION__, service, uri, content);
+
+    if(isOnAsyncThread(service))
+    {
+#ifdef _DEBUG
+        //Abort a debug build so there is a core file pointing to this function and it's caller
+        abort();
+#endif
+        return NULL;
+    }
 
     context = makeAsyncToSyncContext();
     if(context == NULL)
@@ -238,6 +269,15 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, content = %s\n", __FUNCTION__, service, uri, content);
 
+    if(isOnAsyncThread(service))
+    {
+#ifdef _DEBUG
+        //Abort a debug build so there is a core file pointing to this function and it's caller
+        abort();
+#endif
+        return NULL;
+    }
+
     context = makeAsyncToSyncContext();
     if(context == NULL)
     {
@@ -275,6 +315,15 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     bool tmp;
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s\n", __FUNCTION__, service, uri);
+
+    if(isOnAsyncThread(service))
+    {
+#ifdef _DEBUG
+        //Abort a debug build so there is a core file pointing to this function and it's caller
+        abort();
+#endif
+        return NULL;
+    }
 
     context = makeAsyncToSyncContext();
     if(context == NULL)
