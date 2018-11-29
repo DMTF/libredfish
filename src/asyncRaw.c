@@ -211,6 +211,7 @@ threadRet rawAsyncWorkThread(void* data)
     char headerStr[1024];
     httpHeader* current;
     char* redirect;
+    bool noReuse = false;
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
@@ -308,6 +309,11 @@ threadRet rawAsyncWorkThread(void* data)
                 curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
                 break;
         }
+        if(noReuse)
+        {
+            curl_easy_setopt(curl, CURLOPT_FRESH_CONNECT, 1L);
+            curl_easy_setopt(curl, CURLOPT_FORBID_REUSE, 1L);
+        }
         curl_easy_setopt(curl, CURLOPT_URL, workItem->request->url);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
         res = curl_easy_perform(curl);
@@ -346,6 +352,13 @@ threadRet rawAsyncWorkThread(void* data)
             }
             else
             {
+                //This particular server version does not handle connection reuse correctly, so don't do it on that server
+                current = responseGetHeader(response, "Server");
+                if(current && (strcmp(current->value, "Appweb/4.5.4") == 0))
+                {
+                    noReuse = true;
+                }
+
                 response->connectError = 0;
                 curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response->httpResponseCode);
                 REDFISH_DEBUG_NOTICE_PRINT("%s: Got response for url %s with code %ld\n", __FUNCTION__, workItem->request->url, response->httpResponseCode);
