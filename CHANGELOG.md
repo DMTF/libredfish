@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.1.3] - 2018-11-30
+- Workaround for implementations that do not present the required Members property in resource collections that are empty
+- Error out when sync calls are done on an async callback
+- Workaround for server versions that don't correctly handle Keep-Alive with Redfish
+
 ## [1.1.2] - 2018-10-26
 - Minor compiler warning fixes
 
