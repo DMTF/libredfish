@@ -445,6 +445,7 @@ static void setupRequestFromOptions(asyncHttpRequest* request, redfishService* s
     {
         addRequestHeader(request, "Authorization", service->otherAuth);
     }
+    request->timeout = options->timeout;
 }
 
 bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
