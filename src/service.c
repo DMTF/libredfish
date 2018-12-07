@@ -53,7 +53,8 @@ static zactor_t* eventActor = NULL;
 
 /** Default asynchronous options for Redfish calls **/
 redfishAsyncOptions gDefaultOptions = {
-    .accept = REDFISH_ACCEPT_JSON
+    .accept = REDFISH_ACCEPT_JSON,
+    .timeout = 20
 };
 
 static redfishService* createServiceEnumeratorNoAuth(const char* host, const char* rootUri, bool enumerate, unsigned int flags);

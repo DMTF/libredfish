@@ -231,8 +231,7 @@ threadRet rawAsyncWorkThread(void* data)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteMemory);
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, curlReadMemory);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, asyncHeaderCallback);
-    curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, curlSeekMemory);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 20L);
+    curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, curlSeekMemory); 
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readChunk);
     curl_easy_setopt(curl, CURLOPT_READDATA, &writeChunk);
 
@@ -314,6 +313,7 @@ threadRet rawAsyncWorkThread(void* data)
             curl_easy_setopt(curl, CURLOPT_FRESH_CONNECT, 1L);
             curl_easy_setopt(curl, CURLOPT_FORBID_REUSE, 1L);
         }
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, workItem->request->timeout);
         curl_easy_setopt(curl, CURLOPT_URL, workItem->request->url);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
         res = curl_easy_perform(curl);

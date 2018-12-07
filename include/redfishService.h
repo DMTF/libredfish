@@ -301,6 +301,8 @@ typedef struct
 {
     /** The type of response payload to accept **/
     int accept;
+    /** The timeout for the operation, 0 means never timeout **/
+    unsigned long timeout;
 } redfishAsyncOptions;
 
 /**
