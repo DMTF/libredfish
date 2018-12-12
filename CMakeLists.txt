@@ -34,6 +34,9 @@ endif()
 add_executable(redfishtest "${CMAKE_CURRENT_SOURCE_DIR}/examples/test.c")
 target_link_libraries(redfishtest redfish)
 
+add_executable(redfishtestasync "${CMAKE_CURRENT_SOURCE_DIR}/examples/testAsync.c")
+target_link_libraries(redfishtestasync redfish)
+
 if(CZMQ_FOUND)
   add_executable(redfishevent "${CMAKE_CURRENT_SOURCE_DIR}/httpd/cgi.c")
   target_link_libraries(redfishevent czmq)
