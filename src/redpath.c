@@ -138,6 +138,7 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
     opChars = strpbrk(index, "<>=!");
     if(opChars == NULL && index[0] == '*')
     {
+        free(index);
         node->next->op = REDPATH_OP_ANY;
         return;
     }
@@ -200,6 +201,7 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
             break;
         default:
             node->next->op = REDPATH_OP_ERROR;
+            free(index);
             return;
     }
 
