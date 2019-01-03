@@ -54,6 +54,16 @@ REDFISH_EXPORT redfishPayload* createRedfishPayloadFromString(const char* value,
  * @see cleanupPayload
  */
 REDFISH_EXPORT redfishPayload* createRedfishPayloadFromContent(const char* content, size_t contentLength, const char* contentType, redfishService* service);
+/**
+ * @brief Create a copy of a Redfish Payload
+ *
+ * Create a new redfish payload with the same contents as the original payload
+ *
+ * @param original The original payload data to copy.
+ * @return A new redfish payload structure
+ * @see cleanupPayload
+ */
+REDFISH_EXPORT redfishPayload* copyRedfishPayload(const redfishPayload* original);
 
 /**
  * @brief Is the payload a Redfish Collection?
