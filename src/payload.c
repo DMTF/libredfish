@@ -1102,6 +1102,8 @@ static bool getOpResultAsync(redfishPayload* payload, const char* propName, RedP
     bool ret;
     redpathAsyncOpContext* myContext;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
+
     if(isPayloadCollection(payload))
     {
         return collectionEvalOpAsync(payload, propName, op, value, options, callback, context);
@@ -1277,9 +1279,17 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
     redpathAsyncOpContext* myContext;
     redfishPayload* members;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
+
     max = getCollectionSize(payload);
     if(max == 0)
     {
+        if(op == REDPATH_OP_ANY)
+        {
+            //Return this empty collection for ANY operation
+            callback(true, 200, payload, context);
+            return true;
+        }
         return false;
     }
 
@@ -1407,10 +1417,20 @@ static bool arrayEvalOpAsync(redfishPayload* payload, const char* propName, RedP
     bool ret;
     bool anyWork = false;
     redpathAsyncOpContext* myContext;
+    redfishPayload* tmp;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
 
     max = json_array_size(payload->json);
     if(max == 0)
     {
+        if(op == REDPATH_OP_ANY)
+        {
+            //Return an empty collection for ANY operation
+            tmp = createCollection(payload->service, 0, NULL);
+            callback(true, 200, tmp, context);
+            return true;
+        }
         return false;
     }
 
