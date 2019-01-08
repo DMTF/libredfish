@@ -913,7 +913,10 @@ static void freeServicePtr(redfishService* service)
         service->otherAuth = NULL;
     }
     terminateAsyncThread(service);
-    free(service);
+    if(service->selfTerm == false)
+    {
+        free(service);
+    }
 }
 
 void serviceDecRef(redfishService* service)

@@ -48,6 +48,7 @@ static struct option long_options[] =
     {"verbose",    no_argument,       0,      'v'},
     {"token",      required_argument, 0,      'T'},
     {"command",    required_argument, 0,      'c'},
+    {"valgrind",   no_argument,       0,      'X'},
     {0, 0, 0, 0}
 };
 
@@ -342,10 +343,11 @@ int main(int argc, char** argv)
     enumeratorAuthentication auth;
     gotPayloadContext* context;
     commandMapping* command = NULL;
+    bool valgrind = false;
 
     memset(&auth, 0, sizeof(auth));
 
-    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:", long_options, &opt_index)) != -1)
+    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:X", long_options, &opt_index)) != -1)
     {
         switch(arg)
         {
@@ -413,6 +415,9 @@ int main(int argc, char** argv)
                 break;
             case 'c':
                 command = getCommandByString(optarg);
+                break;
+            case 'X':
+                valgrind = true;
                 break;
         }
     }
@@ -511,6 +516,10 @@ int main(int argc, char** argv)
         getPayloadByPathAsync(redfish, "/", NULL, gotPayload, context);
     }
     serviceDecRefAndWait(redfish);
+    if(valgrind)
+    {
+        sleep(1);
+    }
     safeFree(host);
     safeFree(filename);
     safeFree(token);
