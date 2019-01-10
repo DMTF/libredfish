@@ -657,6 +657,7 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
     size_t i;
     size_t size;
     redfishPayload* retPayload;
+    bool haveUniqReference = false;
 
     if(!payload || !nodeName)
     {
@@ -693,6 +694,10 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
                     json_decref(value);
                     value = NULL;
                 }
+                else
+                {
+                    haveUniqReference = true;
+                }
             }
         }
         else if(isPayloadArray(payload))
@@ -719,6 +724,10 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
                 json_decref(value);
                 value = NULL;
             }
+            else
+            {
+                haveUniqReference = true;
+            }
         }
         else if(strchr(nodeName, '.'))
         {
@@ -736,7 +745,10 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
         free(uri);
         return ret;
     }
-    json_incref(value);
+    if(haveUniqReference == false)
+    {
+        json_incref(value);
+    }
     if(json_is_string(value))
     {
         odataId = json_object();
