@@ -15,6 +15,14 @@ Requires:       jansson
 
 %description
 
+%package        devel
+Summary:        Headers for building apps that use libredfish
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
+
+%description    devel
+This package contains headers required to build applications that use libredfish.
+
 %prep
 %autosetup
 
@@ -25,12 +33,19 @@ make
 %install
 install -d -m755 $RPM_BUILD_ROOT%{_bindir}
 install -d -m755 $RPM_BUILD_ROOT%{_libdir}
+install -d -m755 $RPM_BUILD_ROOT%{_includedir}/%{name}/entities
 install -m755 bin/redfishtest $RPM_BUILD_ROOT%{_bindir}/
 install -m755 lib/libredfish.so $RPM_BUILD_ROOT%{_libdir}/
+install include/*.h $RPM_BUILD_ROOT%{_includedir}/%{name}/
+install include/entities/* $RPM_BUILD_ROOT%{_includedir}/%{name}/entities/
 
 %files
 %{_bindir}/*
 %{_libdir}/*
+
+%files devel
+%defattr(-,root,root,-)
+%{_includedir}/%{name}
 
 %changelog
 
