@@ -108,6 +108,15 @@ bool startRawAsyncRequest(redfishService* service, asyncHttpRequest* request, as
     return true;
 }
 
+thread getThreadId()
+{
+#ifndef _MSC_VER
+    return pthread_self();
+#else
+    return GetCurrentThread();
+#endif
+}
+
 void terminateAsyncThread(redfishService* service)
 {
     asyncWorkItem* workItem;
@@ -126,18 +135,31 @@ void terminateAsyncThread(redfishService* service)
     }
     workItem->term = true;
     queuePush(service->queue, workItem);
-#ifdef _MSC_VER
-    WaitForSingleObject(service->asyncThread, INFINITE);
-#else
-    x = pthread_join(service->asyncThread, NULL);
-    if(x == 35)
+    if(service->asyncThread == getThreadId())
     {
-        //Workaround for valgrind
-        sleep(10);
-    }
+        REDFISH_DEBUG_INFO_PRINT("%s: Async thread self cleanup...\n", __FUNCTION__);
+#ifndef _MSC_VER
+        //Need to set this thread detached and make it clean itself up
+        pthread_detach(pthread_self());
 #endif
-    freeQueue(service->queue);
-    service->queue = NULL;
+        service->selfTerm = true;
+    }
+    else
+    {
+        REDFISH_DEBUG_INFO_PRINT("%s: Async thread other thread cleanup...\n", __FUNCTION__);
+#ifdef _MSC_VER
+        WaitForSingleObject(service->asyncThread, INFINITE);
+#else
+        x = pthread_join(service->asyncThread, NULL);
+        if(x == 35)
+        {
+            //Workaround for valgrind
+            sleep(10);
+        }
+#endif
+        freeQueue(service->queue);
+        service->queue = NULL;
+    }
 }
 
 void freeAsyncRequest(asyncHttpRequest* request)
@@ -200,7 +222,8 @@ struct MemoryStruct
 
 threadRet rawAsyncWorkThread(void* data)
 {
-    queue* q = (queue*)data;
+    redfishService* service = (redfishService*)data;
+    queue* q = service->queue;
     asyncWorkItem* workItem = NULL;
     CURL* curl;
     CURLcode res;
@@ -377,6 +400,12 @@ threadRet rawAsyncWorkThread(void* data)
     safeFree(workItem);
     curl_easy_cleanup(curl);
     curl_global_cleanup(); //Must be called the same number of times as init...
+    if(service->selfTerm)
+    {
+        freeQueue(service->queue);
+        service->queue = NULL;
+        free(service);
+    }
 #ifdef _MSC_VER
     return 0;
 #else
@@ -427,9 +456,9 @@ static void initAsyncThread(redfishService* service)
 static void startAsyncThread(redfishService* service)
 {
 #ifdef _MSC_VER
-    service->asyncThread = CreateThread(NULL, 0, rawAsyncWorkThread, service->queue, 0, NULL);
+    service->asyncThread = CreateThread(NULL, 0, rawAsyncWorkThread, service, 0, NULL);
 #else
-    pthread_create(&(service->asyncThread), NULL, rawAsyncWorkThread, service->queue);
+    pthread_create(&(service->asyncThread), NULL, rawAsyncWorkThread, service);
 #endif
 }
 
