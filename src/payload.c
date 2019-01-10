@@ -1278,6 +1278,7 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
     bool anyWork = false;
     redpathAsyncOpContext* myContext;
     redfishPayload* members;
+    redfishPayload* tmp;
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
 
@@ -1286,8 +1287,9 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
     {
         if(op == REDPATH_OP_ANY)
         {
-            //Return this empty collection for ANY operation
-            callback(true, 200, payload, context);
+            //Return an empty collection for ANY operation
+            tmp = createCollection(payload->service, 0, NULL);
+            callback(true, 200, tmp, context);
             return true;
         }
         return false;
