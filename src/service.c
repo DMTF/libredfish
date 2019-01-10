@@ -292,11 +292,11 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     }
     payload = createRedfishPayloadFromContent(content, contentLength, contentType, service);
     tmp = postUriFromServiceAsync(service, uri, payload, NULL, asyncToSyncConverter, context);
+    cleanupPayload(payload);
     if(tmp == false)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
-        cleanupAsyncToSyncContext(context);
-        cleanupPayload(payload);
+        cleanupAsyncToSyncContext(context); 
         return NULL;
     }
     //Wait for the condition
@@ -312,6 +312,7 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
         json = NULL;
     }
     cleanupAsyncToSyncContext(context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit.\n", __FUNCTION__);
     return json;
 }
 
@@ -395,6 +396,7 @@ static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* res
         freeAsyncResponse(response);
         serviceDecRef(myContext->service);
         free(context);
+        REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. Location Redirect...\n", __FUNCTION__);
         return;
     }
     if(myContext->callback)
@@ -410,6 +412,7 @@ static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* res
     freeAsyncResponse(response);
     serviceDecRef(myContext->service);
     free(context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit.\n", __FUNCTION__);
 }
 
 static void setupRequestFromOptions(asyncHttpRequest* request, redfishService* service, redfishAsyncOptions* options)
