@@ -771,6 +771,8 @@ void gotNextRedPath(bool success, unsigned short httpCode, redfishPayload* paylo
     redpathAsyncContext* myContext = (redpathAsyncContext*)context;
     bool ret;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+
     if(success == false || httpCode >= 400 || myContext->redpath->next == NULL)
     {
         myContext->callback(success, httpCode, payload, myContext->originalContext);
@@ -1102,6 +1104,8 @@ static bool getOpResultAsync(redfishPayload* payload, const char* propName, RedP
     bool ret;
     redpathAsyncOpContext* myContext;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
+
     if(isPayloadCollection(payload))
     {
         return collectionEvalOpAsync(payload, propName, op, value, options, callback, context);
@@ -1276,6 +1280,8 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
     bool anyWork = false;
     redpathAsyncOpContext* myContext;
     redfishPayload* members;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
 
     max = getCollectionSize(payload);
     if(max == 0)
