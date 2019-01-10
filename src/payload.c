@@ -822,6 +822,8 @@ void gotNextRedPath(bool success, unsigned short httpCode, redfishPayload* paylo
     redpathAsyncContext* myContext = (redpathAsyncContext*)context;
     bool ret;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+
     if(success == false || httpCode >= 400 || myContext->redpath->next == NULL)
     {
         myContext->callback(success, httpCode, payload, myContext->originalContext);
@@ -1330,6 +1332,8 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
     redpathAsyncOpContext* myContext;
     redfishPayload* members;
     redfishPayload* tmp;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
 
