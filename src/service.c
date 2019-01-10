@@ -53,7 +53,8 @@ static zactor_t* eventActor = NULL;
 
 /** Default asynchronous options for Redfish calls **/
 redfishAsyncOptions gDefaultOptions = {
-    .accept = REDFISH_ACCEPT_JSON
+    .accept = REDFISH_ACCEPT_JSON,
+    .timeout = 20
 };
 
 static redfishService* createServiceEnumeratorNoAuth(const char* host, const char* rootUri, bool enumerate, unsigned int flags);
@@ -444,6 +445,7 @@ static void setupRequestFromOptions(asyncHttpRequest* request, redfishService* s
     {
         addRequestHeader(request, "Authorization", service->otherAuth);
     }
+    request->timeout = options->timeout;
 }
 
 bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)

@@ -67,6 +67,8 @@ typedef struct
     char* url;
     /** The HTTP method to use **/
     httpMethod method;
+    /** The timeout for the operation, 0 means never timeout **/
+    unsigned long timeout;
     /** Headers to send or NULL for none **/
     httpHeader* headers;
     /** The size of the request payload body **/
