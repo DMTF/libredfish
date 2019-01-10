@@ -305,6 +305,36 @@ typedef struct
     unsigned long timeout;
 } redfishAsyncOptions;
 
+typedef void (*redfishCreateAsyncCallback)(redfishService* service, void* context);
+
+/**
+ * @brief Create a redfish service connection asynchronously.
+ *
+ * Create a new redfish service connection asynchronously.
+ *
+ * Host examples:
+ * Connection Type | Host Identity Type | Example
+ * --------------- | ------------------ | ----------------------------------
+ * HTTP            | Domain Name        | http://example.com
+ * HTTPS           | Domain Name        | https://example.com
+ * HTTP            | IPv4               | http://127.0.0.1
+ * HTTPS           | IPv4               | https://127.0.0.1
+ * HTTP            | IPv6               | http://[::1]
+ * HTTPS           | IPv6               | https://[::1]
+ *
+ * @param host The host to connect to. This must contain the protocol schema see above for more details.
+ * @param rootUri The root URI of the redfish service. If NULL the connection with assume /redfish
+ * @param auth The authentication method to use for the redfish service. If NULL the connection will be made with no authentication
+ * @param flags Any extra flags to pass to the service
+ * @param callback The callback to call when the service is created
+ * @param context The context to pass to the callback
+ * @return True if the callback will be called, false otherwise.
+ * @see createServiceEnumerator
+ * @see serviceDecRef
+ * @see serviceDecRefAndWait
+ */
+REDFISH_EXPORT bool createServiceEnumeratorAsync(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
+
 /**
  * Callback for Redfish async calls
  *
