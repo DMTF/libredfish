@@ -53,7 +53,7 @@ redfishPayload* createRedfishPayloadFromString(const char* value, redfishService
 #define strncasecmp _strnicmp
 #endif
 
-REDFISH_EXPORT redfishPayload* createRedfishPayloadFromContent(const char* content, size_t contentLength, const char* contentType, redfishService* service)
+redfishPayload* createRedfishPayloadFromContent(const char* content, size_t contentLength, const char* contentType, redfishService* service)
 {
     redfishPayload* ret;
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. content = %p, contentLength = %lu, contentType = %s, service = %p\n", __FUNCTION__, content, contentLength, contentType, service);
@@ -82,6 +82,45 @@ REDFISH_EXPORT redfishPayload* createRedfishPayloadFromContent(const char* conte
         {
             serviceIncRef(service);
         }
+    }
+    return ret;
+}
+
+redfishPayload* copyRedfishPayload(const redfishPayload* original)
+{
+    redfishPayload* ret;
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. original = %p\n", __FUNCTION__, original);
+
+    if(original == NULL)
+    {
+        return NULL;
+    }
+
+    ret = (redfishPayload*)calloc(sizeof(redfishPayload), 1);
+    if(original->json)
+    {
+        ret->json = json_deep_copy(original->json);
+    }
+    if(original->service)
+    {
+        ret->service = original->service; 
+    }
+    if(original->content)
+    {
+        ret->contentLength = original->contentLength;
+        ret->content = (char*)malloc(ret->contentLength);
+        if(ret->content == NULL)
+        {
+            free(ret);
+            return NULL;
+        }
+        memcpy(ret->content, original->content, ret->contentLength);
+    }
+    ret->contentType = original->contentType;
+    ret->contentTypeStr = safeStrdup(original->contentTypeStr);
+    if(ret->service)
+    {
+        serviceIncRef(ret->service);
     }
     return ret;
 }
