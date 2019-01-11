@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.1.4] - 2019-01-11
+- Fixed various leaks
+- Added ability to specify a timeout per request
+- Added asynchronous initialization
+- Added operation to copy redfish payload
+- Fixed RPM spec file version
+- Added devel package to RPM spec file
+
 ## [1.1.3] - 2018-11-30
 - Workaround for implementations that do not present the required Members property in resource collections that are empty
 - Error out when sync calls are done on an async callback
