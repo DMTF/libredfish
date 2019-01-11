@@ -1,6 +1,6 @@
 # libRedfish
 
-Copyright 2017-2018 DMTF. All rights reserved.
+Copyright 2017-2019 DMTF. All rights reserved.
 
 ## About
 
@@ -70,6 +70,6 @@ int main(int argc, char** argv)
 ## Release Process
 
 1. Update `CHANGELOG.md` with the list of changes since the last release
-2. TODO: Add version string in the tool somewhere
+2. Update `Version` in `rpm/libredfish.spec` to reflect the new library version
 3. Push changes to Github
 4. Create a new release in Github
