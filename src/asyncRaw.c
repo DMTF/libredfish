@@ -372,6 +372,7 @@ threadRet rawAsyncWorkThread(void* data)
                 response->httpResponseCode = 0xFFFF;
                 response->body = NULL;
                 response->bodySize = 0;
+                safeFree(readChunk.memory);
             }
             else
             {
