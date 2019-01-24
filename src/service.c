@@ -1299,10 +1299,10 @@ static void gotServiceRootServiceAuth(bool success, unsigned short httpCode, red
     }
 
     rc = postUriFromServiceAsync(myContext->service, uri, authPayload, NULL, didSessionAuthPost, myContext);
+    cleanupPayload(links);
+    cleanupPayload(authPayload); 
     if(rc == false)
     {
-        cleanupPayload(authPayload);
-        cleanupPayload(links);
         myContext->originalCallback(NULL, myContext->originalContext);
         free(myContext->username);
         free(myContext->password);
