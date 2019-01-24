@@ -1188,12 +1188,13 @@ static void didSessionAuthPost(bool success, unsigned short httpCode, redfishPay
 {
     createServiceSessionAuthAsyncContext* myContext = (createServiceSessionAuthAsyncContext*)context;
 
+    if(payload)
+    {
+        cleanupPayload(payload);
+    }
+
     if(success == false)
     {
-        if(payload)
-        {
-            cleanupPayload(payload);
-        }
         myContext->originalCallback(NULL, myContext->originalContext);
         free(myContext->username);
         free(myContext->password);
@@ -1206,10 +1207,6 @@ static void didSessionAuthPost(bool success, unsigned short httpCode, redfishPay
     if(myContext->service->sessionToken == NULL)
     {
         REDFISH_DEBUG_ERR_PRINT("Session returned success (%u) but did not set X-Auth-Token header...\n", httpCode);
-        if(payload)
-        {
-            cleanupPayload(payload);
-        }
         myContext->originalCallback(NULL, myContext->originalContext);
         free(myContext->username);
         free(myContext->password);
