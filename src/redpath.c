@@ -7,11 +7,10 @@
 #include <string.h>
 
 #include <redpath.h>
+#include "util.h"
 
 static char* getVersion(const char* path, char** end);
 static void parseNode(const char* path, redPathNode* node, redPathNode** end);
-
-static char* getStringTill(const char* string, const char* terminator, char** retEnd);
 
 redPathNode* parseRedPath(const char* path)
 {
@@ -213,26 +212,3 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
     free(index);
 }
 
-static char* getStringTill(const char* string, const char* terminator, char** retEnd)
-{
-    char* ret;
-    char* end;
-    end = strstr((char*)string, terminator);
-    if(retEnd)
-    {
-        *retEnd = end;
-    }
-    if(end == NULL)
-    {
-        //No terminator
-#ifdef _MSC_VER
-		return _strdup(string);
-#else
-        return strdup(string);
-#endif
-    }
-    ret = (char*)malloc((end-string)+1);
-    memcpy(ret, string, (end-string));
-    ret[(end-string)] = 0;
-    return ret;
-}

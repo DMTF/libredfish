@@ -7,6 +7,7 @@
 
 #include "redfishPayload.h"
 #include "debug.h"
+#include "util.h"
 
 static redfishPayload* getOpResult(redfishPayload* payload, const char* propName, RedPathOp op, const char* value);
 static bool            getOpResultAsync(redfishPayload* payload, const char* propName, RedPathOp op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
@@ -17,7 +18,6 @@ static bool            arrayEvalOpAsync(redfishPayload* payload, const char* pro
 static redfishPayload* createCollection(redfishService* service, size_t count, redfishPayload** payloads);
 static json_t*         json_object_get_by_index(json_t* json, size_t index);
 static bool            isOdataIdNode(json_t* json, char** uriPtr);
-static char*           safeStrdup(const char* str);
 
 redfishPayload* createRedfishPayload(json_t* value, redfishService* service)
 {
@@ -602,30 +602,6 @@ char* payloadToString(redfishPayload* payload, bool prettyPrint)
         flags = JSON_INDENT(2);
     }
     return json_dumps(payload->json, flags);
-}
-
-static char* getStringTill(const char* string, const char* terminator, char** retEnd)
-{
-    char* ret;
-    char* end;
-    end = strstr((char*)string, terminator);
-    if(retEnd)
-    {
-        *retEnd = end;
-    }
-    if(end == NULL)
-    {
-        //No terminator
-#ifdef _MSC_VER
-		return _strdup(string);
-#else
-        return strdup(string);
-#endif
-    }
-    ret = (char*)malloc((end-string)+1);
-    memcpy(ret, string, (end-string));
-    ret[(end-string)] = 0;
-    return ret;
 }
 
 static json_t* getEmbeddedJsonField(json_t* parent, const char* nodeName)
@@ -1600,18 +1576,5 @@ static bool isOdataIdNode(json_t* json, char** uriPtr)
     }
     *uriPtr = safeStrdup(uri);
     return true;
-}
-
-static char* safeStrdup(const char* str)
-{
-    if(str == NULL)
-    {
-        return NULL;
-    }
-#ifdef _MSC_VER
-	return _strdup(str);
-#else
-    return strdup(str);
-#endif
 }
 /* vim: set tabstop=4 shiftwidth=4 expandtab: */
