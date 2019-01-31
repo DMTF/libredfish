@@ -583,6 +583,14 @@ void cleanupPayload(redfishPayload* payload)
         return;
     }
     json_decref(payload->json);
+    if(payload->contentTypeStr)
+    {
+        free(payload->contentTypeStr);
+    }
+    if(payload->content)
+    {
+        free(payload->content);
+    }
     if(payload->service)
     {
         serviceDecRef(payload->service);
@@ -660,9 +668,12 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
                         {
                             odataId = json_object();
                             json_object_set(odataId, nodeName, tmp);
-                            tmp = odataId;
+                            json_array_append_new(value, odataId);
                         }
-                        json_array_append(value, tmp);
+                        else
+                        {
+                            json_array_append(value, tmp);
+                        }
                     }
                 }
                 if(json_array_size(value) == 0)

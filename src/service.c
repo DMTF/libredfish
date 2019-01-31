@@ -160,12 +160,20 @@ static bool isOnAsyncThread(redfishService* service)
 void asyncToSyncConverter(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
 {
     asyncToSyncContext* myContext = (asyncToSyncContext*)context;
+    char* content;
     (void)httpCode;
     myContext->success = success;
     myContext->data = payload;
     if(payload != NULL && payload->content != NULL)
     {
-        REDFISH_DEBUG_DEBUG_PRINT("%s: Got non-json response to old sync operation %s\n", __FUNCTION__, payload->content);
+        content = malloc(payload->contentLength+1);
+        if(content)
+        {
+            memcpy(content, payload->content, payload->contentLength);
+            content[payload->contentLength] = 0; //HTTP payloads aren't null terminated...
+            REDFISH_DEBUG_DEBUG_PRINT("%s: Got non-json response to old sync operation %s\n", __FUNCTION__, content);
+            free(content);
+        }
     }
     cond_broadcast(&myContext->waitForIt);
 }
@@ -204,9 +212,8 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     cond_wait(&context->waitForIt, &context->spinLock);
     if(context->data)
     {
-        json = context->data->json;
-        serviceDecRef(context->data->service);
-        free(context->data);
+        json = json_incref(context->data->json);
+        cleanupPayload(context->data);
     }
     else
     {
@@ -254,9 +261,8 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     cond_wait(&context->waitForIt, &context->spinLock);
     if(context->data)
     {
-        json = context->data->json;
-        serviceDecRef(context->data->service);
-        free(context->data);
+        json = json_incref(context->data->json);
+        cleanupPayload(context->data);
     }
     else
     {
@@ -303,9 +309,8 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     cond_wait(&context->waitForIt, &context->spinLock);
     if(context->data)
     {
-        json = context->data->json;
-        serviceDecRef(context->data->service);
-        free(context->data);
+        json = json_incref(context->data->json);
+        cleanupPayload(context->data);
     }
     else
     {
