@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.1.5] - 2019-02-01
+- Fixed various leaks
+- Refactored some code to remove duplications
+
 ## [1.1.4] - 2019-01-11
 - Fixed various leaks
 - Added ability to specify a timeout per request
