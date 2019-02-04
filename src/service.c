@@ -1867,11 +1867,23 @@ static char* getDestinationAddress(const char* addressInfo, int* socket)
     }
     free(interface);
     *socket = getRandomSocket(ret, &port);
+    if(strcmp(addressType, "ipv4") == 0)
+    {
 #ifdef HAVE_OPENSSL
-    snprintf(dest, sizeof(dest)-1, "https://%s:%u", ret, port);
+        snprintf(dest, sizeof(dest)-1, "https://%s:%u", ret, port);
 #else
-    snprintf(dest, sizeof(dest)-1, "http://%s:%u", ret, port);
+        snprintf(dest, sizeof(dest)-1, "http://%s:%u", ret, port);
 #endif
+    }
+    else
+    {
+        //Per RFC3986 IPv6 addresses in URIs need to be enclosed in []
+#ifdef HAVE_OPENSSL
+        snprintf(dest, sizeof(dest)-1, "https://[%s]:%u", ret, port);
+#else
+        snprintf(dest, sizeof(dest)-1, "http://[%s]:%u", ret, port);
+#endif
+    }
     free(ret);
     return safeStrdup(dest);
 }
