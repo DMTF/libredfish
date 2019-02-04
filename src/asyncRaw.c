@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include "debug.h"
+#include "util.h"
 
 static void safeFree(void* ptr);
 static void freeHeaders(httpHeader* headers);
@@ -106,15 +107,6 @@ bool startRawAsyncRequest(redfishService* service, asyncHttpRequest* request, as
     workItem->context = context;
     queuePush(service->queue, workItem);
     return true;
-}
-
-thread getThreadId()
-{
-#ifndef _MSC_VER
-    return pthread_self();
-#else
-    return GetCurrentThread();
-#endif
 }
 
 void terminateAsyncThread(redfishService* service)

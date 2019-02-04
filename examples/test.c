@@ -445,6 +445,7 @@ int main(int argc, char** argv)
     {
         redfish = createServiceEnumerator(host, NULL, NULL, flags);
     }
+    safeFree(token);
 
     if(eventUri != NULL)
     {
@@ -466,7 +467,7 @@ int main(int argc, char** argv)
             printf("Failed to register for events! Cleaning up...\n");
         }
         free(eventUri);
-        cleanupServiceEnumerator(redfish);
+        serviceDecRefAndWait(redfish);
         if(host)
         {
             free(host);
@@ -522,7 +523,6 @@ int main(int argc, char** argv)
     }
     safeFree(host);
     safeFree(filename);
-    safeFree(token);
     safeFree(username);
     safeFree(password);
     return 0;

@@ -4,8 +4,10 @@
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
+#include <unistd.h>
 
 #include "internal_service.h"
+#include "asyncEvent.h"
 #include <redfishService.h>
 #include <redfishPayload.h>
 #include <redpath.h>
@@ -13,27 +15,8 @@
 #include <redfishRawAsync.h>
 
 #include "debug.h"
+#include "util.h"
 
-/**
- * @brief A representation of event registrations.
- *
- * A structure representing a redfish event registration
- */
-struct EventCallbackRegister
-{
-    /** If true, the event actor thread will remove this registration the next time it processes **/
-    bool unregister;
-    /** The function to call each time an event meeting the requirements is received **/
-    redfishEventCallback callback;
-    /** The event types for this registration **/
-    unsigned int eventTypes;
-    /** The context to pass to the callback **/
-    char* context;
-    /** The service associated with this registration **/
-    redfishService* service;
-};
-
-#if CZMQ_VERSION_MAJOR >= 3
 /**
  * @brief A representation of event actor state.
  *
@@ -44,12 +27,8 @@ struct EventActorState
     /** If true, terminate the thread **/
     bool terminate;
     /** A linked list of struct EventCallbackRegister for each registration **/
-    zlist_t* registrations;
+    queueNode* registrations;
 };
-
-/** The event actor thread **/
-static zactor_t* eventActor = NULL;
-#endif
 
 /** Default asynchronous options for Redfish calls **/
 redfishAsyncOptions gDefaultOptions = {
@@ -63,14 +42,9 @@ static redfishService* createServiceEnumeratorSessionAuth(const char* host, cons
 static redfishService* createServiceEnumeratorToken(const char* host, const char* rootUri, const char* token, unsigned int flags);
 static char* makeUrlForService(redfishService* service, const char* uri);
 static json_t* getVersions(redfishService* service, const char* rootUri);
-#if CZMQ_VERSION_MAJOR >= 3
+static char* getSSEUri(redfishService* service);
 static char* getEventSubscriptionUri(redfishService* service);
-static bool registerCallback(redfishService* service, redfishEventCallback callback, unsigned int eventTypes, const char* context);
-static bool unregisterCallback(redfishEventCallback callback, unsigned int eventTypes, const char* context);
-static void eventActorTask(zsock_t* pipe, void* args);
-static void cleanupEventActor();
 static void addStringToJsonArray(json_t* array, const char* value);
-#endif
 static void addStringToJsonObject(json_t* object, const char* key, const char* value);
 static redfishPayload* getPayloadFromAsyncResponse(asyncHttpResponse* response, redfishService* service);
 static unsigned char* base64_encode(const unsigned char* src, size_t len, size_t* out_len);
@@ -79,6 +53,7 @@ static bool createServiceEnumeratorBasicAuthAsync(const char* host, const char* 
 static bool createServiceEnumeratorSessionAuthAsync(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
 static bool createServiceEnumeratorTokenAsync(const char* host, const char* rootUri, const char* token, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
 static bool getVersionsAsync(redfishService* service, const char* rootUri, redfishCreateAsyncCallback callback, void* context);
+static char* getDestinationAddress(const char* addressInfo, int* socket);
 
 redfishService* createServiceEnumerator(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags)
 {
@@ -160,7 +135,8 @@ static bool isOnAsyncThread(redfishService* service)
 void asyncToSyncConverter(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
 {
     asyncToSyncContext* myContext = (asyncToSyncContext*)context;
-    (void)httpCode;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %d, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
     myContext->success = success;
     myContext->data = payload;
     if(payload != NULL && payload->content != NULL)
@@ -272,6 +248,7 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     asyncToSyncContext* context;
     bool tmp;
     redfishPayload* payload;
+    char* tmpStr;
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, content = %s\n", __FUNCTION__, service, uri, content);
 
@@ -309,6 +286,15 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     }
     else
     {
+        json = NULL;
+    }
+    if(context->success == false)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Old style call got an error, but returned payload!\n", __FUNCTION__);
+        tmpStr = json_dumps(json, 0);
+        REDFISH_DEBUG_NOTICE_PRINT("%s: Response payload is %s\n", __FUNCTION__, tmpStr);
+        free(tmpStr);
+        json_decref(json);
         json = NULL;
     }
     cleanupAsyncToSyncContext(context);
@@ -730,22 +716,66 @@ bool getPayloadByPathAsync(redfishService* service, const char* path, redfishAsy
 
 bool registerForEvents(redfishService* service, const char* postbackUri, unsigned int eventTypes, redfishEventCallback callback, const char* context)
 {
-#if CZMQ_VERSION_MAJOR >= 3
     json_t* eventSubscriptionPayload;
     json_t* postRes;
     json_t* typeArray;
+    char* sseUri;
     char* eventSubscriptionUri;
     char* eventSubscriptionPayloadStr;
+    char* destination = (char*)postbackUri;
+    bool ret;
+    int socket;
 
     if(service == NULL || postbackUri == NULL || callback == NULL)
     {
         return false;
     }
 
+    //start event thread
+    if(service->eventThreadQueue == NULL)
+    {
+        service->eventThreadQueue = newQueue();
+        startEventThread(service);
+    }
+    registerCallback(service, callback, eventTypes, context);
+
+    //Try to use SSE first...
+    sseUri = getSSEUri(service);
+    if(sseUri)
+    {
+        ret = startSSEListener(service, sseUri);
+        if(ret == true)
+        {
+            free(sseUri);
+            return true;
+        }
+        else
+        {
+            REDFISH_DEBUG_ERR_PRINT("Service supports SSE, but listening to SSE @ %s failed. Falling back to old style events...\n", sseUri);
+            free(sseUri);
+        }
+    }
+
+    //User wants libredfish to listen for events directly...
+    if(strncmp(postbackUri, "libredfish", 10) == 0)
+    {
+        destination = getDestinationAddress(postbackUri+11, &socket);
+        if(destination == NULL)
+        {
+            REDFISH_DEBUG_CRIT_PRINT("Unable to obtain destination address from string \"%s\"\n", postbackUri);
+            return false;
+        }
+        ret = startTCPListener(service, socket);
+    }
+
     eventSubscriptionUri = getEventSubscriptionUri(service);
     if(eventSubscriptionUri == NULL)
     {
         //This service does not support Eventing
+        if(destination != (char*)postbackUri)
+        {
+            free(destination);
+        }
         return false;
     }
 
@@ -754,9 +784,17 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
     {
         //Out of memory
         free(eventSubscriptionUri);
+        if(destination != (char*)postbackUri)
+        {
+            free(destination);
+        }
         return false;
     }
-    addStringToJsonObject(eventSubscriptionPayload, "Destination", postbackUri);
+    addStringToJsonObject(eventSubscriptionPayload, "Destination", destination);
+    if(destination != (char*)postbackUri)
+    {
+        free(destination);
+    }
     addStringToJsonObject(eventSubscriptionPayload, "Context", context);
     addStringToJsonObject(eventSubscriptionPayload, "Protocol", "Redfish");
     if(eventTypes != 0)
@@ -797,40 +835,18 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
     {
         free(eventSubscriptionUri);
         return false;
-    }
-
-    //start eventActor before POST
-    if(!eventActor || !zactor_is(eventActor))
-    {
-        eventActor = zactor_new(eventActorTask, NULL);
-        if(!eventActor)
-        {
-            free(eventSubscriptionUri);
-            free(eventSubscriptionPayloadStr);
-            return false;
-        }
-    }
-    atexit(cleanupEventActor);
-    registerCallback(service, callback, eventTypes, context);
+    } 
 
     postRes = postUriFromService(service, eventSubscriptionUri, eventSubscriptionPayloadStr, 0, NULL);
     free(eventSubscriptionUri);
     free(eventSubscriptionPayloadStr);
     if(postRes == NULL)
     {
-        unregisterCallback(callback, eventTypes, context);
+        unregisterCallback(service, callback, eventTypes, context);
         return false;
     }
     json_decref(postRes);
     return true;
-#else
-    (void)service;
-    (void)postbackUri;
-    (void)eventTypes;
-    (void)callback;
-    (void)context;
-    return false;
-#endif
 }
 
 redfishPayload* getRedfishServiceRoot(redfishService* service, const char* version)
@@ -947,8 +963,22 @@ static void freeServicePtr(redfishService* service)
         free(service->otherAuth);
         service->otherAuth = NULL;
     }
+    if(service->tcpSocket != -1)
+    {
+        close(service->tcpSocket);
+        service->tcpSocket = -1;
+#ifdef _MSC_VER
+        WaitForSingleObject(service->tcpThread, INFINITE);
+#else
+        pthread_join(service->tcpThread, NULL);
+#endif
+    }
     terminateAsyncThread(service);
-    if(service->selfTerm == false)
+    if(service->eventThreadQueue != NULL)
+    { 
+        terminateAsyncEventThread(service);
+    }
+    if(service->selfTerm == false && service->eventTerm == false)
     {
         free(service);
     }
@@ -956,21 +986,23 @@ static void freeServicePtr(redfishService* service)
 
 void serviceDecRef(redfishService* service)
 {
+    size_t newCount;
+
     if(service == NULL)
     {
         return;
     }
 #ifdef _MSC_VER
 #if WIN64
-    InterlockedDecrement64(&(service->refCount));
+    newCount = InterlockedDecrement64(&(service->refCount));
 #else
-    InterlockedDecrement(&(service->refCount));
+    newCount = InterlockedDecrement(&(service->refCount));
 #endif
 #else
-    __sync_fetch_and_sub(&(service->refCount), 1);
+    newCount = __sync_fetch_and_sub(&(service->refCount), 1);
 #endif
-    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __FUNCTION__, service->refCount);
-    if(service->refCount == 0)
+    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __FUNCTION__, newCount);
+    if(newCount == 0)
     {
         freeServicePtr(service);
     }
@@ -993,6 +1025,7 @@ void serviceDecRefAndWait(redfishService* service)
 #else
     newCount = __sync_sub_and_fetch(&(service->refCount), 1);
 #endif
+    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __FUNCTION__, newCount);
     if(newCount == 0)
     {
         freeServicePtr(service);
@@ -1022,6 +1055,7 @@ static redfishService* createServiceEnumeratorNoAuth(const char* host, const cha
     ret->host = strdup(host);
 #endif
     ret->flags = flags;
+    ret->tcpSocket = -1;
     if(enumerate)
     {
         ret->versions = getVersions(ret, rootUri);
@@ -1047,6 +1081,7 @@ static bool createServiceEnumeratorNoAuthAsync(const char* host, const char* roo
     ret->host = strdup(host);
 #endif
     ret->flags = flags;
+    ret->tcpSocket = -1;
     rc = getVersionsAsync(ret, rootUri, callback, context);
     if(rc == false)
     {
@@ -1538,7 +1573,26 @@ static bool getVersionsAsync(redfishService* service, const char* rootUri, redfi
     return rc;
 }
 
-#if CZMQ_VERSION_MAJOR >= 3
+static char* getSSEUri(redfishService* service)
+{
+    redfishPayload* payload;
+    char* tmp;
+    char* ret = NULL;
+
+    payload = getPayloadByPath(service, "/EventService/ServerSentEventUri");
+    if(payload)
+    {
+        tmp = getPayloadStringValue(payload);
+        cleanupPayload(payload);
+        if(tmp)
+        {
+            ret = makeUrlForService(service, tmp);
+            free(tmp);
+        }
+    }
+    return ret;
+}
+
 static char* getEventSubscriptionUri(redfishService* service)
 {
     redPathNode* redpath;
@@ -1575,228 +1629,7 @@ static char* getEventSubscriptionUri(redfishService* service)
     cleanupPayload(eventSub);
     return ret;
 }
-
-static bool registerCallback(redfishService* service, redfishEventCallback callback, unsigned int eventTypes, const char* context)
-{
-    struct EventCallbackRegister* registration;
-    zmsg_t* msg;
-
-    msg = zmsg_new();
-    if(!msg)
-    {
-        return false;
-    }
-
-    //Passing to another thread need to allocate
-    registration = malloc(sizeof(struct EventCallbackRegister));
-    if(!registration)
-    {
-        zmsg_destroy(&msg);
-        return false;
-    }
-    registration->unregister = false;
-    registration->callback = callback;
-    registration->eventTypes = eventTypes;
-    if(context)
-    {
-        //Passing to another thread, this may go out of scope unless I duplicate it
-        registration->context = strdup(context);
-    }
-    else
-    {
-        registration->context = NULL;
-    }
-    registration->service = service;
-
-    if(zmsg_addmem(msg, registration, sizeof(struct EventCallbackRegister)) != 0)
-    {
-        if(registration->context)
-        {
-            free(registration->context);
-        }
-        free(registration);
-        zmsg_destroy(&msg);
-        return false;
-    }
-
-    if(zmsg_send(&msg, eventActor) == 0)
-    {
-        //registration is copied into the zmsg...
-        free(registration);
-        return true;
-    }
-    //zmsg_send always destroys the msg regardless of return code
-    if(registration->context)
-    {
-        free(registration->context);
-    }
-    free(registration);
-    return false;
-}
-
-static bool unregisterCallback(redfishEventCallback callback, unsigned int eventTypes, const char* context)
-{
-    struct EventCallbackRegister* registration;
-    zmsg_t* msg;
-
-    msg = zmsg_new();
-
-    //Passing to another thread need to allocate
-    registration = malloc(sizeof(struct EventCallbackRegister));
-    if(!registration)
-    {
-        zmsg_destroy(&msg);
-        return false;
-    }
-    registration->unregister = true;
-    registration->callback = callback;
-    registration->eventTypes = eventTypes;
-    if(context)
-    {
-        //Passing to another thread, this may go out of scope unless I duplicate it
-        registration->context = strdup(context);
-    }
-    else
-    {
-        registration->context = NULL;
-    }
-
-    if(zmsg_addmem(msg, registration, sizeof(struct EventCallbackRegister)) != 0)
-    {
-        if(registration->context)
-        {
-            free(registration->context);
-        }
-        free(registration);
-        zmsg_destroy(&msg);
-        return false;
-    }
-
-    if(zmsg_send(&msg, eventActor) == 0)
-    {
-        return true;
-    }
-    //zmsg_send always destroys the msg regardless of return code
-    if(registration->context)
-    {
-        free(registration->context);
-    }
-    free(registration);
-    return false;
-}
-
-static void freeRegistration(void* reg)
-{
-    struct EventCallbackRegister* registration = (struct EventCallbackRegister*)reg;
-
-    if(registration)
-    {
-        if(registration->context)
-        {
-            free(registration->context);
-        }
-        free(registration);
-    }
-}
-
-static int eventRegisterCallback(zloop_t* loop, zsock_t* reader, void* arg)
-{
-    struct EventActorState* state = (struct EventActorState*)arg;
-    struct EventCallbackRegister* registration;
-    struct EventCallbackRegister* current;
-    zmsg_t* msg;
-    zframe_t* frame;
-    byte* frameData;
-
-    (void)loop;
-
-    msg = zmsg_recv(reader);
-    if(!msg)
-    {
-        return 0;
-    }
-    frame = zmsg_pop(msg);
-    zmsg_destroy(&msg);
-    if(!frame)
-    {
-        return 0;
-    }
-    frameData = zframe_data(frame);
-    if(!frameData)
-    {
-        zframe_destroy(&frame);
-        return 0;
-    }
-    if(frameData[0] == '$')
-    {
-        if(strstr((const char*)frameData, "$TERM"))
-        {
-            state->terminate = true;
-            zframe_destroy(&frame);
-            return -1;
-        }
-    }
-    registration = malloc(sizeof(struct EventCallbackRegister));
-    if(!registration)
-    {
-        zframe_destroy(&frame);
-        return -1;
-    }
-    memcpy(registration, frameData, sizeof(struct EventCallbackRegister));
-    zframe_destroy(&frame);
-    if(registration->unregister == false)
-    {
-        zlist_append(state->registrations, registration);
-        zlist_freefn(state->registrations, registration, freeRegistration, true);
-    }
-    else
-    {
-        //Find the registration on the zlist...
-        current = zlist_first(state->registrations);
-        if(!current)
-        {
-            //No more registrations end the thread...
-            state->terminate = true;
-            free(registration);
-            return -1;
-        }
-        while(current)
-        {
-            if(current->context == NULL && registration->context != NULL)
-            {
-                current = zlist_next(state->registrations);
-                continue;
-            }
-            if(current->callback == registration->callback ||
-               (registration->context == NULL || strcmp(current->context, registration->context) == 0))
-            {
-                zlist_remove(state->registrations, current);
-                if(registration->context)
-                {
-                    free(registration->context);
-                }
-                if(current->context)
-                {
-                    free(current->context);
-                }
-                if(zlist_size(state->registrations) == 0)
-                {
-                    //No more registrations end the thread...
-                    state->terminate = true;
-                    free(registration);
-                    return -1;
-                }
-            }
-
-            current = zlist_next(state->registrations);
-        }
-        free(registration);
-    }
-    //Coverity complains about registration going out of scope, but in the case of adding to the zlist it doesn't so
-    //this is a false positive.
-    return 0;
-}
-
+/*
 static int eventReceivedCallback(zloop_t* loop, zsock_t* reader, void* arg)
 {
     struct EventActorState* state = (struct EventActorState*)arg;
@@ -1897,64 +1730,7 @@ static int eventReceivedCallback(zloop_t* loop, zsock_t* reader, void* arg)
     }
     free(msg);
     return 0;
-}
-
-static void eventActorTask(zsock_t* pipe, void* args)
-{
-    struct EventActorState state;
-    zloop_t* loop;
-    zsock_t* remote;
-
-    //args should always be null. Shut up compiler warning about it
-    (void)args;
-
-    state.terminate = false;
-    state.registrations = zlist_new();
-    if(!state.registrations)
-    {
-        zsock_signal(pipe, 0);
-        return;
-    }
-
-    loop = zloop_new();
-    if(!loop)
-    {
-        zlist_destroy(&state.registrations);
-        zsock_signal(pipe, 0);
-        return;
-    }
-    //zloop_set_verbose(loop, true);
-    zloop_reader(loop, pipe, eventRegisterCallback, &state);
-
-    //Open 0mq socket for redfish events
-    remote = REDFISH_EVENT_0MQ_LIBRARY_NEW_SOCK;
-    if(!remote)
-    {
-        zloop_destroy(&loop);
-        zlist_destroy(&state.registrations);
-        zsock_signal(pipe, 0);
-        return;
-    }
-
-    zloop_reader(loop, remote, eventReceivedCallback, &state);
-
-    //Inform the parent we are active
-    zsock_signal(pipe, 0);
-
-    zloop_start(loop);
-
-    zloop_destroy(&loop);
-    zsock_destroy(&remote);
-    zlist_destroy(&state.registrations);
-}
-
-static void cleanupEventActor()
-{
-    if(eventActor && zactor_is(eventActor))
-    {
-        zactor_destroy(&eventActor);
-    }
-}
+}*/
 
 static void addStringToJsonArray(json_t* array, const char* value)
 {
@@ -1964,7 +1740,6 @@ static void addStringToJsonArray(json_t* array, const char* value)
 
     json_decref(jValue);
 }
-#endif
 
 static void addStringToJsonObject(json_t* object, const char* key, const char* value)
 {
@@ -2063,4 +1838,38 @@ static unsigned char* base64_encode(const unsigned char* src, size_t len, size_t
 		*out_len = pos - out;
     }
 	return out;
+}
+
+static char* getDestinationAddress(const char* addressInfo, int* socket)
+{
+    char* addressType = NULL;
+    char* interface = getStringTill(addressInfo, ":", &addressType);
+    char* ret = NULL;
+    char dest[1024];
+    unsigned int port;
+    if(addressType == NULL)
+    {
+        addressType = "ipv4";
+    }
+    else
+    {
+        addressType++;
+    }
+    if(strcmp(addressType, "ipv4") == 0)
+    {
+        ret = getIpv4Address(interface);
+    }
+    else
+    {
+        ret = getIpv6Address(interface);
+    }
+    free(interface);
+    *socket = getRandomSocket(ret, &port);
+#ifdef HAVE_OPENSSL
+    snprintf(dest, sizeof(dest)-1, "https://%s:%u", ret, port);
+#else
+    snprintf(dest, sizeof(dest)-1, "http://%s:%u", ret, port);
+#endif
+    free(ret);
+    return safeStrdup(dest);
 }
