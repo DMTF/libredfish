@@ -1875,3 +1875,4 @@ static char* getDestinationAddress(const char* addressInfo, int* socket)
     free(ret);
     return safeStrdup(dest);
 }
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */

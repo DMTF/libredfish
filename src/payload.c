@@ -1588,4 +1588,4 @@ static bool isOdataIdNode(json_t* json, char** uriPtr)
     *uriPtr = safeStrdup(uri);
     return true;
 }
-/* vim: set tabstop=4 shiftwidth=4 expandtab: */
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */

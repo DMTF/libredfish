@@ -940,3 +940,4 @@ static int mkSSLCert(X509** x509Ptr, EVP_PKEY** publicKeyPtr)
     return 0;
 }
 #endif
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */

@@ -89,3 +89,4 @@ typedef struct _redfishService {
 } redfishService;
 
 #endif
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */

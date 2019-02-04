@@ -604,3 +604,4 @@ static int addHeader(httpHeader** headersPtr, const char* name, const char* valu
     current->next = NULL;
     return 0;
 }
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */
