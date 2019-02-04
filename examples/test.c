@@ -237,6 +237,10 @@ void gotPayload(bool success, unsigned short httpCode, redfishPayload* payload, 
     if(success == false)
     {
         printf("Got a failure, httpCode = %u\n", httpCode);
+        if(payload == NULL)
+        {
+            free(context);
+        }
     }
     if(payload)
     {
@@ -344,6 +348,7 @@ int main(int argc, char** argv)
     gotPayloadContext* context;
     commandMapping* command = NULL;
     bool valgrind = false;
+    bool ret;
 
     memset(&auth, 0, sizeof(auth));
 
@@ -445,6 +450,10 @@ int main(int argc, char** argv)
     {
         redfish = createServiceEnumerator(host, NULL, NULL, flags);
     }
+    if(redfish == NULL)
+    {
+        fprintf(stderr, "Unable to create service enumerator\n");
+    }
     safeFree(token);
 
     if(eventUri != NULL)
@@ -510,11 +519,15 @@ int main(int argc, char** argv)
     context->command = command;
     if(query)
     {
-        getPayloadByPathAsync(redfish, query, NULL, gotPayload, context);
+        ret = getPayloadByPathAsync(redfish, query, NULL, gotPayload, context);
     }
     else
     {
-        getPayloadByPathAsync(redfish, "/", NULL, gotPayload, context);
+        ret = getPayloadByPathAsync(redfish, "/", NULL, gotPayload, context);
+    }
+    if(ret == false)
+    {
+        free(context);
     }
     serviceDecRefAndWait(redfish);
     if(valgrind)

@@ -135,13 +135,21 @@ static bool isOnAsyncThread(redfishService* service)
 void asyncToSyncConverter(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
 {
     asyncToSyncContext* myContext = (asyncToSyncContext*)context;
+    char* content;
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %d, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
     myContext->success = success;
     myContext->data = payload;
     if(payload != NULL && payload->content != NULL)
     {
-        REDFISH_DEBUG_DEBUG_PRINT("%s: Got non-json response to old sync operation %s\n", __FUNCTION__, payload->content);
+        content = malloc(payload->contentLength+1);
+        if(content)
+        {
+            memcpy(content, payload->content, payload->contentLength);
+            content[payload->contentLength] = 0; //HTTP payloads aren't null terminated...
+            REDFISH_DEBUG_DEBUG_PRINT("%s: Got non-json response to old sync operation %s\n", __FUNCTION__, content);
+            free(content);
+        }
     }
     cond_broadcast(&myContext->waitForIt);
 }
@@ -180,9 +188,8 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     cond_wait(&context->waitForIt, &context->spinLock);
     if(context->data)
     {
-        json = context->data->json;
-        serviceDecRef(context->data->service);
-        free(context->data);
+        json = json_incref(context->data->json);
+        cleanupPayload(context->data);
     }
     else
     {
@@ -230,9 +237,8 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     cond_wait(&context->waitForIt, &context->spinLock);
     if(context->data)
     {
-        json = context->data->json;
-        serviceDecRef(context->data->service);
-        free(context->data);
+        json = json_incref(context->data->json);
+        cleanupPayload(context->data);
     }
     else
     {
@@ -280,9 +286,8 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     cond_wait(&context->waitForIt, &context->spinLock);
     if(context->data)
     {
-        json = context->data->json;
-        serviceDecRef(context->data->service);
-        free(context->data);
+        json = json_incref(context->data->json);
+        cleanupPayload(context->data);
     }
     else
     {
@@ -1223,12 +1228,13 @@ static void didSessionAuthPost(bool success, unsigned short httpCode, redfishPay
 {
     createServiceSessionAuthAsyncContext* myContext = (createServiceSessionAuthAsyncContext*)context;
 
+    if(payload)
+    {
+        cleanupPayload(payload);
+    }
+
     if(success == false)
     {
-        if(payload)
-        {
-            cleanupPayload(payload);
-        }
         myContext->originalCallback(NULL, myContext->originalContext);
         free(myContext->username);
         free(myContext->password);
@@ -1241,10 +1247,6 @@ static void didSessionAuthPost(bool success, unsigned short httpCode, redfishPay
     if(myContext->service->sessionToken == NULL)
     {
         REDFISH_DEBUG_ERR_PRINT("Session returned success (%u) but did not set X-Auth-Token header...\n", httpCode);
-        if(payload)
-        {
-            cleanupPayload(payload);
-        }
         myContext->originalCallback(NULL, myContext->originalContext);
         free(myContext->username);
         free(myContext->password);
@@ -1337,10 +1339,10 @@ static void gotServiceRootServiceAuth(bool success, unsigned short httpCode, red
     }
 
     rc = postUriFromServiceAsync(myContext->service, uri, authPayload, NULL, didSessionAuthPost, myContext);
+    cleanupPayload(links);
+    cleanupPayload(authPayload); 
     if(rc == false)
     {
-        cleanupPayload(authPayload);
-        cleanupPayload(links);
         myContext->originalCallback(NULL, myContext->originalContext);
         free(myContext->username);
         free(myContext->password);
