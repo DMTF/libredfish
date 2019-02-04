@@ -605,7 +605,7 @@ static bool processNewRegistrations(EventCallbackRegister* newReg, queueNode** r
 {
     EventCallbackRegister* oldReg;
     queueNode* current;
-    queueNode* prev;
+    queueNode* prev = NULL;
 
     if(newReg->unregister == true)
     {
