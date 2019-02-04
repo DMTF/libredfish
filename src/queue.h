@@ -14,6 +14,8 @@
 #ifndef _QUEUE_H_
 #define _QUEUE_H_
 
+#include <stdbool.h>
+
 #ifdef _MSC_VER
 //Windows
 #include <windows.h>
