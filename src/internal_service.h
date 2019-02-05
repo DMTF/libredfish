@@ -86,6 +86,8 @@ typedef struct _redfishService {
     int tcpSocket;
     /** An indicator to the event thread to terminate itself **/
     bool eventTerm;
+    /** The uri the event registration is stored at **/
+    char* eventRegistrationUri;
 } redfishService;
 
 #endif

@@ -101,7 +101,7 @@ static asyncToSyncContext* makeAsyncToSyncContext()
 {
     asyncToSyncContext* context;
 
-    context = malloc(sizeof(asyncToSyncContext));
+    context = calloc(sizeof(asyncToSyncContext), 1);
     if(context)
     {
         mutex_init(&context->spinLock);
@@ -137,6 +137,9 @@ void asyncToSyncConverter(bool success, unsigned short httpCode, redfishPayload*
     asyncToSyncContext* myContext = (asyncToSyncContext*)context;
     char* content;
 
+#ifndef DEBUG
+    (void)httpCode;
+#endif
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %d, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
     myContext->success = success;
     myContext->data = payload;
@@ -722,14 +725,14 @@ bool getPayloadByPathAsync(redfishService* service, const char* path, redfishAsy
 bool registerForEvents(redfishService* service, const char* postbackUri, unsigned int eventTypes, redfishEventCallback callback, const char* context)
 {
     json_t* eventSubscriptionPayload;
-    json_t* postRes;
     json_t* typeArray;
     char* sseUri;
     char* eventSubscriptionUri;
-    char* eventSubscriptionPayloadStr;
     char* destination = (char*)postbackUri;
     bool ret;
     int socket;
+    redfishPayload* postPayload;
+    asyncToSyncContext* asyncContext;
 
     if(service == NULL || postbackUri == NULL || callback == NULL)
     {
@@ -834,23 +837,42 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
         json_object_set(eventSubscriptionPayload, "EventTypes", typeArray);
         json_decref(typeArray);
     }
-    eventSubscriptionPayloadStr = json_dumps(eventSubscriptionPayload, 0);
-    json_decref(eventSubscriptionPayload);
-    if(eventSubscriptionPayloadStr == NULL)
+    postPayload = createRedfishPayload(eventSubscriptionPayload, service);
+    if(postPayload == NULL)
     {
         free(eventSubscriptionUri);
         return false;
-    } 
+    }
 
-    postRes = postUriFromService(service, eventSubscriptionUri, eventSubscriptionPayloadStr, 0, NULL);
-    free(eventSubscriptionUri);
-    free(eventSubscriptionPayloadStr);
-    if(postRes == NULL)
+    asyncContext = makeAsyncToSyncContext();
+    if(asyncContext == NULL)
     {
-        unregisterCallback(service, callback, eventTypes, context);
+        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate asyncContext!\n", __FUNCTION__);
         return false;
     }
-    json_decref(postRes);
+    ret = postUriFromServiceAsync(service, eventSubscriptionUri, postPayload, NULL, asyncToSyncConverter, asyncContext);
+    free(eventSubscriptionUri);
+    cleanupPayload(postPayload);
+    if(ret == false)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
+        cleanupAsyncToSyncContext(asyncContext); 
+        return false;
+    }
+    //Wait for the condition
+    cond_wait(&asyncContext->waitForIt, &asyncContext->spinLock);
+    if(asyncContext->data)
+    {
+        service->eventRegistrationUri = getPayloadUri(asyncContext->data);
+        cleanupPayload(asyncContext->data);
+    } 
+    if(asyncContext->success == false)
+    {
+        unregisterCallback(service, callback, eventTypes, context);
+        cleanupAsyncToSyncContext(asyncContext);
+        return false;
+    }
+    cleanupAsyncToSyncContext(asyncContext);
     return true;
 }
 
@@ -948,7 +970,27 @@ void serviceIncRef(redfishService* service)
 void terminateAsyncThread(redfishService* service);
 
 static void freeServicePtr(redfishService* service)
-{
+{ 
+    if(service->tcpSocket != -1)
+    {
+        close(service->tcpSocket);
+        service->tcpSocket = -1;
+#ifdef _MSC_VER
+        WaitForSingleObject(service->tcpThread, INFINITE);
+#else
+        pthread_join(service->tcpThread, NULL);
+#endif
+    }
+    if(service->eventRegistrationUri)
+    {
+        deleteUriFromServiceAsync(service, service->eventRegistrationUri, NULL, NULL, NULL);
+        free(service->eventRegistrationUri);
+    }
+    if(service->eventThreadQueue != NULL)
+    { 
+        terminateAsyncEventThread(service);
+    } 
+    terminateAsyncThread(service); 
     free(service->host);
     service->host = NULL;
     json_decref(service->versions);
@@ -967,21 +1009,6 @@ static void freeServicePtr(redfishService* service)
     {
         free(service->otherAuth);
         service->otherAuth = NULL;
-    }
-    if(service->tcpSocket != -1)
-    {
-        close(service->tcpSocket);
-        service->tcpSocket = -1;
-#ifdef _MSC_VER
-        WaitForSingleObject(service->tcpThread, INFINITE);
-#else
-        pthread_join(service->tcpThread, NULL);
-#endif
-    }
-    terminateAsyncThread(service);
-    if(service->eventThreadQueue != NULL)
-    { 
-        terminateAsyncEventThread(service);
     }
     if(service->selfTerm == false && service->eventTerm == false)
     {
@@ -1227,6 +1254,8 @@ typedef struct {
 static void didSessionAuthPost(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
 {
     createServiceSessionAuthAsyncContext* myContext = (createServiceSessionAuthAsyncContext*)context;
+
+    (void)httpCode;
 
     if(payload)
     {
