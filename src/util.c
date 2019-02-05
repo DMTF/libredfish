@@ -49,8 +49,106 @@ char* getStringTill(const char* string, const char* terminator, char** retEnd)
     return ret;
 }
 
+#ifdef _MSC_VER
+//Windows IP stuff
+#include <winsock2.h>
+#include <iphlpapi.h>
+#include <windows.h>
+#include <stdio.h>
+
+static void initWinsock()
+{
+	WORD wVersionRequested;
+	WSADATA wsaData;
+
+	/* Use the MAKEWORD(lowbyte, highbyte) macro declared in Windef.h */
+	wVersionRequested = MAKEWORD(2, 2);
+	WSAStartup(wVersionRequested, &wsaData);
+}
+
+static wchar_t* windowsStringFromCString(const char* cstr)
+{
+	size_t inputLength = strlen(cstr);
+	size_t ignore;
+	wchar_t* ret = (wchar_t*)calloc(inputLength + 1, sizeof(wchar_t));
+
+	mbstowcs_s(&ignore, ret, inputLength+1, cstr, inputLength+1);
+
+	return ret;
+}
+
+static PIP_ADAPTER_ADDRESSES getAdapterByName(const char* _interface, DWORD interfaceType, PIP_ADAPTER_ADDRESSES* freeMe)
+{
+	ULONG size = 4096;
+	ULONG ret;
+	PIP_ADAPTER_ADDRESSES addresses = (PIP_ADAPTER_ADDRESSES)malloc(size);
+	PIP_ADAPTER_ADDRESSES current;
+	PIP_ADAPTER_ADDRESSES adapter = NULL;
+	wchar_t* wideName;
+
+	wideName = windowsStringFromCString(_interface);
+
+	ret = GetAdaptersAddresses(interfaceType, 0, NULL, addresses, &size);
+	if (ret != 0)
+	{
+		return NULL;
+	}
+	current = addresses;
+	while (current)
+	{
+		if (strcmp(_interface, current->AdapterName) == 0 || wcscmp(wideName, current->FriendlyName) == 0)
+		{
+			adapter = current;
+			break;
+		}
+	}
+	free(wideName);
+	*freeMe = addresses;
+	return adapter;
+}
+
+static char* getWindowsIP(const char* _interface, DWORD addressType)
+{
+	PIP_ADAPTER_ADDRESSES bigBuff = NULL;
+	PIP_ADAPTER_ADDRESSES adapter;
+	DWORD rc;
+	char* ret = NULL;
+	DWORD strSize = 1024;
+	wchar_t addressStr[1024] = { 0 };
+	size_t maxLength;
+
+	initWinsock();
+
+	adapter = getAdapterByName(_interface, addressType, &bigBuff);
+	if (adapter && adapter->FirstUnicastAddress)
+	{
+		rc = WSAAddressToString(adapter->FirstUnicastAddress->Address.lpSockaddr, adapter->FirstUnicastAddress->Address.iSockaddrLength, NULL, addressStr, &strSize);
+		if (rc != 0)
+		{
+			printf("WSAAddressToString returned %d %d\n", rc, WSAGetLastError());
+		}
+		else
+		{
+			maxLength = wcslen(addressStr) + 1;
+			ret = (char*)calloc(maxLength, 1);
+			wcstombs_s(&maxLength, ret, maxLength, addressStr, strSize);
+		}
+	}
+	if (bigBuff)
+	{
+		free(bigBuff);
+	}
+
+	WSACleanup();
+	return ret;
+}
+#endif
+
 char* getIpv4Address(const char* interface)
 {
+#ifdef _MSC_VER
+    return getWindowsIP(interface, AF_INET);
+#else
     int fd;
     struct ifreq ifr;
     const char* tmp;
@@ -77,10 +175,14 @@ char* getIpv4Address(const char* interface)
 
     tmp = inet_ntop(AF_INET, &(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr), buf, sizeof(buf));
     return safeStrdup(tmp);
+#endif
 }
 
 char* getIpv6Address(const char* interface)
 {
+#ifdef _MSC_VER
+    return getWindowsIP(interface, AF_INET6);
+#else
     struct ifaddrs* ifap;
     struct ifaddrs* current;
     char host[NI_MAXHOST] = {0};
@@ -116,6 +218,7 @@ char* getIpv6Address(const char* interface)
     
     freeifaddrs(ifap);
     return safeStrdup(host);
+#endif
 }
 
 int getRandomSocket(const char* ip, unsigned int* portNum)
