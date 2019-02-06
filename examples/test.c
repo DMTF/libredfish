@@ -49,6 +49,7 @@ static struct option long_options[] =
     {"token",      required_argument, 0,      'T'},
     {"command",    required_argument, 0,      'c'},
     {"valgrind",   no_argument,       0,      'X'},
+    {"context",    required_argument, 0,      'C'},
     {0, 0, 0, 0}
 };
 
@@ -344,6 +345,7 @@ int main(int argc, char** argv)
     char*            username = NULL;
     char*            password = NULL;
     char*            token = NULL;
+    char*            userContext = NULL;
     enumeratorAuthentication auth;
     gotPayloadContext* context;
     commandMapping* command = NULL;
@@ -352,7 +354,7 @@ int main(int argc, char** argv)
 
     memset(&auth, 0, sizeof(auth));
 
-    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:X", long_options, &opt_index)) != -1)
+    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:XC:", long_options, &opt_index)) != -1)
     {
         switch(arg)
         {
@@ -424,6 +426,9 @@ int main(int argc, char** argv)
             case 'X':
                 valgrind = true;
                 break;
+            case 'C':
+                userContext = strdup(optarg);
+                break;
         }
     }
     if(host == NULL)
@@ -458,7 +463,7 @@ int main(int argc, char** argv)
 
     if(eventUri != NULL)
     {
-        if(registerForEvents(redfish, eventUri, REDFISH_EVENT_TYPE_ALL, printRedfishEvent, NULL) == true)
+        if(registerForEvents(redfish, eventUri, REDFISH_EVENT_TYPE_ALL, printRedfishEvent, userContext) == true)
         {
             signal(SIGINT, inthand);
             printf("Successfully registered. Waiting for events...\n");
@@ -475,6 +480,7 @@ int main(int argc, char** argv)
         {
             printf("Failed to register for events! Cleaning up...\n");
         }
+        safeFree(userContext);
         free(eventUri);
         serviceDecRefAndWait(redfish);
         if(host)
@@ -487,6 +493,7 @@ int main(int argc, char** argv)
         }
         return 0;
     }
+    safeFree(userContext);
 
     if(optind < argc)
     {
