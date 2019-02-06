@@ -1,5 +1,43 @@
 # Change Log
 
+## [1.1.5] - 2019-02-01
+- Fixed various leaks
+- Refactored some code to remove duplications
+
+## [1.1.4] - 2019-01-11
+- Fixed various leaks
+- Added ability to specify a timeout per request
+- Added asynchronous initialization
+- Added operation to copy redfish payload
+- Fixed RPM spec file version
+- Added devel package to RPM spec file
+
+## [1.1.3] - 2018-11-30
+- Workaround for implementations that do not present the required Members property in resource collections that are empty
+- Error out when sync calls are done on an async callback
+- Workaround for server versions that don't correctly handle Keep-Alive with Redfish
+
+## [1.1.2] - 2018-10-26
+- Minor compiler warning fixes
+
+## [1.1.1] - 2018-10-19
+- Added support for != and null operators
+- Fixed reference count with several synchronous calls
+
+## [1.1.0] - 2018-10-12
+- Fixed crash due to null passed to strdup
+- Added Payload PATCH/POST/DELETE helper functions
+- Added getResourceName function
+
+## [1.0.9] - 2018-10-05
+- Various fixes for memory management
+- Allow paths inside of collections
+- Added helper to get a payload by index when no network is present
+
+## [1.0.8] - 2018-09-28
+- Added redpath for all members of a collection
+- Added helper to get the URI for a payload
+
 ## [1.0.7] - 2018-09-21
 - Added helper to get the path string for asynchronous operations
 - Fixed size issue with synchronous POST operations

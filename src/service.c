@@ -53,7 +53,8 @@ static zactor_t* eventActor = NULL;
 
 /** Default asynchronous options for Redfish calls **/
 redfishAsyncOptions gDefaultOptions = {
-    .accept = REDFISH_ACCEPT_JSON
+    .accept = REDFISH_ACCEPT_JSON,
+    .timeout = 20
 };
 
 static redfishService* createServiceEnumeratorNoAuth(const char* host, const char* rootUri, bool enumerate, unsigned int flags);
@@ -73,6 +74,11 @@ static void addStringToJsonArray(json_t* array, const char* value);
 static void addStringToJsonObject(json_t* object, const char* key, const char* value);
 static redfishPayload* getPayloadFromAsyncResponse(asyncHttpResponse* response, redfishService* service);
 static unsigned char* base64_encode(const unsigned char* src, size_t len, size_t* out_len);
+static bool createServiceEnumeratorNoAuthAsync(const char* host, const char* rootUri, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
+static bool createServiceEnumeratorBasicAuthAsync(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
+static bool createServiceEnumeratorSessionAuthAsync(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
+static bool createServiceEnumeratorTokenAsync(const char* host, const char* rootUri, const char* token, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
+static bool getVersionsAsync(redfishService* service, const char* rootUri, redfishCreateAsyncCallback callback, void* context);
 
 redfishService* createServiceEnumerator(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags)
 {
@@ -138,15 +144,36 @@ static void cleanupAsyncToSyncContext(asyncToSyncContext* context)
     free(context);
 }
 
+static bool isOnAsyncThread(redfishService* service)
+{
+    if(service == NULL)
+    {
+        return false;
+    }
+#ifdef _MSC_VER
+    return (GetThreadId(service->asyncThread) == GetCurrentThreadId());
+#else
+    return (service->asyncThread == pthread_self());
+#endif
+}
+
 void asyncToSyncConverter(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
 {
     asyncToSyncContext* myContext = (asyncToSyncContext*)context;
+    char* content;
     (void)httpCode;
     myContext->success = success;
     myContext->data = payload;
     if(payload != NULL && payload->content != NULL)
     {
-        REDFISH_DEBUG_DEBUG_PRINT("%s: Got non-json response to old sync operation %s\n", __FUNCTION__, payload->content);
+        content = malloc(payload->contentLength+1);
+        if(content)
+        {
+            memcpy(content, payload->content, payload->contentLength);
+            content[payload->contentLength] = 0; //HTTP payloads aren't null terminated...
+            REDFISH_DEBUG_DEBUG_PRINT("%s: Got non-json response to old sync operation %s\n", __FUNCTION__, content);
+            free(content);
+        }
     }
     cond_broadcast(&myContext->waitForIt);
 }
@@ -158,6 +185,15 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     bool tmp;
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s\n", __FUNCTION__, service, uri);
+
+    if(isOnAsyncThread(service))
+    {
+#ifdef _DEBUG
+        //Abort a debug build so there is a core file pointing to this function and it's caller
+        abort();
+#endif
+        return NULL;
+    }
 
     context = makeAsyncToSyncContext();
     if(context == NULL)
@@ -176,14 +212,15 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     cond_wait(&context->waitForIt, &context->spinLock);
     if(context->data)
     {
-        json = context->data->json;
-        free(context->data);
+        json = json_incref(context->data->json);
+        cleanupPayload(context->data);
     }
     else
     {
         json = NULL;
     }
     cleanupAsyncToSyncContext(context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. json = %p\n", __FUNCTION__, json);
     return json;
 }
 
@@ -196,6 +233,15 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, content = %s\n", __FUNCTION__, service, uri, content);
 
+    if(isOnAsyncThread(service))
+    {
+#ifdef _DEBUG
+        //Abort a debug build so there is a core file pointing to this function and it's caller
+        abort();
+#endif
+        return NULL;
+    }
+
     context = makeAsyncToSyncContext();
     if(context == NULL)
     {
@@ -204,6 +250,7 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     }
     payload = createRedfishPayloadFromString(content, service);
     tmp = patchUriFromServiceAsync(service, uri, payload, NULL, asyncToSyncConverter, context);
+    cleanupPayload(payload);
     if(tmp == false)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
@@ -214,8 +261,8 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     cond_wait(&context->waitForIt, &context->spinLock);
     if(context->data)
     {
-        json = context->data->json;
-        free(context->data);
+        json = json_incref(context->data->json);
+        cleanupPayload(context->data);
     }
     else
     {
@@ -234,6 +281,15 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, content = %s\n", __FUNCTION__, service, uri, content);
 
+    if(isOnAsyncThread(service))
+    {
+#ifdef _DEBUG
+        //Abort a debug build so there is a core file pointing to this function and it's caller
+        abort();
+#endif
+        return NULL;
+    }
+
     context = makeAsyncToSyncContext();
     if(context == NULL)
     {
@@ -242,24 +298,26 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     }
     payload = createRedfishPayloadFromContent(content, contentLength, contentType, service);
     tmp = postUriFromServiceAsync(service, uri, payload, NULL, asyncToSyncConverter, context);
+    cleanupPayload(payload);
     if(tmp == false)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
-        cleanupAsyncToSyncContext(context);
+        cleanupAsyncToSyncContext(context); 
         return NULL;
     }
     //Wait for the condition
     cond_wait(&context->waitForIt, &context->spinLock);
     if(context->data)
     {
-        json = context->data->json;
-        free(context->data);
+        json = json_incref(context->data->json);
+        cleanupPayload(context->data);
     }
     else
     {
         json = NULL;
     }
     cleanupAsyncToSyncContext(context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit.\n", __FUNCTION__);
     return json;
 }
 
@@ -269,6 +327,15 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     bool tmp;
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s\n", __FUNCTION__, service, uri);
+
+    if(isOnAsyncThread(service))
+    {
+#ifdef _DEBUG
+        //Abort a debug build so there is a core file pointing to this function and it's caller
+        abort();
+#endif
+        return NULL;
+    }
 
     context = makeAsyncToSyncContext();
     if(context == NULL)
@@ -334,6 +401,7 @@ static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* res
         freeAsyncResponse(response);
         serviceDecRef(myContext->service);
         free(context);
+        REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. Location Redirect...\n", __FUNCTION__);
         return;
     }
     if(myContext->callback)
@@ -349,6 +417,7 @@ static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* res
     freeAsyncResponse(response);
     serviceDecRef(myContext->service);
     free(context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit.\n", __FUNCTION__);
 }
 
 static void setupRequestFromOptions(asyncHttpRequest* request, redfishService* service, redfishAsyncOptions* options)
@@ -389,6 +458,32 @@ static void setupRequestFromOptions(asyncHttpRequest* request, redfishService* s
     {
         addRequestHeader(request, "Authorization", service->otherAuth);
     }
+    request->timeout = options->timeout;
+}
+
+bool createServiceEnumeratorAsync(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags, redfishCreateAsyncCallback callback, void* context)
+{
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. host = %s, rootUri = %s, auth = %p, callback = %p, context = %p\n", __FUNCTION__, host, rootUri, auth, callback, context);
+    if(auth == NULL)
+    {
+        return createServiceEnumeratorNoAuthAsync(host, rootUri, flags, callback, context);
+    }
+    if(auth->authType == REDFISH_AUTH_BASIC)
+    {
+        return createServiceEnumeratorBasicAuthAsync(host, rootUri, auth->authCodes.userPass.username, auth->authCodes.userPass.password, flags, callback, context);
+    }
+    else if(auth->authType == REDFISH_AUTH_BEARER_TOKEN)
+    {
+        return createServiceEnumeratorTokenAsync(host, rootUri, auth->authCodes.authToken.token, flags, callback, context);
+    }
+    else if(auth->authType == REDFISH_AUTH_SESSION)
+    {
+        return createServiceEnumeratorSessionAuthAsync(host, rootUri, auth->authCodes.userPass.username, auth->authCodes.userPass.password, flags, callback, context);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
@@ -398,11 +493,14 @@ bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsy
     rawAsyncCallbackContextWrapper* myContext;
     bool ret;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, options = %p, callback = %p, context = %p\n", __FUNCTION__, service, uri, options, callback, context);
+
     serviceIncRef(service);
 
     url = makeUrlForService(service, uri);
     if(!url)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not make url for uri %s\n", __FUNCTION__, uri);
         serviceDecRef(service);
         return NULL;
     }
@@ -421,6 +519,7 @@ bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsy
     {
         free(myContext);
     }
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. ret = %u\n", __FUNCTION__, ret);
     return ret;
 }
 
@@ -430,6 +529,8 @@ bool patchUriFromServiceAsync(redfishService* service, const char* uri, redfishP
     asyncHttpRequest* request;
     rawAsyncCallbackContextWrapper* myContext;
     bool ret;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, payload = %p\n", __FUNCTION__, service, uri, payload);
 
     serviceIncRef(service);
 
@@ -825,6 +926,7 @@ void serviceIncRef(redfishService* service)
 #else
     __sync_fetch_and_add(&(service->refCount), 1);
 #endif
+    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __FUNCTION__, service->refCount);
 }
 
 void terminateAsyncThread(redfishService* service);
@@ -851,7 +953,10 @@ static void freeServicePtr(redfishService* service)
         service->otherAuth = NULL;
     }
     terminateAsyncThread(service);
-    free(service);
+    if(service->selfTerm == false)
+    {
+        free(service);
+    }
 }
 
 void serviceDecRef(redfishService* service)
@@ -869,6 +974,7 @@ void serviceDecRef(redfishService* service)
 #else
     __sync_fetch_and_sub(&(service->refCount), 1);
 #endif
+    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __FUNCTION__, service->refCount);
     if(service->refCount == 0)
     {
         freeServicePtr(service);
@@ -929,6 +1035,31 @@ static redfishService* createServiceEnumeratorNoAuth(const char* host, const cha
     return ret;
 }
 
+static bool createServiceEnumeratorNoAuthAsync(const char* host, const char* rootUri, unsigned int flags, redfishCreateAsyncCallback callback, void* context)
+{
+    redfishService* ret;
+    bool rc;
+
+    ret = (redfishService*)calloc(1, sizeof(redfishService)); 
+    if(ret == NULL)
+    {
+        return false;
+    }
+    serviceIncRef(ret);
+#ifdef _MSC_VER
+    ret->host = _strdup(host);
+#else
+    ret->host = strdup(host);
+#endif
+    ret->flags = flags;
+    rc = getVersionsAsync(ret, rootUri, callback, context);
+    if(rc == false)
+    {
+        serviceDecRef(ret);
+    }
+    return rc;
+}
+
 static redfishService* createServiceEnumeratorBasicAuth(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags)
 {
     redfishService* ret;
@@ -950,6 +1081,39 @@ static redfishService* createServiceEnumeratorBasicAuth(const char* host, const 
     ret->otherAuth = strdup(userPass);
     ret->versions = getVersions(ret, rootUri);
     return ret;
+}
+
+static bool createServiceEnumeratorBasicAuthAsync(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags, redfishCreateAsyncCallback callback, void* context)
+{
+    redfishService* ret;
+    char userPass[1024] = {0};
+    char* base64;
+    size_t original;
+    size_t newSize;
+    bool rc;
+
+    original = snprintf(userPass, sizeof(userPass), "%s:%s", username, password);
+    base64 = (char*)base64_encode((unsigned char*)userPass, original, &newSize);
+    if(base64 == NULL)
+    {
+        return NULL;
+    }
+    snprintf(userPass, sizeof(userPass), "Basic %s", base64);
+    free(base64);
+
+    //This does no network interactions when enumerate is false... use it because it's easier
+    ret = createServiceEnumeratorNoAuth(host, rootUri, false, flags);
+    if(ret == NULL)
+    {
+        return false;
+    }
+    ret->otherAuth = strdup(userPass);
+    rc = getVersionsAsync(ret, rootUri, callback, context);
+    if(rc == false)
+    {
+        serviceDecRef(ret);
+    }
+    return rc;
 }
 
 static redfishService* createServiceEnumeratorSessionAuth(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags)
@@ -1017,6 +1181,180 @@ static redfishService* createServiceEnumeratorSessionAuth(const char* host, cons
     return ret;
 }
 
+typedef struct {
+    char* username;
+    char* password;
+    redfishCreateAsyncCallback originalCallback;
+    void* originalContext;
+    redfishService* service;
+} createServiceSessionAuthAsyncContext;
+
+static void didSessionAuthPost(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    createServiceSessionAuthAsyncContext* myContext = (createServiceSessionAuthAsyncContext*)context;
+
+    if(payload)
+    {
+        cleanupPayload(payload);
+    }
+
+    if(success == false)
+    {
+        myContext->originalCallback(NULL, myContext->originalContext);
+        free(myContext->username);
+        free(myContext->password);
+        serviceDecRef(myContext->service);
+        free(myContext);
+        return;
+    }
+
+    //The session token should already be set if the redfish service works according to spec...
+    if(myContext->service->sessionToken == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("Session returned success (%u) but did not set X-Auth-Token header...\n", httpCode);
+        myContext->originalCallback(NULL, myContext->originalContext);
+        free(myContext->username);
+        free(myContext->password);
+        serviceDecRef(myContext->service);
+        free(myContext);
+        return;
+    }
+    myContext->originalCallback(myContext->service, myContext->originalContext);
+    free(myContext->username);
+    free(myContext->password);
+    free(myContext);
+}
+
+static redfishPayload* createAuthPayload(const char* username, const char* password, redfishService* service)
+{
+    json_t* post = json_object();
+    addStringToJsonObject(post, "UserName", username);
+    addStringToJsonObject(post, "Password", password);
+
+    return createRedfishPayload(post, service);
+}
+
+static void gotServiceRootServiceAuth(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    createServiceSessionAuthAsyncContext* myContext = (createServiceSessionAuthAsyncContext*)context;
+    redfishPayload* links;
+    redfishPayload* authPayload;
+    json_t* session;
+    json_t* odataId;
+    const char* uri;
+    bool rc;
+
+    (void)httpCode;
+
+    if(success == false)
+    {
+        myContext->originalCallback(NULL, myContext->originalContext);
+        free(myContext->username);
+        free(myContext->password);
+        serviceDecRef(myContext->service);
+        free(myContext);
+        return;
+    }
+
+    links = getPayloadByNodeNameNoNetwork(payload, "Links");
+    cleanupPayload(payload);
+    if(links == NULL)
+    {
+        myContext->originalCallback(NULL, myContext->originalContext);
+        free(myContext->username);
+        free(myContext->password);
+        serviceDecRef(myContext->service);
+        free(myContext);
+        return;
+    }
+    session = json_object_get(links->json, "Sessions");
+    if(session == NULL)
+    {
+        cleanupPayload(links);
+        myContext->originalCallback(NULL, myContext->originalContext);
+        free(myContext->username);
+        free(myContext->password);
+        serviceDecRef(myContext->service);
+        free(myContext);
+        return;
+    }
+    odataId = json_object_get(session, "@odata.id");
+    if(odataId == NULL)
+    {
+        cleanupPayload(links);
+        myContext->originalCallback(NULL, myContext->originalContext);
+        free(myContext->username);
+        free(myContext->password);
+        serviceDecRef(myContext->service);
+        free(myContext);
+        return;
+    }
+    uri = json_string_value(odataId);
+
+    authPayload = createAuthPayload(myContext->username, myContext->password, myContext->service);
+    if(authPayload == NULL)
+    {
+        cleanupPayload(links);
+        myContext->originalCallback(NULL, myContext->originalContext);
+        free(myContext->username);
+        free(myContext->password);
+        serviceDecRef(myContext->service);
+        free(myContext);
+        return;
+    }
+
+    rc = postUriFromServiceAsync(myContext->service, uri, authPayload, NULL, didSessionAuthPost, myContext);
+    cleanupPayload(links);
+    cleanupPayload(authPayload); 
+    if(rc == false)
+    {
+        myContext->originalCallback(NULL, myContext->originalContext);
+        free(myContext->username);
+        free(myContext->password);
+        serviceDecRef(myContext->service);
+        free(myContext);
+    }
+}
+
+static void finishedRedfishCreate(redfishService* service, void* context)
+{
+    bool rc;
+    createServiceSessionAuthAsyncContext* myContext = (createServiceSessionAuthAsyncContext*)context;
+
+    myContext->service = service;
+
+    rc = getRedfishServiceRootAsync(service, NULL, NULL, gotServiceRootServiceAuth, myContext);
+    if(rc == false)
+    {
+        serviceDecRef(myContext->service);
+        free(myContext->username);
+        free(myContext->password);
+        free(myContext);
+    }
+}
+
+static bool createServiceEnumeratorSessionAuthAsync(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags, redfishCreateAsyncCallback callback, void* context)
+{
+    bool rc;
+    createServiceSessionAuthAsyncContext* myContext;
+
+    myContext = malloc(sizeof(createServiceSessionAuthAsyncContext));
+    myContext->username = strdup(username);
+    myContext->password = strdup(password);
+    myContext->originalCallback = callback;
+    myContext->originalContext = context;
+    myContext->service = NULL;
+
+    rc = createServiceEnumeratorNoAuthAsync(host, rootUri, flags, finishedRedfishCreate, myContext);
+    if(rc == false)
+    {
+        free(myContext->username);
+        free(myContext->password);
+        free(myContext);
+    }
+    return rc;
+}
+
 static redfishService* createServiceEnumeratorToken(const char* host, const char* rootUri, const char* token, unsigned int flags)
 {
     redfishService* ret;
@@ -1029,6 +1367,26 @@ static redfishService* createServiceEnumeratorToken(const char* host, const char
     ret->bearerToken = strdup(token);
     ret->versions = getVersions(ret, rootUri);
     return ret;
+}
+
+static bool createServiceEnumeratorTokenAsync(const char* host, const char* rootUri, const char* token, unsigned int flags, redfishCreateAsyncCallback callback, void* context)
+{
+    redfishService* ret;
+    bool rc;
+
+    //This does no network interactions when enumerate is false... use it because it's easier
+    ret = createServiceEnumeratorNoAuth(host, rootUri, false, flags);
+    if(ret == NULL)
+    {
+        return false;
+    }
+    ret->bearerToken = strdup(token);
+    rc = getVersionsAsync(ret, rootUri, callback, context);
+    if(rc == false)
+    {
+        serviceDecRef(ret);
+    }
+    return rc;
 }
 
 static char* makeUrlForService(redfishService* service, const char* uri)
@@ -1048,19 +1406,22 @@ static json_t* getVersions(redfishService* service, const char* rootUri)
 {
     json_t* data;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, rootUri = %s\n", __FUNCTION__, service, rootUri);
+
     if(service->flags & REDFISH_FLAG_SERVICE_NO_VERSION_DOC)
     {
         service->versions = json_object();
         if(service->versions == NULL)
         {
+            REDFISH_DEBUG_ERR_PRINT("%s: Error. Unable to allocate simple json object!\n", __FUNCTION__);
             return NULL;
         }
         addStringToJsonObject(service->versions, "v1", "/redfish/v1");
-        return service->versions;
+        data = service->versions;
     }
-    if(rootUri != NULL)
+    else if(rootUri != NULL)
     {
-        return getUriFromService(service, rootUri);
+        data = getUriFromService(service, rootUri);
     }
     else
     {
@@ -1070,8 +1431,113 @@ static json_t* getVersions(redfishService* service, const char* rootUri)
             //Some redfish services don't respond here, but do respond at /redfish/
             data = getUriFromService(service, "/redfish/");
         }
-        return data;
     }
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exited. data = %p\n", __FUNCTION__, data);
+    return data;
+}
+
+typedef struct {
+    redfishService* service;
+    redfishCreateAsyncCallback callback;
+    void* context;
+    bool rootUriProvided;
+} getVersionsContext;
+
+static void* doCallbackInSeperateThread(void* data)
+{
+    getVersionsContext* myContext = (getVersionsContext*)data;
+
+    myContext->callback(myContext->service, myContext->context);
+    free(myContext);
+    pthread_exit(NULL);
+    return NULL;
+}
+
+static void gotVersions(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    getVersionsContext* myContext = (getVersionsContext*)context;
+    bool rc;
+    pthread_attr_t attr;
+    pthread_t thread;
+
+    (void)httpCode;
+
+    if(success == false && myContext->rootUriProvided == true)
+    {
+        serviceDecRef(myContext->service);
+        myContext->callback(NULL, myContext->context);
+        free(myContext);
+        return;
+    }
+    if(success == false)
+    {
+        //Some redfish services don't handle the URI /redfish correctly and need /redfish/
+        myContext->rootUriProvided = true;
+        rc = getUriFromServiceAsync(myContext->service, "/redfish/", NULL, gotVersions, myContext);
+        if(rc == false)
+        {
+            serviceDecRef(myContext->service);
+            myContext->callback(NULL, myContext->context);
+            free(myContext);
+        }
+        return;
+    }
+
+    myContext->service->versions = payload->json;
+    //Get rid of the payload's service reference...
+    serviceDecRef(myContext->service);
+    free(payload);
+    //In order to be more useful and let callers actually cleanup things in their callback we're doing this on a seperate thread...
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_create(&thread, &attr, doCallbackInSeperateThread, myContext);
+    
+}
+
+static bool getVersionsAsync(redfishService* service, const char* rootUri, redfishCreateAsyncCallback callback, void* context)
+{
+    bool rc;
+    getVersionsContext* myContext;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, rootUri = %s\n", __FUNCTION__, service, rootUri);
+
+    if(service->flags & REDFISH_FLAG_SERVICE_NO_VERSION_DOC)
+    {
+        service->versions = json_object();
+        if(service->versions == NULL)
+        {
+            REDFISH_DEBUG_ERR_PRINT("%s: Error. Unable to allocate simple json object!\n", __FUNCTION__);
+            return NULL;
+        }
+        addStringToJsonObject(service->versions, "v1", "/redfish/v1");
+        callback(service, context);
+        return true;
+    }
+
+    myContext = malloc(sizeof(getVersionsContext));
+    if(myContext == NULL)
+    {
+        serviceDecRef(service);
+        return false;
+    }
+    myContext->service = service;
+    myContext->callback = callback;
+    myContext->context = context;
+    myContext->rootUriProvided = (rootUri != NULL);
+
+    if(rootUri != NULL)
+    {
+        rc = getUriFromServiceAsync(service, rootUri, NULL, gotVersions, myContext);
+    }
+    else
+    {
+        rc = getUriFromServiceAsync(service, "/redfish", NULL, gotVersions, myContext);
+    }
+    if(rc == false)
+    {
+        free(myContext);
+    }
+    return rc;
 }
 
 #if CZMQ_VERSION_MAJOR >= 3

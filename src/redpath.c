@@ -7,11 +7,10 @@
 #include <string.h>
 
 #include <redpath.h>
+#include "util.h"
 
 static char* getVersion(const char* path, char** end);
 static void parseNode(const char* path, redPathNode* node, redPathNode** end);
-
-static char* getStringTill(const char* string, const char* terminator, char** retEnd);
 
 redPathNode* parseRedPath(const char* path)
 {
@@ -80,10 +79,6 @@ void cleanupRedPath(redPathNode* node)
     {
         free(node->nodeName);
     }
-    if(node->op)
-    {
-        free(node->op);
-    }
     if(node->propName)
     {
         free(node->propName);
@@ -109,6 +104,13 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
     size_t tmpIndex;
     char* opChars;
 
+    if(strcmp(nodeName, "*") == 0)
+    {
+        node->op = REDPATH_OP_ANY;
+        *end = node;
+        free(nodeName);
+        return;
+    }
     node->nodeName = nodeName;
     if(indexStart == NULL)
     {
@@ -132,45 +134,75 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
         node->next->isIndex = true;
         return;
     }
-    opChars = strpbrk(index, "<>=");
+    opChars = strpbrk(index, "<>=!");
     if(opChars == NULL && index[0] == '*')
     {
-#ifdef _MSC_VER
-		node->next->op = _strdup("any");
-#else
-        node->next->op = strdup("any");
-#endif
+        free(index);
+        node->next->op = REDPATH_OP_ANY;
         return;
     }
     else if(opChars == NULL)
     {
-        //TODO handle last() and position()
-#ifdef _MSC_VER
-		node->next->op = _strdup("exists");
-#else
-        node->next->op = strdup("exists");
-#endif
-        node->next->propName = index;
+        if(strncmp(index, "last()", 6) == 0)
+        {
+            node->next->op = REDPATH_OP_LAST;
+        }
+        else
+        {
+            //TODO handle position()
+            node->next->op = REDPATH_OP_EXISTS;
+            node->next->propName = index;
+        }
         return;
     }
     node->next->propName = (char*)malloc((opChars - index)+1);
     memcpy(node->next->propName, index, (opChars - index));
     node->next->propName[(opChars - index)] = 0;
 
-    tmpIndex = 1;
-    while(1)
+    switch(opChars[0])
     {
-        if(opChars[tmpIndex] == '=' || opChars[tmpIndex] == '<' || opChars[tmpIndex] == '>')
-        {
-            tmpIndex++;
-            continue;
-        }
-        break;
+        case '=':
+            tmpIndex = 1;
+            node->next->op = REDPATH_OP_EQUAL;
+            break;
+        case '<':
+            if(opChars[1] == '=')
+            {
+                node->next->op = REDPATH_OP_LESS_EQUAL;
+                tmpIndex = 2;
+            }
+            else
+            {
+                node->next->op = REDPATH_OP_LESS;
+                tmpIndex = 1;
+            }
+            break;
+        case '>':
+            if(opChars[1] == '=')
+            {
+                node->next->op = REDPATH_OP_GREATER_EQUAL;
+                tmpIndex = 2;
+            }
+            else
+            {
+                node->next->op = REDPATH_OP_GREATER;
+                tmpIndex = 1;
+            }
+            break;
+        case '!':
+            if(opChars[1] != '=')
+            {
+                node->next->op = REDPATH_OP_ERROR;
+                return;
+            }
+            tmpIndex = 2;
+            node->next->op = REDPATH_OP_NOTEQUAL;
+            break;
+        default:
+            node->next->op = REDPATH_OP_ERROR;
+            free(index);
+            return;
     }
-
-    node->next->op = (char*)malloc(tmpIndex+1);
-    memcpy(node->next->op, opChars, tmpIndex);
-    node->next->op[tmpIndex] = 0;
 
 #ifdef _MSC_VER
 	node->next->value = _strdup(opChars + tmpIndex);
@@ -180,26 +212,3 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
     free(index);
 }
 
-static char* getStringTill(const char* string, const char* terminator, char** retEnd)
-{
-    char* ret;
-    char* end;
-    end = strstr((char*)string, terminator);
-    if(retEnd)
-    {
-        *retEnd = end;
-    }
-    if(end == NULL)
-    {
-        //No terminator
-#ifdef _MSC_VER
-		return _strdup(string);
-#else
-        return strdup(string);
-#endif
-    }
-    ret = (char*)malloc((end-string)+1);
-    memcpy(ret, string, (end-string));
-    ret[(end-string)] = 0;
-    return ret;
-}

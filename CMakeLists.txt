@@ -34,6 +34,9 @@ endif()
 add_executable(redfishtest "${CMAKE_CURRENT_SOURCE_DIR}/examples/test.c")
 target_link_libraries(redfishtest redfish)
 
+add_executable(redfishtestasync "${CMAKE_CURRENT_SOURCE_DIR}/examples/testAsync.c")
+target_link_libraries(redfishtestasync redfish)
+
 if(CZMQ_FOUND)
   add_executable(redfishevent "${CMAKE_CURRENT_SOURCE_DIR}/httpd/cgi.c")
   target_link_libraries(redfishevent czmq)
@@ -42,5 +45,5 @@ endif()
 ENABLE_TESTING()
 
 if(CMAKE_COMPILER_IS_GNUCC)
-    add_definitions(-Wall -Wextra -Wdeclaration-after-statement -ggdb3)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wdeclaration-after-statement -ggdb3")
 endif()

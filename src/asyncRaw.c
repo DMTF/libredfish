@@ -108,6 +108,15 @@ bool startRawAsyncRequest(redfishService* service, asyncHttpRequest* request, as
     return true;
 }
 
+thread getThreadId()
+{
+#ifndef _MSC_VER
+    return pthread_self();
+#else
+    return GetCurrentThread();
+#endif
+}
+
 void terminateAsyncThread(redfishService* service)
 {
     asyncWorkItem* workItem;
@@ -126,18 +135,31 @@ void terminateAsyncThread(redfishService* service)
     }
     workItem->term = true;
     queuePush(service->queue, workItem);
-#ifdef _MSC_VER
-    WaitForSingleObject(service->asyncThread, INFINITE);
-#else
-    x = pthread_join(service->asyncThread, NULL);
-    if(x == 35)
+    if(service->asyncThread == getThreadId())
     {
-        //Workaround for valgrind
-        sleep(10);
-    }
+        REDFISH_DEBUG_INFO_PRINT("%s: Async thread self cleanup...\n", __FUNCTION__);
+#ifndef _MSC_VER
+        //Need to set this thread detached and make it clean itself up
+        pthread_detach(pthread_self());
 #endif
-    freeQueue(service->queue);
-    service->queue = NULL;
+        service->selfTerm = true;
+    }
+    else
+    {
+        REDFISH_DEBUG_INFO_PRINT("%s: Async thread other thread cleanup...\n", __FUNCTION__);
+#ifdef _MSC_VER
+        WaitForSingleObject(service->asyncThread, INFINITE);
+#else
+        x = pthread_join(service->asyncThread, NULL);
+        if(x == 35)
+        {
+            //Workaround for valgrind
+            sleep(10);
+        }
+#endif
+        freeQueue(service->queue);
+        service->queue = NULL;
+    }
 }
 
 void freeAsyncRequest(asyncHttpRequest* request)
@@ -200,7 +222,8 @@ struct MemoryStruct
 
 threadRet rawAsyncWorkThread(void* data)
 {
-    queue* q = (queue*)data;
+    redfishService* service = (redfishService*)data;
+    queue* q = service->queue;
     asyncWorkItem* workItem = NULL;
     CURL* curl;
     CURLcode res;
@@ -211,6 +234,7 @@ threadRet rawAsyncWorkThread(void* data)
     char headerStr[1024];
     httpHeader* current;
     char* redirect;
+    bool noReuse = false;
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
@@ -230,8 +254,7 @@ threadRet rawAsyncWorkThread(void* data)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteMemory);
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, curlReadMemory);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, asyncHeaderCallback);
-    curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, curlSeekMemory);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 20L);
+    curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, curlSeekMemory); 
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readChunk);
     curl_easy_setopt(curl, CURLOPT_READDATA, &writeChunk);
 
@@ -305,8 +328,15 @@ threadRet rawAsyncWorkThread(void* data)
                 break;
             case PATCH:
                 curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PATCH");
+                curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
                 break;
         }
+        if(noReuse)
+        {
+            curl_easy_setopt(curl, CURLOPT_FRESH_CONNECT, 1L);
+            curl_easy_setopt(curl, CURLOPT_FORBID_REUSE, 1L);
+        }
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, workItem->request->timeout);
         curl_easy_setopt(curl, CURLOPT_URL, workItem->request->url);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
         res = curl_easy_perform(curl);
@@ -342,9 +372,17 @@ threadRet rawAsyncWorkThread(void* data)
                 response->httpResponseCode = 0xFFFF;
                 response->body = NULL;
                 response->bodySize = 0;
+                safeFree(readChunk.memory);
             }
             else
             {
+                //This particular server version does not handle connection reuse correctly, so don't do it on that server
+                current = responseGetHeader(response, "Server");
+                if(current && (strcmp(current->value, "Appweb/4.5.4") == 0))
+                {
+                    noReuse = true;
+                }
+
                 response->connectError = 0;
                 curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response->httpResponseCode);
                 REDFISH_DEBUG_NOTICE_PRINT("%s: Got response for url %s with code %ld\n", __FUNCTION__, workItem->request->url, response->httpResponseCode);
@@ -363,6 +401,12 @@ threadRet rawAsyncWorkThread(void* data)
     safeFree(workItem);
     curl_easy_cleanup(curl);
     curl_global_cleanup(); //Must be called the same number of times as init...
+    if(service->selfTerm)
+    {
+        freeQueue(service->queue);
+        service->queue = NULL;
+        free(service);
+    }
 #ifdef _MSC_VER
     return 0;
 #else
@@ -413,9 +457,9 @@ static void initAsyncThread(redfishService* service)
 static void startAsyncThread(redfishService* service)
 {
 #ifdef _MSC_VER
-    service->asyncThread = CreateThread(NULL, 0, rawAsyncWorkThread, service->queue, 0, NULL);
+    service->asyncThread = CreateThread(NULL, 0, rawAsyncWorkThread, service, 0, NULL);
 #else
-    pthread_create(&(service->asyncThread), NULL, rawAsyncWorkThread, service->queue);
+    pthread_create(&(service->asyncThread), NULL, rawAsyncWorkThread, service);
 #endif
 }
 

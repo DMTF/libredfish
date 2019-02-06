@@ -92,11 +92,36 @@ redfishState getResourceState(redfishPayload* payload)
     return RedfishStateUnknown;
 }
 
+char* getResourceName(redfishPayload* payload)
+{
+    redfishPayload* name;
+    char* ret;
+
+    if(payload == NULL)
+    {
+        REDFISH_DEBUG_WARNING_PRINT("%s: Payload is NULL\n", __FUNCTION__);
+        return NULL;
+    }
+    name = getPayloadByNodeNameNoNetwork(payload, "Name");
+    if(name == NULL)
+    {
+        REDFISH_DEBUG_WARNING_PRINT("%s: Unable to obtain Name resource from payload...\n", __FUNCTION__);
+        return NULL;
+    }
+    ret = getPayloadStringValue(name);
+    cleanupPayload(name);
+    return ret;
+}
+
 static redfishHealth _getResourceHealth(redfishPayload* payload, const char* subElement, const char* function)
 {
     redfishPayload* status;
     redfishPayload* health;
     char* healthStr;
+
+#ifndef _DEBUG
+    (void)function;
+#endif
 
     if(payload == NULL)
     {

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017 DMTF. All rights reserved.
+// Copyright 2018 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
@@ -48,7 +48,6 @@ static struct option long_options[] =
     {"verbose",    no_argument,       0,      'v'},
     {"token",      required_argument, 0,      'T'},
     {"command",    required_argument, 0,      'c'},
-    {"valgrind",   no_argument,       0,      'X'},
     {0, 0, 0, 0}
 };
 
@@ -237,10 +236,6 @@ void gotPayload(bool success, unsigned short httpCode, redfishPayload* payload, 
     if(success == false)
     {
         printf("Got a failure, httpCode = %u\n", httpCode);
-        if(payload == NULL)
-        {
-            free(context);
-        }
     }
     if(payload)
     {
@@ -329,30 +324,73 @@ static commandMapping* getCommandByString(const char* name)
     return NULL;
 }
 
+typedef struct {
+    char*           query;
+    char*           filename;
+    unsigned int    method;
+    commandMapping* command;
+    int             argc;
+    char**          argv;
+} redfishParams;
+
+redfishParams gRedfishParams = {0};
+
+static void gotRedfishService(redfishService* service, void* context)
+{
+    pthread_mutex_t*   mutex = (pthread_mutex_t*)context;
+    char*              leaf = NULL; 
+    gotPayloadContext* myContext;
+ 
+    switch(gRedfishParams.method)
+    {
+        default:
+            break;
+        case 1:
+            if(gRedfishParams.query)
+            {
+                leaf = strrchr(gRedfishParams.query, '/');
+                if(leaf)
+                {
+                    leaf[0] = '\0';
+                    leaf++;
+                }
+            }
+            break;
+    }
+    myContext = malloc(sizeof(gotPayloadContext));
+    myContext->method = gRedfishParams.method;
+    myContext->leaf = leaf;
+    myContext->query = gRedfishParams.query;
+    myContext->filename = gRedfishParams.filename;
+    myContext->redfish = service;
+    myContext->argc = gRedfishParams.argc;
+    myContext->argv = gRedfishParams.argv;
+    myContext->command = gRedfishParams.command;
+    if(gRedfishParams.query)
+    {
+        getPayloadByPathAsync(service, gRedfishParams.query, NULL, gotPayload, myContext);
+    }
+    else
+    {
+        getPayloadByPathAsync(service, "/", NULL, gotPayload, myContext);
+    }
+    serviceDecRefAndWait(service);
+    pthread_mutex_unlock(mutex);
+}
+
 int main(int argc, char** argv)
 {
     int              arg;
     int              opt_index  = 0;
-    unsigned int     method = 0;
     char*            host = NULL;
-    char*            filename = NULL;
-    redfishService*  redfish = NULL; 
-    char*            query = NULL;
-    char*            leaf = NULL; 
-    char*            eventUri = NULL;
     unsigned int     flags = 0;
-    char*            username = NULL;
-    char*            password = NULL;
-    char*            token = NULL;
-    enumeratorAuthentication auth;
-    gotPayloadContext* context;
-    commandMapping* command = NULL;
-    bool valgrind = false;
+    enumeratorAuthentication* auth = NULL; 
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     bool ret;
 
     memset(&auth, 0, sizeof(auth));
 
-    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:X", long_options, &opt_index)) != -1)
+    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:", long_options, &opt_index)) != -1)
     {
         switch(arg)
         {
@@ -367,19 +405,19 @@ int main(int argc, char** argv)
             case 'M':
                 if(strcasecmp(optarg, "GET") == 0)
                 {
-                    method = 0;
+                    gRedfishParams.method = 0;
                 }
                 else if(strcasecmp(optarg, "PATCH") == 0)
                 {
-                    method = 1;
+                    gRedfishParams.method = 1;
                 }
                 else if(strcasecmp(optarg, "POST") == 0)
                 {
-                    method = 2;
+                    gRedfishParams.method = 2;
                 }
                 else if(strcasecmp(optarg, "DELETE") == 0)
                 {
-                    method = 3;
+                    gRedfishParams.method = 3;
                 }
                 else
                 {
@@ -388,13 +426,10 @@ int main(int argc, char** argv)
                 }
                 break;
             case 'f':
-                filename = strdup(optarg);
+                gRedfishParams.filename = strdup(optarg);
                 break;
             case 'H':
                 host = strdup(optarg);
-                break;
-            case 'e':
-                eventUri = strdup(optarg);
                 break;
             case 'W':
                 if(strcasecmp(optarg, "verdoc") == 0)
@@ -404,25 +439,39 @@ int main(int argc, char** argv)
                 }
                 break;
             case 'u':
-                username = strdup(optarg);
+                if(auth == NULL)
+                {
+                    auth = malloc(sizeof(enumeratorAuthentication));
+                }
+                auth->authCodes.userPass.username = strdup(optarg);
                 break;
             case 'p':
-                password = strdup(optarg);
+                if(auth == NULL)
+                {
+                    auth = malloc(sizeof(enumeratorAuthentication));
+                }
+                auth->authCodes.userPass.password = strdup(optarg);
                 break;
             case 'T':
-                token = strdup(optarg);
+                if(auth == NULL)
+                {
+                    auth = malloc(sizeof(enumeratorAuthentication));
+                }
+                auth->authCodes.authToken.token = strdup(optarg);
+                auth->authType = REDFISH_AUTH_BEARER_TOKEN;
                 break;
             case 'S':
-                auth.authType = REDFISH_AUTH_SESSION;
+                if(auth == NULL)
+                {
+                    auth = malloc(sizeof(enumeratorAuthentication));
+                }
+                auth->authType = REDFISH_AUTH_SESSION;
                 break;
             case 'v':
                 verbose++;
                 break;
             case 'c':
-                command = getCommandByString(optarg);
-                break;
-            case 'X':
-                valgrind = true;
+                gRedfishParams.command = getCommandByString(optarg);
                 break;
         }
     }
@@ -432,112 +481,30 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    libredfishSetDebugFunction(syslogPrintf);
-
-    if(username && password)
-    {
-        auth.authCodes.userPass.username = username;
-        auth.authCodes.userPass.password = password;
-        redfish = createServiceEnumerator(host, NULL, &auth, flags);
-    }
-    else if(token)
-    {
-        auth.authCodes.authToken.token = token;
-        auth.authType = REDFISH_AUTH_BEARER_TOKEN;
-        redfish = createServiceEnumerator(host, NULL, &auth, flags);
-    }
-    else
-    {
-        redfish = createServiceEnumerator(host, NULL, NULL, flags);
-    }
-    if(redfish == NULL)
-    {
-        fprintf(stderr, "Unable to create service enumerator\n");
-    }
-
-    if(eventUri != NULL)
-    {
-        if(registerForEvents(redfish, eventUri, REDFISH_EVENT_TYPE_ALL, printRedfishEvent, NULL) == true)
-        {
-            signal(SIGINT, inthand);
-            printf("Successfully registered. Waiting for events...\n");
-            while(!stop)
-            {
-#ifdef _MSC_VER
-				Sleep(INFINITE);
-#else
-                pause();
-#endif
-            }
-        }
-        else
-        {
-            printf("Failed to register for events! Cleaning up...\n");
-        }
-        free(eventUri);
-        cleanupServiceEnumerator(redfish);
-        if(host)
-        {
-            free(host);
-        }
-        if(filename)
-        {
-            free(filename);
-        }
-        return 0;
-    }
-
     if(optind < argc)
     {
-        query = argv[optind++];
+        gRedfishParams.query = argv[optind++];
     }
-    switch(method)
+
+    gRedfishParams.argc = argc;
+    gRedfishParams.argv = argv;
+
+    libredfishSetDebugFunction(syslogPrintf);
+
+    pthread_mutex_lock(&mutex);
+    ret = createServiceEnumeratorAsync(host, NULL, auth, flags, gotRedfishService, &mutex);
+    if(ret != false)
     {
-        default:
-            break;
-        case 1:
-            if(query)
-            {
-                leaf = strrchr(query, '/');
-                if(leaf)
-                {
-                    leaf[0] = '\0';
-                    leaf++;
-                }
-            }
-            break;
-    }
-    context = malloc(sizeof(gotPayloadContext));
-    context->method = method;
-    context->leaf = leaf;
-    context->query = query;
-    context->filename = filename;
-    context->redfish = redfish;
-    context->argc = argc;
-    context->argv = argv;
-    context->command = command;
-    if(query)
-    {
-        ret = getPayloadByPathAsync(redfish, query, NULL, gotPayload, context);
+        //Wait till the callback is done...
+        pthread_mutex_lock(&mutex);
     }
     else
     {
-        ret = getPayloadByPathAsync(redfish, "/", NULL, gotPayload, context);
+        fprintf(stderr, "createServiceEnumeratorAsync returned false!\n");
     }
-    if(ret == false)
-    {
-        free(context);
-    }
-    serviceDecRefAndWait(redfish);
-    if(valgrind)
-    {
-        sleep(1);
-    }
+
     safeFree(host);
-    safeFree(filename);
-    safeFree(token);
-    safeFree(username);
-    safeFree(password);
+    safeFree(gRedfishParams.filename);
     return 0;
 }
 

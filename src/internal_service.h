@@ -14,6 +14,8 @@
 #ifndef _INT_SERVICE_H_
 #define _INT_SERVICE_H_
 
+#include <stdbool.h>
+
 #include <jansson.h>
 #include <curl/curl.h>
 #include "queue.h"
@@ -70,6 +72,8 @@ typedef struct _redfishService {
 #endif
     /** A reference count for this structure. Once this reaches 0 it will be freed **/
     size_t refCount;
+    /** An indicator to the async thread to terminate itself **/
+    bool selfTerm;
 } redfishService;
 
 

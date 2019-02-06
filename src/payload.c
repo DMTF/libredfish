@@ -7,13 +7,14 @@
 
 #include "redfishPayload.h"
 #include "debug.h"
+#include "util.h"
 
-static redfishPayload* getOpResult(redfishPayload* payload, const char* propName, const char* op, const char* value);
-static bool            getOpResultAsync(redfishPayload* payload, const char* propName, const char* op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
-static redfishPayload* collectionEvalOp(redfishPayload* payload, const char* propName, const char* op, const char* value);
-static bool            collectionEvalOpAsync(redfishPayload* payload, const char* propName, const char* op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
-static redfishPayload* arrayEvalOp(redfishPayload* payload, const char* propName, const char* op, const char* value);
-static bool            arrayEvalOpAsync(redfishPayload* payload, const char* propName, const char* op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+static redfishPayload* getOpResult(redfishPayload* payload, const char* propName, RedPathOp op, const char* value);
+static bool            getOpResultAsync(redfishPayload* payload, const char* propName, RedPathOp op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+static redfishPayload* collectionEvalOp(redfishPayload* payload, const char* propName, RedPathOp op, const char* value);
+static bool            collectionEvalOpAsync(redfishPayload* payload, const char* propName, RedPathOp op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+static redfishPayload* arrayEvalOp(redfishPayload* payload, const char* propName, RedPathOp op, const char* value);
+static bool            arrayEvalOpAsync(redfishPayload* payload, const char* propName, RedPathOp op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
 static redfishPayload* createCollection(redfishService* service, size_t count, redfishPayload** payloads);
 static json_t*         json_object_get_by_index(json_t* json, size_t index);
 static bool            isOdataIdNode(json_t* json, char** uriPtr);
@@ -26,6 +27,10 @@ redfishPayload* createRedfishPayload(json_t* value, redfishService* service)
     {
         payload->json = value;
         payload->service = service;
+        if(service)
+        {
+            serviceIncRef(service);
+        }
         payload->contentType = PAYLOAD_CONTENT_JSON;
     }
     return payload;
@@ -48,7 +53,7 @@ redfishPayload* createRedfishPayloadFromString(const char* value, redfishService
 #define strncasecmp _strnicmp
 #endif
 
-REDFISH_EXPORT redfishPayload* createRedfishPayloadFromContent(const char* content, size_t contentLength, const char* contentType, redfishService* service)
+redfishPayload* createRedfishPayloadFromContent(const char* content, size_t contentLength, const char* contentType, redfishService* service)
 {
     redfishPayload* ret;
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. content = %p, contentLength = %lu, contentType = %s, service = %p\n", __FUNCTION__, content, contentLength, contentType, service);
@@ -71,8 +76,51 @@ REDFISH_EXPORT redfishPayload* createRedfishPayloadFromContent(const char* conte
         } 
         ret->contentLength = contentLength;
         ret->contentType = PAYLOAD_CONTENT_OTHER;
-        ret->contentTypeStr = strdup(contentType);
+        ret->contentTypeStr = safeStrdup(contentType);
         ret->service = service;
+        if(service)
+        {
+            serviceIncRef(service);
+        }
+    }
+    return ret;
+}
+
+redfishPayload* copyRedfishPayload(const redfishPayload* original)
+{
+    redfishPayload* ret;
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. original = %p\n", __FUNCTION__, original);
+
+    if(original == NULL)
+    {
+        return NULL;
+    }
+
+    ret = (redfishPayload*)calloc(sizeof(redfishPayload), 1);
+    if(original->json)
+    {
+        ret->json = json_deep_copy(original->json);
+    }
+    if(original->service)
+    {
+        ret->service = original->service; 
+    }
+    if(original->content)
+    {
+        ret->contentLength = original->contentLength;
+        ret->content = (char*)malloc(ret->contentLength);
+        if(ret->content == NULL)
+        {
+            free(ret);
+            return NULL;
+        }
+        memcpy(ret->content, original->content, ret->contentLength);
+    }
+    ret->contentType = original->contentType;
+    ret->contentTypeStr = safeStrdup(original->contentTypeStr);
+    if(ret->service)
+    {
+        serviceIncRef(ret->service);
     }
     return ret;
 }
@@ -88,6 +136,11 @@ bool isPayloadCollection(redfishPayload* payload)
     }
     members = json_object_get(payload->json, "Members");
     count = json_object_get(payload->json, "Members@odata.count");
+    if(count != NULL)
+    {
+        //Workaround bug in some implementations where they have a count of 0 and no Members element
+        return true;
+    }
     return ((members != NULL) && (count != NULL));
 }
 
@@ -150,7 +203,7 @@ char* getPayloadUri(redfishPayload* payload)
             return NULL;
         }
     }
-    return strdup(json_string_value(json));
+    return safeStrdup(json_string_value(json));
 }
 
 char* getPayloadStringValue(redfishPayload* payload)
@@ -172,11 +225,7 @@ char* getPayloadStringValue(redfishPayload* payload)
             return NULL;
         }
     }
-#ifdef _MSC_VER
-	return _strdup(value);
-#else
-    return strdup(value);
-#endif
+    return safeStrdup(value);
 }
 
 int getPayloadIntValue(redfishPayload* payload)
@@ -299,6 +348,39 @@ redfishPayload* getPayloadByIndex(redfishPayload* payload, size_t index)
             }
         }
     }
+    return createRedfishPayload(value, payload->service);
+}
+
+redfishPayload* getPayloadByIndexNoNetwork(redfishPayload* payload, size_t index)
+{
+    json_t* value = NULL;
+
+    if(!payload)
+    {
+        return NULL;
+    }
+    if(isPayloadCollection(payload))
+    {
+        redfishPayload* members = getPayloadByNodeNameNoNetwork(payload, "Members");
+        redfishPayload* ret = getPayloadByIndexNoNetwork(members, index);
+        cleanupPayload(members);
+        return ret;
+    }
+    if(json_is_array(payload->json))
+    {
+        value = json_array_get(payload->json, index);
+    }
+    else if(json_is_object(payload->json))
+    {
+        value = json_object_get_by_index(payload->json, index);
+    }
+
+    if(value == NULL)
+    {
+        return NULL;
+    }
+
+    json_incref(value);
     return createRedfishPayload(value, payload->service);
 }
 
@@ -501,7 +583,18 @@ void cleanupPayload(redfishPayload* payload)
         return;
     }
     json_decref(payload->json);
-    //Don't free payload->service, let the caller handle cleaning up the service
+    if(payload->contentTypeStr)
+    {
+        free(payload->contentTypeStr);
+    }
+    if(payload->content)
+    {
+        free(payload->content);
+    }
+    if(payload->service)
+    {
+        serviceDecRef(payload->service);
+    }
     free(payload);
 }
 
@@ -519,13 +612,36 @@ char* payloadToString(redfishPayload* payload, bool prettyPrint)
     return json_dumps(payload->json, flags);
 }
 
+static json_t* getEmbeddedJsonField(json_t* parent, const char* nodeName)
+{
+    json_t* ret;
+    char* tmpStr;
+    char* tmpStr2;
+
+    tmpStr = getStringTill(nodeName, ".", &tmpStr2);
+    ret = json_object_get(parent, tmpStr);
+    free(tmpStr);
+    if(tmpStr2 != NULL)
+    {
+        //Keep going...
+        return getEmbeddedJsonField(ret, tmpStr2+1);
+    }
+    return ret;
+}
+
 bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
 {
     json_t* value;
     json_t* odataId;
+    json_t* members;
+    json_t* member;
+    json_t* tmp;
     char* uri;
     bool ret;
+    size_t i;
+    size_t size;
     redfishPayload* retPayload;
+    bool haveUniqReference = false;
 
     if(!payload || !nodeName)
     {
@@ -535,8 +651,80 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
     value = json_object_get(payload->json, nodeName);
     if(value == NULL)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Payload contains no element named %s", __FUNCTION__, nodeName);
-        return false;
+        if(isPayloadCollection(payload))
+        {
+            members = json_object_get(payload->json, "Members");
+            if(members)
+            {
+                value = json_array();
+                size = json_array_size(members);
+                for(i = 0; i < size; i++)
+                {
+                    member = json_array_get(members, i);
+                    if(member)
+                    {
+                        tmp = json_object_get(member, nodeName);
+                        if(json_is_string(tmp))
+                        {
+                            odataId = json_object();
+                            json_object_set(odataId, nodeName, tmp);
+                            json_array_append_new(value, odataId);
+                        }
+                        else
+                        {
+                            json_array_append(value, tmp);
+                        }
+                    }
+                }
+                if(json_array_size(value) == 0)
+                {
+                    json_decref(value);
+                    value = NULL;
+                }
+                else
+                {
+                    haveUniqReference = true;
+                }
+            }
+        }
+        else if(isPayloadArray(payload))
+        {
+            size = json_array_size(payload->json);
+            value = json_array();
+            for(i = 0; i < size; i++)
+            {
+                member = json_array_get(payload->json, i);
+                if(member)
+                {
+                    tmp = json_object_get(member, nodeName);
+                    if(json_is_string(tmp))
+                    {
+                        odataId = json_object();
+                        json_object_set(odataId, nodeName, tmp);
+                        tmp = odataId;
+                    }
+                    json_array_append(value, tmp);
+                }
+            }
+            if(json_array_size(value) == 0)
+            {
+                json_decref(value);
+                value = NULL;
+            }
+            else
+            {
+                haveUniqReference = true;
+            }
+        }
+        else if(strchr(nodeName, '.'))
+        {
+            value = getEmbeddedJsonField(payload->json, nodeName);
+        }
+        if(value == NULL)
+        {
+            REDFISH_DEBUG_ERR_PRINT("%s: Payload contains no element named %s\n", __FUNCTION__, nodeName);
+            return false;
+        }
     }
     if(isOdataIdNode(value, &uri))
     {
@@ -544,7 +732,10 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
         free(uri);
         return ret;
     }
-    json_incref(value);
+    if(haveUniqReference == false)
+    {
+        json_incref(value);
+    }
     if(json_is_string(value))
     {
         odataId = json_object();
@@ -618,6 +809,8 @@ void gotNextRedPath(bool success, unsigned short httpCode, redfishPayload* paylo
     redpathAsyncContext* myContext = (redpathAsyncContext*)context;
     bool ret;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+
     if(success == false || httpCode >= 400 || myContext->redpath->next == NULL)
     {
         myContext->callback(success, httpCode, payload, myContext->originalContext);
@@ -667,14 +860,9 @@ bool getPayloadForPathAsync(redfishPayload* payload, redPathNode* redpath, redfi
     {
         ret = getPayloadByIndexAsync(payload, redpath->index, options, gotNextRedPath, myContext);
     }
-    else if(redpath->op)
-    {
-        ret = getOpResultAsync(payload, redpath->propName, redpath->op, redpath->value, options, gotNextRedPath, myContext);
-    }
     else
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Don't know how to handle redpath with no nodename, no index, and no operation\n", __FUNCTION__);
-        ret = false;
+        ret = getOpResultAsync(payload, redpath->propName, redpath->op, redpath->value, options, gotNextRedPath, myContext);
     }
     if(ret == false)
     {
@@ -705,13 +893,166 @@ bool getPayloadForPathStringAsync(redfishPayload* payload, const char* string, r
     return ret;
 }
 
-static redfishPayload* getOpResult(redfishPayload* payload, const char* propName, const char* op, const char* value)
+bool patchPayloadAsync(redfishPayload* target, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
 {
+    char* uri;
+    bool ret;
+    redfishService* service;
+
+    if(!target || !payload)
+    {
+        return false;
+    }
+    service = target->service;
+    if(!service)
+    {
+        service = payload->service;
+    }
+    uri = getPayloadUri(target);
+    if(!uri)
+    {
+        return false;
+    }
+    ret = patchUriFromServiceAsync(service, uri, payload, options, callback, context);
+    free(uri);
+    return ret;
+}
+
+bool postPayloadAsync(redfishPayload* target, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    char* uri;
+    bool ret;
+    redfishService* service;
+
+    if(!target || !payload)
+    {
+        return false;
+    }
+    service = target->service;
+    if(!service)
+    {
+        service = payload->service;
+    }
+    uri = getPayloadUri(target);
+    if(!uri)
+    {
+        return false;
+    }
+    ret = postUriFromServiceAsync(service, uri, payload, options, callback, context);
+    free(uri);
+    return ret;
+}
+
+bool deletePayloadAsync(redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+{
+    char* uri;
+    bool ret;
+
+    if(!payload)
+    {
+        return false;
+    }
+    uri = getPayloadUri(payload);
+    if(!uri)
+    {
+        return false;
+    }
+    ret = deleteUriFromServiceAsync(payload->service, uri, options, callback, context);
+    free(uri);
+    return ret;
+}
+
+static bool intCompareOpResult(long long int1, long long int2, RedPathOp op)
+{
+    switch(op)
+    {
+        case REDPATH_OP_EQUAL:
+            return (int1 == int2);
+        case REDPATH_OP_NOTEQUAL:
+            return (int1 != int2);
+        case REDPATH_OP_LESS:
+            return (int1 < int2);
+        case REDPATH_OP_GREATER:
+            return (int1 > int2);
+        case REDPATH_OP_LESS_EQUAL:
+            return (int1 <= int2);
+        case REDPATH_OP_GREATER_EQUAL:
+            return (int1 >= int2);
+        default: 
+            return false;
+    }
+}
+
+static bool stringCompareOpResult(const char* str1, const char* str2, RedPathOp op)
+{
+    int tmp;
+    if(op == REDPATH_OP_EXISTS)
+    {
+        return (str1 != NULL);
+    }
+    tmp = strcmp(str1, str2);
+    return intCompareOpResult(tmp, 0, op);
+}
+
+static bool getSimpleOpResult(json_t* json, const char* propName, RedPathOp op, const char* value)
+{
+    json_t* stringProp = json;
     const char* propStr;
-    json_t* stringProp;
+    long long intVal, intPropVal;
+    bool ret;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. json = %p, propName = %s, op = %u, value = %s\n", __FUNCTION__, json, propName, op, value);
+
+    if(json == NULL)
+    {
+        REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. Null JSON\n", __FUNCTION__);
+        return false;
+    }
+
+    switch(json_typeof(json))
+    {
+        case JSON_OBJECT:
+            if(op == REDPATH_OP_EXISTS)
+            {
+                ret = (json != NULL);
+                break;
+            }
+            stringProp = json_object_get(json, propName); 
+        case JSON_STRING:
+            propStr = json_string_value(stringProp);
+            if(propStr == NULL)
+            {
+                ret = false;
+                break;
+            }
+            ret = stringCompareOpResult(propStr, value, op);
+            break;
+        case JSON_TRUE:
+            ret = stringCompareOpResult(value, "true", op);
+            break;
+        case JSON_FALSE:
+            ret = stringCompareOpResult(value, "false", op);
+            break;
+        case JSON_INTEGER:
+            intPropVal = json_integer_value(json);
+            intVal = strtoll(value, NULL, 0);
+            ret = intCompareOpResult(intPropVal, intVal, op);
+            break;
+        case JSON_NULL:
+            ret = stringCompareOpResult(value, "null", op);
+            break;
+        default:
+            ret = false;
+            break;
+    }
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. %u\n", __FUNCTION__, ret);
+    return ret;
+}
+
+static redfishPayload* getOpResult(redfishPayload* payload, const char* propName, RedPathOp op, const char* value)
+{
     bool ret = false;
     redfishPayload* prop;
-    long long intVal, intPropVal;
 
     if(isPayloadCollection(payload))
     {
@@ -727,62 +1068,7 @@ static redfishPayload* getOpResult(redfishPayload* payload, const char* propName
     {
         return NULL;
     }
-    stringProp = prop->json;
-    switch(json_typeof(prop->json))
-    {
-        case JSON_OBJECT:
-            stringProp = json_object_get(prop->json, propName);
-        case JSON_STRING:
-            if(strcmp(op, "=") == 0)
-            {
-                propStr = json_string_value(stringProp);
-                if(propStr == NULL)
-                {
-                    cleanupPayload(prop);
-                    return NULL;
-                }
-                ret = (strcmp(propStr, value) == 0);
-            }
-            break;
-        case JSON_TRUE:
-            if(strcmp(op, "=") == 0)
-            {
-                ret = (strcmp(value, "true") == 0);
-            }
-            break;
-        case JSON_FALSE:
-            if(strcmp(op, "=") == 0)
-            {
-                ret = (strcmp(value, "false") == 0);
-            }
-            break;
-        case JSON_INTEGER:
-            intPropVal = json_integer_value(prop->json);
-            intVal = strtoll(value, NULL, 0);
-            if(strcmp(op, "=") == 0)
-            {
-                ret = (intPropVal == intVal);
-            }
-            else if(strcmp(op, "<") == 0)
-            {
-                ret = (intPropVal < intVal);
-            }
-            else if(strcmp(op, ">") == 0)
-            {
-                ret = (intPropVal > intVal);
-            }
-            else if(strcmp(op, "<=") == 0)
-            {
-                ret = (intPropVal <= intVal);
-            }
-            else if(strcmp(op, ">=") == 0)
-            {
-                ret = (intPropVal >= intVal);
-            }
-            break;
-        default:
-            break;
-    }
+    ret = getSimpleOpResult(prop->json, propName, op, value);
     cleanupPayload(prop);
     if(ret)
     {
@@ -808,7 +1094,7 @@ typedef struct
     /** The property name to retrieve **/
     char* propName;
     /** The operation to perform on the property **/
-    char* op;
+    RedPathOp op;
     /** The value for the operation **/
     char* value;
     /** The number of operations to perform (i.e. a collection or array has to perform the operation on each element) **/
@@ -824,80 +1110,18 @@ typedef struct
 static void opGotPayloadByNodeNameAsync(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
 {
     redpathAsyncOpContext* myContext = (redpathAsyncOpContext*)context;
-    json_t* stringProp;
     bool ret = false;
-    const char* propStr;
-    long long intVal, intPropVal;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
 
     if(success == false || httpCode >= 400 || payload == NULL)
     {
         myContext->callback(success, httpCode, payload, myContext->originalContext);
-        free(myContext->op);
         free(myContext->value);
         free(myContext);
         return;
     }
-    stringProp = payload->json;
-    switch(json_typeof(payload->json))
-    {
-        case JSON_OBJECT:
-            stringProp = json_object_get(payload->json, myContext->propName);
-        case JSON_STRING:
-            if(strcmp(myContext->op, "=") == 0)
-            {
-                propStr = json_string_value(stringProp);
-                if(propStr == NULL)
-                {
-                    cleanupPayload(payload);
-                    myContext->callback(false, 0xFFFF, NULL, myContext->originalContext);
-                    free(myContext->propName);
-                    free(myContext->op);
-                    free(myContext->value);
-                    free(myContext);
-                    return;
-                }
-                ret = (strcmp(propStr, myContext->value) == 0);
-            }
-            break;
-        case JSON_TRUE:
-            if(strcmp(myContext->op, "=") == 0)
-            {
-                ret = (strcmp(myContext->value, "true") == 0);
-            }
-            break;
-        case JSON_FALSE:
-            if(strcmp(myContext->op, "=") == 0)
-            {
-                ret = (strcmp(myContext->value, "false") == 0);
-            }
-            break;
-        case JSON_INTEGER:
-            intPropVal = json_integer_value(payload->json);
-            intVal = strtoll(myContext->value, NULL, 0);
-            if(strcmp(myContext->op, "=") == 0)
-            {
-                ret = (intPropVal == intVal);
-            }
-            else if(strcmp(myContext->op, "<") == 0)
-            {
-                ret = (intPropVal < intVal);
-            }
-            else if(strcmp(myContext->op, ">") == 0)
-            {
-                ret = (intPropVal > intVal);
-            }
-            else if(strcmp(myContext->op, "<=") == 0)
-            {
-                ret = (intPropVal <= intVal);
-            }
-            else if(strcmp(myContext->op, ">=") == 0)
-            {
-                ret = (intPropVal >= intVal);
-            }
-            break;
-        default:
-            break;
-    }
+    ret = getSimpleOpResult(payload->json, myContext->propName, myContext->op, myContext->value);
     cleanupPayload(payload);
     if(ret)
     {
@@ -905,18 +1129,20 @@ static void opGotPayloadByNodeNameAsync(bool success, unsigned short httpCode, r
     }
     else
     {
-        myContext->callback(ret, 0xFFFF, NULL, myContext->originalContext);
+        //Send the payload, that allows the callback to clean it up if needed
+        myContext->callback(ret, 0xFFFF, myContext->payload, myContext->originalContext);
     }
     free(myContext->propName);
-    free(myContext->op);
     free(myContext->value);
     free(myContext);
 }
 
-static bool getOpResultAsync(redfishPayload* payload, const char* propName, const char* op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+static bool getOpResultAsync(redfishPayload* payload, const char* propName, RedPathOp op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
 {
     bool ret;
     redpathAsyncOpContext* myContext;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
 
     if(isPayloadCollection(payload))
     {
@@ -926,7 +1152,7 @@ static bool getOpResultAsync(redfishPayload* payload, const char* propName, cons
     {
         return arrayEvalOpAsync(payload, propName, op, value, options, callback, context);
     }
-    if(strcmp(op, "any") == 0)
+    if(op == REDPATH_OP_ANY || op == REDPATH_OP_LAST)
     {
         callback(true, 200, payload, context);
         return true;
@@ -940,9 +1166,9 @@ static bool getOpResultAsync(redfishPayload* payload, const char* propName, cons
     myContext->originalContext = context;
     myContext->options = options;
     myContext->payload = payload;
-    myContext->propName = strdup(propName);
-    myContext->op = strdup(op);
-    myContext->value = strdup(value);
+    myContext->propName = safeStrdup(propName);
+    myContext->op = op;
+    myContext->value = safeStrdup(value);
     ret = getPayloadByNodeNameAsync(payload, propName, options, opGotPayloadByNodeNameAsync, myContext);
     if(ret == false)
     {
@@ -951,7 +1177,7 @@ static bool getOpResultAsync(redfishPayload* payload, const char* propName, cons
     return ret;
 }
 
-static redfishPayload* collectionEvalOp(redfishPayload* payload, const char* propName, const char* op, const char* value)
+static redfishPayload* collectionEvalOp(redfishPayload* payload, const char* propName, RedPathOp op, const char* value)
 {
     redfishPayload* ret;
     redfishPayload* tmp;
@@ -1020,7 +1246,7 @@ static void opFinishByIndexTransaction(redpathAsyncOpContext* myContext)
     {
         returnValue = NULL;
     }
-    else if(myContext->validCount == 1)
+    else if(myContext->validCount == 1 && myContext->op != REDPATH_OP_ANY)
     {
         returnValue = myContext->payloads[0];
     }
@@ -1031,7 +1257,6 @@ static void opFinishByIndexTransaction(redpathAsyncOpContext* myContext)
 
     myContext->callback(true, 200, returnValue, myContext->originalContext);
     free(myContext->propName);
-    free(myContext->op);
     free(myContext->value);
     free(myContext->payloads);
     free(myContext);
@@ -1041,9 +1266,15 @@ static void opGotResultAsync(bool success, unsigned short httpCode, redfishPaylo
 {
     redpathAsyncOpContext* myContext = (redpathAsyncOpContext*)context;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+
     if(success == true && httpCode < 300 && payload != NULL)
     {
         myContext->payloads[myContext->validCount++] = payload;
+    }
+    else if(payload)
+    {
+        cleanupPayload(payload);
     }
 
     myContext->left--;
@@ -1058,6 +1289,8 @@ static void opGotPayloadByIndexAsync(bool success, unsigned short httpCode, redf
     redpathAsyncOpContext* myContext = (redpathAsyncOpContext*)context;
     bool ret;
 
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+
     if(success == true && httpCode < 300 && payload != NULL)
     {
         ret = getOpResultAsync(payload, myContext->propName, myContext->op, myContext->value, myContext->options, opGotResultAsync, myContext);
@@ -1071,9 +1304,13 @@ static void opGotPayloadByIndexAsync(bool success, unsigned short httpCode, redf
     {
         opFinishByIndexTransaction(myContext);
     }
+    if(payload)
+    {
+        cleanupPayload(payload);
+    }
 }
 
-static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName, const char* op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName, RedPathOp op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
 {
     size_t max;
     size_t i;
@@ -1081,10 +1318,22 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
     bool anyWork = false;
     redpathAsyncOpContext* myContext;
     redfishPayload* members;
+    redfishPayload* tmp;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
 
     max = getCollectionSize(payload);
     if(max == 0)
     {
+        if(op == REDPATH_OP_ANY)
+        {
+            //Return an empty collection for ANY operation
+            tmp = createCollection(payload->service, 0, NULL);
+            callback(true, 200, tmp, context);
+            return true;
+        }
         return false;
     }
 
@@ -1093,35 +1342,21 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
     {
         return false;
     }
-    myContext->callback = callback;
-    myContext->originalContext = context;
-    myContext->options = options;
-    if(propName)
-    {
-        myContext->propName = strdup(propName);
-    }
-    else
-    {
-        myContext->propName = NULL;
-    }
-    myContext->op = strdup(op);
-    if(value)
-    {
-        myContext->value = strdup(value);
-    }
-    else
-    {
-        myContext->value = NULL;
-    }
-    myContext->count = max;
-    myContext->left = max;
-    myContext->validCount = 0;
-    myContext->payloads = calloc(sizeof(redfishPayload*), max);
     /*Technically getPayloadByIndex would do this, but this optimizes things*/
     members = getPayloadByNodeName(payload, "Members");
-    for(i = 0; i < max; i++)
+    if(op == REDPATH_OP_LAST)
     {
-        ret = getPayloadByIndexAsync(members, i, options, opGotPayloadByIndexAsync, myContext);
+        myContext->callback = callback;
+        myContext->originalContext = context;
+        myContext->options = options;
+        myContext->propName = safeStrdup(propName);
+        myContext->op = op;
+        myContext->value = safeStrdup(value);
+        myContext->count = 1;
+        myContext->left = 1;
+        myContext->validCount = 0;
+        myContext->payloads = calloc(sizeof(redfishPayload*), 1);
+        ret = getPayloadByIndexAsync(members, max-1, options, opGotPayloadByIndexAsync, myContext);
         if(ret == false)
         {
             myContext->left--;
@@ -1131,11 +1366,35 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
             anyWork = true;
         }
     }
+    else
+    {
+        myContext->callback = callback;
+        myContext->originalContext = context;
+        myContext->options = options;
+        myContext->propName = safeStrdup(propName);
+        myContext->op = op;
+        myContext->value = safeStrdup(value);
+        myContext->count = max;
+        myContext->left = max;
+        myContext->validCount = 0;
+        myContext->payloads = calloc(sizeof(redfishPayload*), max); 
+        for(i = 0; i < max; i++)
+        {
+            ret = getPayloadByIndexAsync(members, i, options, opGotPayloadByIndexAsync, myContext);
+            if(ret == false)
+            {
+                myContext->left--;
+            }
+            else
+            {
+                anyWork = true;
+            }
+        }
+    }
     cleanupPayload(members);
     if(anyWork == false)
     {
         free(myContext->propName);
-        free(myContext->op);
         free(myContext->value);
         free(myContext->payloads);
         free(myContext);
@@ -1143,7 +1402,7 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
     return anyWork;
 }
 
-static redfishPayload* arrayEvalOp(redfishPayload* payload, const char* propName, const char* op, const char* value)
+static redfishPayload* arrayEvalOp(redfishPayload* payload, const char* propName, RedPathOp op, const char* value)
 {
     redfishPayload* ret;
     redfishPayload* tmp;
@@ -1195,17 +1454,27 @@ static redfishPayload* arrayEvalOp(redfishPayload* payload, const char* propName
     }
 }
 
-static bool arrayEvalOpAsync(redfishPayload* payload, const char* propName, const char* op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
+static bool arrayEvalOpAsync(redfishPayload* payload, const char* propName, RedPathOp op, const char* value, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
 {
     size_t max;
     size_t i;
     bool ret;
     bool anyWork = false;
     redpathAsyncOpContext* myContext;
+    redfishPayload* tmp;
+
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
 
     max = json_array_size(payload->json);
     if(max == 0)
     {
+        if(op == REDPATH_OP_ANY)
+        {
+            //Return an empty collection for ANY operation
+            tmp = createCollection(payload->service, 0, NULL);
+            callback(true, 200, tmp, context);
+            return true;
+        }
         return false;
     }
 
@@ -1217,9 +1486,9 @@ static bool arrayEvalOpAsync(redfishPayload* payload, const char* propName, cons
     myContext->callback = callback;
     myContext->originalContext = context;
     myContext->options = options;
-    myContext->propName = strdup(propName);
-    myContext->op = strdup(op);
-    myContext->value = strdup(value);
+    myContext->propName = safeStrdup(propName);
+    myContext->op = op;
+    myContext->value = safeStrdup(value);
     myContext->count = max;
     myContext->left = max;
     myContext->validCount = 0;
@@ -1239,7 +1508,6 @@ static bool arrayEvalOpAsync(redfishPayload* payload, const char* propName, cons
     if(anyWork == false)
     {
         free(myContext->propName);
-        free(myContext->op);
         free(myContext->value);
         free(myContext->payloads);
         free(myContext);
@@ -1317,7 +1585,7 @@ static bool isOdataIdNode(json_t* json, char** uriPtr)
     {
         return false;
     }
-    *uriPtr = strdup(uri);
+    *uriPtr = safeStrdup(uri);
     return true;
 }
 /* vim: set tabstop=4 shiftwidth=4 expandtab: */
