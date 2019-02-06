@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "internal_service.h"
 #include "asyncEvent.h"
@@ -1875,9 +1876,11 @@ static char* getDestinationAddress(const char* addressInfo, int* socket)
 {
     char* addressType = NULL;
     char* interface = getStringTill(addressInfo, ":", &addressType);
+    char* portStr = NULL;
     char* ret = NULL;
     char dest[1024];
-    unsigned int port;
+    unsigned int port = 0;
+    bool freeAddressType = false;
     if(addressType == NULL)
     {
         addressType = "ipv4";
@@ -1885,6 +1888,17 @@ static char* getDestinationAddress(const char* addressInfo, int* socket)
     else
     {
         addressType++;
+        addressType = getStringTill(addressType, ":", &portStr);
+        freeAddressType = true;
+        if(portStr == NULL)
+        {
+            port = 0;
+        }
+        else
+        {
+            portStr++;
+            port = strtoul(portStr, NULL, 10);
+        }
     }
     if(strcmp(addressType, "ipv4") == 0)
     {
@@ -1895,7 +1909,11 @@ static char* getDestinationAddress(const char* addressInfo, int* socket)
         ret = getIpv6Address(interface);
     }
     free(interface);
-    *socket = getRandomSocket(ret, &port);
+    if(freeAddressType)
+    {
+        free(addressType);
+    }
+    *socket = getSocket(ret, &port);
     if(strcmp(addressType, "ipv4") == 0)
     {
 #ifdef HAVE_OPENSSL

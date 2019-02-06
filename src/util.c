@@ -221,7 +221,7 @@ char* getIpv6Address(const char* interface)
 #endif
 }
 
-int getRandomSocket(const char* ip, unsigned int* portNum)
+int getSocket(const char* ip, unsigned int* portNum)
 {
     int ret;
     int domain = AF_INET;
@@ -234,7 +234,7 @@ int getRandomSocket(const char* ip, unsigned int* portNum)
         domain = AF_INET6;
         inet_pton(AF_INET6, ip, (void *)&ip6_socket_struct.sin6_addr.s6_addr);
         ip6_socket_struct.sin6_family = AF_INET6;
-        ip6_socket_struct.sin6_port = 0;
+        ip6_socket_struct.sin6_port = htons(*portNum);
         addr = (struct sockaddr*)&ip6_socket_struct;
         size = sizeof(struct sockaddr_in6);
     }
@@ -242,7 +242,7 @@ int getRandomSocket(const char* ip, unsigned int* portNum)
     {
         inet_pton(AF_INET, ip, (void *)&ip4_socket_struct.sin_addr.s_addr);
         ip4_socket_struct.sin_family = AF_INET;
-        ip4_socket_struct.sin_port = 0;
+        ip4_socket_struct.sin_port = htons(*portNum);
     }
     ret = socket(domain, SOCK_STREAM, 0);
     if(ret < 0)
@@ -259,7 +259,7 @@ int getRandomSocket(const char* ip, unsigned int* portNum)
     {
         if(getsockname(ret, addr, &size) == -1)
         {
-            REDFISH_DEBUG_WARNING_PRINT("getsockname returned error! errno = %d", errno);
+            REDFISH_DEBUG_WARNING_PRINT("%s: getsockname returned error! errno = %d", __FUNCTION__, errno);
         }
         else
         {

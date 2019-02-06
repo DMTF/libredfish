@@ -64,10 +64,10 @@ char* getIpv6Address(const char* interface);
  * Get a socket bound to a random port on the specified ip.
  *
  * @param ip The ip to bind to
- * @param portNum A pointer to an integer describing the port number
+ * @param portNum A pointer to an integer describing the port number. If set to an int other than 0 the function will use that port. 0 will cause a random port to be used.
  * @return The socket or -1 on error
  */
-int getRandomSocket(const char* ip, unsigned int* portNum);
+int getSocket(const char* ip, unsigned int* portNum);
 
 /**
  * @brief Get the id of the currently running thread.

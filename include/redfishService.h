@@ -208,6 +208,12 @@ REDFISH_EXPORT bool    deleteUriFromService(redfishService* service, const char*
  *
  * Register for notification of async redfish events.
  *
+ * Postback examples:
+ * If the postbackUri starts with libredfish: then libredfish will create a socket to listen to events directly.
+ * The format for this is libredfish:<interface name>[:<ipv4/ipv6>[:<port>]]
+ * To use this format the caller must supply the name of the interface to listen on (libredfish will aquire the interfaces IP to send to the redfish server)
+ * By default IPv4 and a random port number will be used. However a caller can specify to listen on IPv6 and specify a port number if desired.
+ *
  * @param service The service to obtain events from
  * @param postbackUri The URI for the redfish service to send events to. This must point to an event listener that can send events back to this process. See the httpd/cgi.c for an example
  * @param eventTypes The event types to be notified about
