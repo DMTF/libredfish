@@ -804,6 +804,13 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
     {
         free(destination);
     }
+    else
+    {
+        //Start external event listeners...
+#ifndef NO_CZMQ
+        startZeroMQListener(service);
+#endif
+    }
     addStringToJsonObject(eventSubscriptionPayload, "Context", context);
     addStringToJsonObject(eventSubscriptionPayload, "Protocol", "Redfish");
     if(eventTypes != 0)
@@ -1661,108 +1668,6 @@ static char* getEventSubscriptionUri(redfishService* service)
     cleanupPayload(eventSub);
     return ret;
 }
-/*
-static int eventReceivedCallback(zloop_t* loop, zsock_t* reader, void* arg)
-{
-    struct EventActorState* state = (struct EventActorState*)arg;
-    char* msg;
-    char* body;
-    enumeratorAuthentication* auth;
-    json_t* jBody;
-    json_t* jContext;
-    const char* context = NULL;
-    struct EventCallbackRegister* current;
-    redfishPayload* payload;
-
-    (void)loop;
-
-    if(!state || state->terminate == true)
-    {
-        return -1;
-    }
-
-    msg = zstr_recv(reader);
-    if(!msg)
-    {
-        return 0;
-    }
-
-    body = strstr(msg, "\n\n");
-    if(!body)
-    {
-        free(msg);
-        return 0;
-    }
-    jBody = json_loads(body, 0, NULL);
-    if(!jBody)
-    {
-        //Not in JSON format...
-        free(msg);
-        return 0;
-    }
-
-    if(strncmp("Authorization None", msg, 18) == 0)
-    {
-        auth = NULL;
-    }
-    else
-    {
-        printf("TODO Auth!\n");
-        auth = malloc(sizeof(enumeratorAuthentication));
-        if(auth)
-        {
-        }
-    }
-
-    jContext = json_object_get(jBody, "Context");
-    if(jContext)
-    {
-        context = json_string_value(jContext);
-    }
-
-    if(context)
-    {
-        //Call each callback where context matches or the registration is NULL
-        current = zlist_first(state->registrations);
-        while(current)
-        {
-            if(current->context == NULL || strcmp(current->context, context) == 0)
-            {
-                payload = createRedfishPayload(jBody, current->service);
-
-                current->callback(payload, auth, context);
-
-                //Don't call cleanupPayload()... we want to leave the json value intact
-                free(payload);
-            }
-
-            current = zlist_next(state->registrations);
-        }
-    }
-    else
-    {
-        //Call each callback
-        current = zlist_first(state->registrations);
-        while(current)
-        {
-            payload = createRedfishPayload(jBody, current->service);
-
-            current->callback(payload, auth, context);
-
-            //Don't call cleanupPayload()... we want to leave the json value intact
-            free(payload);
-
-            current = zlist_next(state->registrations);
-        }
-    }
-    json_decref(jBody);
-    if(auth)
-    {
-        free(auth);
-    }
-    free(msg);
-    return 0;
-}*/
 
 static void addStringToJsonArray(json_t* array, const char* value)
 {

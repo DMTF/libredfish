@@ -18,6 +18,9 @@
 
 #include <jansson.h>
 #include <curl/curl.h>
+#ifndef NO_CZMQ
+#include <czmq.h>
+#endif
 #include "queue.h"
 
 /**
@@ -88,6 +91,10 @@ typedef struct _redfishService {
     bool eventTerm;
     /** The uri the event registration is stored at **/
     char* eventRegistrationUri;
+#ifndef NO_CZMQ
+    /** Ths listener for Zero MQ async events **/
+    zactor_t* zeroMQListener;
+#endif
 } redfishService;
 
 #endif

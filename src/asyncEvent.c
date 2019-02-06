@@ -9,6 +9,7 @@
 #include "asyncEvent.h"
 #include "util.h"
 #include "debug.h"
+#include "redfishEvent.h"
 
 #ifdef HAVE_OPENSSL
 #include <openssl/bio.h>
@@ -76,6 +77,9 @@ static void initOpenssl();
 static void cleanupOpenssl();
 static SSL_CTX* createSSLContext();
 static int mkSSLCert(X509** x509Ptr, EVP_PKEY** publicKeyPtr);
+#endif
+#ifndef NO_CZMQ
+static void zeroMQActor(zsock_t* pipe, void* args);
 #endif
 
 bool registerCallback(redfishService* service, redfishEventCallback callback, unsigned int eventTypes, const char* context)
@@ -186,6 +190,25 @@ bool startTCPListener(redfishService* service, int socket)
 #endif
     service->tcpSocket = socket;
     return true;
+}
+
+bool startZeroMQListener(redfishService* service)
+{
+#ifdef NO_CZMQ
+    (void)service;
+    return false;
+#else
+    if(!service->zeroMQListener || !zactor_is(service->zeroMQListener))
+    {
+        service->zeroMQListener = zactor_new(zeroMQActor, service);
+        if(!service->zeroMQListener)
+        {
+            return false;
+        }
+    }
+    //Either already running or just started
+    return true;
+#endif
 }
 
 static threadRet eventActorTask(void* args)
@@ -693,33 +716,14 @@ static size_t gotSSEData(void *contents, size_t size, size_t nmemb, void *userp)
   return realsize;
 }
 
-static size_t getRedfishEventInfoFromRawHttp(const char* buffer, redfishService* service, EventInfo** events)
+static size_t getRedfishEventInfoFromPayload(redfishPayload* payload, enumeratorAuthentication* auth, EventInfo** events)
 {
     EventInfo* ret;
-    const char* bodyStart;
-    redfishPayload* payload;
     redfishPayload* contextPayload;
     redfishPayload* eventArray;
     char* contextStr;
     size_t count, i;
 
-    //REDFISH_DEBUG_DEBUG_PRINT("%s: Got Payload: %s\n", __FUNCTION__, buffer);
-
-    if(strncmp(buffer, "POST", 4) != 0)
-    {
-        REDFISH_DEBUG_WARNING_PRINT("Recieved non-POST to event URI: %s\n", buffer);
-        *events = NULL;
-        return 0;
-    }
-    bodyStart = strstr(buffer, "\r\n\r\n");
-    if(bodyStart == NULL)
-    {
-        REDFISH_DEBUG_WARNING_PRINT("Recieved POST with no body: %s\n", buffer);
-        *events = NULL;
-        return 0;
-    }
-    bodyStart+=4;
-    payload = createRedfishPayloadFromString(bodyStart, service);
     contextPayload = getPayloadByNodeName(payload, "Context");
     if(contextPayload)
     {
@@ -757,8 +761,7 @@ static size_t getRedfishEventInfoFromRawHttp(const char* buffer, redfishService*
     for(i = 0; i < count; i++)
     {
         ret[i].event = getPayloadByIndex(eventArray, i);
-        //TODO Auth...
-        ret[i].auth = NULL;
+        ret[i].auth = auth;
         ret[i].context = safeStrdup(contextStr);
         ret[i].eventType = getEventTypeFromEventPayload(ret[i].event);
     }
@@ -768,6 +771,32 @@ static size_t getRedfishEventInfoFromRawHttp(const char* buffer, redfishService*
         free(contextStr);
     }
     return count;
+}
+
+static size_t getRedfishEventInfoFromRawHttp(const char* buffer, redfishService* service, EventInfo** events)
+{
+    const char* bodyStart;
+    redfishPayload* payload;
+
+    //REDFISH_DEBUG_DEBUG_PRINT("%s: Got Payload: %s\n", __FUNCTION__, buffer);
+
+    if(strncmp(buffer, "POST", 4) != 0)
+    {
+        REDFISH_DEBUG_WARNING_PRINT("Recieved non-POST to event URI: %s\n", buffer);
+        *events = NULL;
+        return 0;
+    }
+    bodyStart = strstr(buffer, "\r\n\r\n");
+    if(bodyStart == NULL)
+    {
+        REDFISH_DEBUG_WARNING_PRINT("Recieved POST with no body: %s\n", buffer);
+        *events = NULL;
+        return 0;
+    }
+    bodyStart+=4;
+    payload = createRedfishPayloadFromString(bodyStart, service);
+    //TODO Auth...
+    return getRedfishEventInfoFromPayload(payload, NULL, events);
 }
 
 static unsigned int getEventTypeFromEventPayload(redfishPayload* payload)
@@ -938,6 +967,111 @@ static int mkSSLCert(X509** x509Ptr, EVP_PKEY** publicKeyPtr)
 
     *x509Ptr = cert;
     return 0;
+}
+#endif
+
+#ifndef NO_CZMQ
+static int zeroMQEventReceivedCallback(zloop_t* loop, zsock_t* reader, void* arg)
+{
+    redfishService* service = (redfishService*)arg;
+    char* msg;
+    char* body;
+    enumeratorAuthentication* auth = NULL;
+    size_t eventCount, i;
+    EventInfo* events;
+    redfishPayload* payload;
+
+    (void)loop;
+
+    if(!service || !service->eventThreadQueue)
+    {
+        return -1;
+    }
+
+    msg = zstr_recv(reader);
+    if(!msg)
+    {
+        return 0;
+    }
+
+    body = strstr(msg, "\n\n");
+    if(!body)
+    {
+        free(msg);
+        return 0;
+    }
+    payload = createRedfishPayloadFromString(body, service);
+    eventCount = getRedfishEventInfoFromPayload(payload, NULL, &events);
+    for(i = 0; i < eventCount; i++)
+    {
+        addEventToQueue(service, &(events[i]), true);
+    }
+    free(events); 
+    if(auth)
+    {
+        free(auth);
+    }
+    free(msg);
+    return 0;
+}
+
+static int zeroMQThreadSocketListener(zloop_t* loop, zsock_t* reader, void* arg)
+{
+    zmsg_t* msg = zmsg_recv(reader);
+    char* command;
+    int rc = 0;
+
+    (void)loop;
+    (void)arg;
+
+    if(msg == NULL)
+    {
+        //No message on socket something is wrong, terminate...
+        return -1;
+    }
+    command = zmsg_popstr(msg);
+    if(strcmp(command, "$TERM") == 0)
+    {
+        //Told to terminate
+        rc = -1;
+    }
+    free(command);
+    zmsg_destroy(&msg);
+
+    return rc;
+}
+
+static void zeroMQActor(zsock_t* pipe, void* args)
+{
+    redfishService* service = (redfishService*)args;
+    zloop_t* loop;
+    zsock_t* remote;
+
+    //Unblock caller
+    zsock_signal(pipe, 0);
+
+    loop = zloop_new();
+    if(!loop)
+    { 
+        return;
+    }
+    //zloop_set_verbose(loop, true);
+    zloop_reader(loop, pipe, zeroMQThreadSocketListener, NULL);
+
+    //Open 0mq socket for redfish events
+    remote = REDFISH_EVENT_0MQ_LIBRARY_NEW_SOCK;
+    if(!remote)
+    {
+        zloop_destroy(&loop);
+        return;
+    }
+
+    zloop_reader(loop, remote, zeroMQEventReceivedCallback, service);
+
+    zloop_start(loop);
+
+    zloop_destroy(&loop);
+    zsock_destroy(&remote);
 }
 #endif
 /* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */

@@ -23,6 +23,7 @@ void terminateAsyncEventThread(redfishService* service);
 
 bool startSSEListener(redfishService* service, const char* sseUri);
 bool startTCPListener(redfishService* service, int socket);
+bool startZeroMQListener(redfishService* service);
 
 #endif
 /* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */
