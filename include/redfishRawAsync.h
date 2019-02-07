@@ -38,22 +38,22 @@ typedef struct _httpHeader
  *
  * A representation of an HTTP method.
  */
-typedef enum
+typedef enum _httpMethod
 {
     /** Get an HTTP resource **/
-    GET,
+	HTTP_GET,
     /** Get the headers for an HTTP resource **/
-    HEAD,
+	HTTP_HEAD,
     /** Write/Create an HTTP resource **/
-    POST,
+	HTTP_POST,
     /** Write an HTTP resource **/
-    PUT,
+	HTTP_PUT,
     /** Delete an HTTP resource **/
-    DELETE,
+    HTTP_DELETE,
     /** Get the communication options for an HTTP resource **/
-    OPTIONS,
+	HTTP_OPTIONS,
     /** Write part of an HTTP resource **/
-    PATCH
+	HTTP_PATCH
 } httpMethod;
 
 /**
@@ -61,7 +61,7 @@ typedef enum
  *
  * A structure with all the information needed to start an HTTP(s) request.
  */
-typedef struct
+typedef struct _asyncHttpRequest
 {
     /** The url to send the request to **/
     char* url;
@@ -82,7 +82,7 @@ typedef struct
  *
  * A structure with all the information returned by the server.
  */
-typedef struct
+typedef struct _asyncHttpResponse
 {
     /** 0 on success, another value if the connection failed **/
     int connectError;

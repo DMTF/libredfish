@@ -7,7 +7,9 @@
 #include <redfishRawAsync.h>
 
 #include <string.h>
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 
 #include "debug.h"
 #include "util.h"
@@ -27,7 +29,7 @@ asyncHttpRequest* createRequest(const char* url, httpMethod method, size_t bodys
     asyncHttpRequest* ret = malloc(sizeof(asyncHttpRequest));
     if(ret)
     {
-        ret->url = strdup(url);
+        ret->url = safeStrdup(url);
         ret->method = method;
         ret->bodySize = bodysize;
         ret->body = body;
@@ -44,6 +46,7 @@ void addRequestHeader(asyncHttpRequest* request, const char* name, const char* v
 
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
+#define strtok_r   strtok_s
 #endif
 
 httpHeader* responseGetHeader(asyncHttpResponse* response, const char* name)
@@ -212,7 +215,11 @@ struct MemoryStruct
   size_t originalSize;
 };
 
+#ifdef _MSC_VER
+threadRet __stdcall rawAsyncWorkThread(void* data)
+#else
 threadRet rawAsyncWorkThread(void* data)
+#endif
 {
     redfishService* service = (redfishService*)data;
     queue* q = service->queue;
@@ -296,29 +303,29 @@ threadRet rawAsyncWorkThread(void* data)
         }
         switch(workItem->request->method)
         {
-            case GET:
+            case HTTP_GET:
                 curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
                 curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L);
                 break;
-            case HEAD:
+            case HTTP_HEAD:
                 curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "HEAD");
                 curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
                 break;
-            case POST:
+            case HTTP_POST:
                 curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
                 curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
                 break;
-            case PUT:
+            case HTTP_PUT:
                 curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
                 curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
                 break;
-            case DELETE:
+            case HTTP_DELETE:
                 curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
                 break;
-            case OPTIONS:
+            case HTTP_OPTIONS:
                 curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "OPTIONS");
                 break;
-            case PATCH:
+            case HTTP_PATCH:
                 curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PATCH");
                 curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
                 break;
@@ -599,8 +606,8 @@ static int addHeader(httpHeader** headersPtr, const char* name, const char* valu
         }
         current = current->next;
     }
-    current->name = strdup(name);
-    current->value = strdup(value);
+    current->name = safeStrdup(name);
+    current->value = safeStrdup(value);
     current->next = NULL;
     return 0;
 }
