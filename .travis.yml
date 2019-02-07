@@ -31,12 +31,11 @@ matrix:
   - os: linux
     env: OS=Windows VISUAL_STUDIO="Visual Studio 15 2017 Win64" JANSSON_LIB="janssonx64.lib" ARCH=x64
 script:
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then git submodule update --init --recursive; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then git describe --long || true; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then git clone https://github.com/packpack/packpack.git packpack; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then packpack/packpack; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then VERSION=${TRAVIS_TAG:1} packpack/packpack; fi
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then sh -xe travisWinBuild.sh; fi
 before_deploy:
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then rm build/*debuginfo* && rm build/*debugsource*; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mkdir deploy && cp build/*.rpm deploy/; fi
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cd deploy && 7z a -sdel libredfish-$TRAVIS_TAG-$ARCH.zip *; fi
 deploy:
