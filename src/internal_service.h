@@ -18,6 +18,9 @@
 
 #include <jansson.h>
 #include <curl/curl.h>
+#ifndef NO_CZMQ
+#include <czmq.h>
+#endif
 #include "queue.h"
 
 /**
@@ -74,7 +77,25 @@ typedef struct _redfishService {
     size_t refCount;
     /** An indicator to the async thread to terminate itself **/
     bool selfTerm;
+    /** The queue of events to process **/
+    queue* eventThreadQueue;
+    /** The thread listening for events **/
+    thread eventThread;
+    /** The thread listening for sse events **/
+    thread sseThread;
+    /** The thread listening for tcp events **/
+    thread tcpThread;
+    /** The socket listening for tcp events **/
+    int tcpSocket;
+    /** An indicator to the event thread to terminate itself **/
+    bool eventTerm;
+    /** The uri the event registration is stored at **/
+    char* eventRegistrationUri;
+#ifndef NO_CZMQ
+    /** Ths listener for Zero MQ async events **/
+    zactor_t* zeroMQListener;
+#endif
 } redfishService;
 
-
 #endif
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */

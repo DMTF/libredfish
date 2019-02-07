@@ -166,3 +166,4 @@ static redfishHealth _getResourceHealth(redfishPayload* payload, const char* sub
     free(healthStr);
     return RedfishHealthUnknown;
 }
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */
