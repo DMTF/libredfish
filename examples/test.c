@@ -8,6 +8,10 @@
 #include <getopt.h>
 #ifndef _MSC_VER
 #include <unistd.h>
+#else
+#include <windows.h>
+//Windows sleep function is capital and in milliseconds
+#define sleep(x) Sleep((x)*1000);
 #endif
 #include <signal.h>
 

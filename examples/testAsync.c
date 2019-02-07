@@ -8,6 +8,14 @@
 #include <getopt.h>
 #ifndef _MSC_VER
 #include <unistd.h>
+#define mutex_t           pthread_mutex_t
+#define mutex_lock        pthread_mutex_lock
+#define mutex_unlock      pthread_mutex_unlock
+#else
+#include <windows.h>
+#define mutex_t           SRWLOCK
+#define mutex_lock        AcquireSRWLockExclusive
+#define mutex_unlock      ReleaseSRWLockExclusive
 #endif
 #include <signal.h>
 
@@ -337,7 +345,7 @@ redfishParams gRedfishParams = {0};
 
 static void gotRedfishService(redfishService* service, void* context)
 {
-    pthread_mutex_t*   mutex = (pthread_mutex_t*)context;
+    mutex_t*           mutex = (mutex_t*)context;
     char*              leaf = NULL; 
     gotPayloadContext* myContext;
  
@@ -375,7 +383,7 @@ static void gotRedfishService(redfishService* service, void* context)
         getPayloadByPathAsync(service, "/", NULL, gotPayload, myContext);
     }
     serviceDecRefAndWait(service);
-    pthread_mutex_unlock(mutex);
+    mutex_unlock(mutex);
 }
 
 int main(int argc, char** argv)
@@ -384,9 +392,15 @@ int main(int argc, char** argv)
     int              opt_index  = 0;
     char*            host = NULL;
     unsigned int     flags = 0;
-    enumeratorAuthentication* auth = NULL; 
-    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    enumeratorAuthentication* auth = NULL;
     bool ret;
+#ifndef _MSC_VER
+    mutex_t          mutex = PTHREAD_MUTEX_INITIALIZER;
+#else
+    mutex_t          mutex;
+
+    InitializeSRWLock(&mutex);
+#endif
 
     memset(&auth, 0, sizeof(auth));
 
@@ -491,12 +505,12 @@ int main(int argc, char** argv)
 
     libredfishSetDebugFunction(syslogPrintf);
 
-    pthread_mutex_lock(&mutex);
+    mutex_lock(&mutex);
     ret = createServiceEnumeratorAsync(host, NULL, auth, flags, gotRedfishService, &mutex);
     if(ret != false)
     {
         //Wait till the callback is done...
-        pthread_mutex_lock(&mutex);
+        mutex_lock(&mutex);
     }
     else
     {

@@ -23,6 +23,9 @@ find_package(CURL REQUIRED)
 find_package(Jansson REQUIRED)
 find_package(CZMQ)
 
+include_directories(${CURL_INCLUDE_DIR})
+include_directories(${JANSSON_INCLUDE_DIRS})
+
 add_library(redfish SHARED ${REDFISH_SRC} ${REDFISH_HDR_PRIVATE})
 if(CZMQ_FOUND)
   target_link_libraries(redfish jansson curl czmq)
@@ -46,4 +49,8 @@ ENABLE_TESTING()
 
 if(CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wdeclaration-after-statement -ggdb3")
+endif()
+if(MSVC)
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /LIBPATH:.. /LIBPATH:../curl/lib")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LIBPATH:.. /LIBPATH:../curl/lib")
 endif()
