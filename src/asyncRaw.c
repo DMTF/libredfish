@@ -112,15 +112,6 @@ bool startRawAsyncRequest(redfishService* service, asyncHttpRequest* request, as
     return true;
 }
 
-thread getThreadId()
-{
-#ifndef _MSC_VER
-    return pthread_self();
-#else
-    return GetCurrentThread();
-#endif
-}
-
 void terminateAsyncThread(redfishService* service)
 {
     asyncWorkItem* workItem;
@@ -620,3 +611,4 @@ static int addHeader(httpHeader** headersPtr, const char* name, const char* valu
     current->next = NULL;
     return 0;
 }
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */

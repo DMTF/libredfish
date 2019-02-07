@@ -211,4 +211,4 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
 #endif
     free(index);
 }
-
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */

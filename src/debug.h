@@ -107,3 +107,4 @@ extern libRedfishDebugFunc gDebugFunc;
  */
 #define REDFISH_DEBUG_CRIT_PRINT(...) 
 #endif
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */

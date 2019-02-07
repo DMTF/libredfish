@@ -190,4 +190,4 @@ int main(int argc, char** argv)
 }
 
 #endif
-/* vim: set tabstop=4 shiftwidth=4 expandtab: */
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */

@@ -143,4 +143,4 @@ static queueNode* newQueueNode(void* value)
     ret->next  = NULL;
     return ret;
 }
-/* vim: set tabstop=4 shiftwidth=4 expandtab: */
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */
