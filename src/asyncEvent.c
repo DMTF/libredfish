@@ -224,7 +224,7 @@ bool startZeroMQListener(redfishService* service)
 #endif
 }
 
-static threadRet eventActorTask(void* args)
+static threadRet WINAPI eventActorTask(void* args)
 {
     redfishService* service = (redfishService*)args;
     queueNode* registrations = NULL;
@@ -304,7 +304,7 @@ struct SSEStruct {
   redfishService* service;
 };
 
-static threadRet sseThread(void* args)
+static threadRet WINAPI sseThread(void* args)
 {
     struct SSEThreadData* data = (struct SSEThreadData*)args;
     CURL* curl;
@@ -377,7 +377,7 @@ static threadRet sseThread(void* args)
 #endif
 }
 
-static threadRet tcpThread(void* args)
+static threadRet WINAPI tcpThread(void* args)
 {
     struct TCPThreadData* data = (struct TCPThreadData*)args;
 	SOCKET tmpSock;
