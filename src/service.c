@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017 DMTF. All rights reserved.
+// Copyright 2017-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
@@ -283,7 +283,7 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     if(tmp == false)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
-        cleanupAsyncToSyncContext(context); 
+        cleanupAsyncToSyncContext(context);
         return NULL;
     }
     //Wait for the condition
@@ -479,7 +479,7 @@ bool createServiceEnumeratorAsync(const char* host, const char* rootUri, enumera
 bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
 {
     char* url;
-    asyncHttpRequest* request; 
+    asyncHttpRequest* request;
     rawAsyncCallbackContextWrapper* myContext;
     bool ret;
 
@@ -498,7 +498,7 @@ bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsy
     request = createRequest(url, HTTP_GET, 0, NULL);
     free(url);
     setupRequestFromOptions(request, service, options);
-    
+
     myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
     myContext->callback = callback;
     myContext->originalContext = context;
@@ -535,7 +535,7 @@ bool patchUriFromServiceAsync(redfishService* service, const char* uri, redfishP
     free(url);
     setupRequestFromOptions(request, service, options);
     addRequestHeader(request, "Content-Type", getPayloadContentType(payload));
-    
+
     myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
     myContext->callback = callback;
     myContext->originalContext = context;
@@ -569,7 +569,7 @@ bool postUriFromServiceAsync(redfishService* service, const char* uri, redfishPa
     free(url);
     setupRequestFromOptions(request, service, options);
     addRequestHeader(request, "Content-Type", getPayloadContentType(payload));
-    
+
     myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
     myContext->callback = callback;
     myContext->originalContext = context;
@@ -602,7 +602,7 @@ bool deleteUriFromServiceAsync(redfishService* service, const char* uri, redfish
     request = createRequest(url, HTTP_DELETE, 0, NULL);
     free(url);
     setupRequestFromOptions(request, service, options);
-    
+
     myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
     myContext->callback = callback;
     myContext->originalContext = context;
@@ -864,7 +864,7 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
     if(ret == false)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
-        cleanupAsyncToSyncContext(asyncContext); 
+        cleanupAsyncToSyncContext(asyncContext);
         return false;
     }
     //Wait for the condition
@@ -873,7 +873,7 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
     {
         service->eventRegistrationUri = getPayloadUri(asyncContext->data);
         cleanupPayload(asyncContext->data);
-    } 
+    }
     if(asyncContext->success == false)
     {
         unregisterCallback(service, callback, eventTypes, context);
@@ -978,7 +978,7 @@ void serviceIncRef(redfishService* service)
 void terminateAsyncThread(redfishService* service);
 
 static void freeServicePtr(redfishService* service)
-{ 
+{
     if(service->tcpSocket != -1)
     {
         close(service->tcpSocket);
@@ -995,10 +995,10 @@ static void freeServicePtr(redfishService* service)
         free(service->eventRegistrationUri);
     }
     if(service->eventThreadQueue != NULL)
-    { 
+    {
         terminateAsyncEventThread(service);
-    } 
-    terminateAsyncThread(service); 
+    }
+    terminateAsyncThread(service);
     free(service->host);
     service->host = NULL;
     json_decref(service->versions);
@@ -1087,7 +1087,7 @@ static redfishService* createServiceEnumeratorNoAuth(const char* host, const cha
 {
     redfishService* ret;
 
-    ret = (redfishService*)calloc(1, sizeof(redfishService)); 
+    ret = (redfishService*)calloc(1, sizeof(redfishService));
     serviceIncRef(ret);
 #ifdef _MSC_VER
 	ret->host = _strdup(host);
@@ -1109,7 +1109,7 @@ static bool createServiceEnumeratorNoAuthAsync(const char* host, const char* roo
     redfishService* ret;
     bool rc;
 
-    ret = (redfishService*)calloc(1, sizeof(redfishService)); 
+    ret = (redfishService*)calloc(1, sizeof(redfishService));
     if(ret == NULL)
     {
         return false;
@@ -1377,7 +1377,7 @@ static void gotServiceRootServiceAuth(bool success, unsigned short httpCode, red
 
     rc = postUriFromServiceAsync(myContext->service, uri, authPayload, NULL, didSessionAuthPost, myContext);
     cleanupPayload(links);
-    cleanupPayload(authPayload); 
+    cleanupPayload(authPayload);
     if(rc == false)
     {
         myContext->originalCallback(NULL, myContext->originalContext);
@@ -1577,7 +1577,7 @@ static void gotVersions(bool success, unsigned short httpCode, redfishPayload* p
 #else
 	CreateThread(NULL, 0, doCallbackInSeperateThread, myContext, 0, NULL);
 #endif
-    
+
 }
 
 static bool getVersionsAsync(redfishService* service, const char* rootUri, redfishCreateAsyncCallback callback, void* context)

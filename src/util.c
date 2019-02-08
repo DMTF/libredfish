@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017 DMTF. All rights reserved.
+// Copyright 2017-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
@@ -215,7 +215,7 @@ char* getIpv6Address(const char* interface)
         freeifaddrs(ifap);
         return NULL;
     }
-    
+
     freeifaddrs(ifap);
     return safeStrdup(host);
 #endif

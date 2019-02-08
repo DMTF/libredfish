@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2018 DMTF. All rights reserved.
+// Copyright 2018-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 
@@ -39,20 +39,20 @@ typedef struct _redfishService {
     CURL* curl;
     /** A json object containing all Redfish versions supported by this service **/
     json_t* versions;
-    /** 
-     * Flags about this service 
+    /**
+     * Flags about this service
      *
      * @see REDFISH_FLAG_SERVICE_NO_VERSION_DOC
      **/
     unsigned int flags;
-    /** 
-     * A redfish session token. If set this will be used for authentication 
+    /**
+     * A redfish session token. If set this will be used for authentication
      *
      * @see bearerToken
      * @see otherAuth
      */
     char* sessionToken;
-    /** 
+    /**
      * A bearer token. If set and sessionToken is not this will be used
      * for authentication.
      *
@@ -60,7 +60,7 @@ typedef struct _redfishService {
      * @see otherAuth
      */
     char* bearerToken;
-    /** 
+    /**
      * Raw authorization field (usually basic auth). This is the last resort.
      *
      * @see sessionToken

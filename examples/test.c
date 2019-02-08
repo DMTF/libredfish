@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017 DMTF. All rights reserved.
+// Copyright 2017-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
@@ -337,9 +337,9 @@ int main(int argc, char** argv)
     unsigned int     method = 0;
     char*            host = NULL;
     char*            filename = NULL;
-    redfishService*  redfish = NULL; 
+    redfishService*  redfish = NULL;
     char*            query = NULL;
-    char*            leaf = NULL; 
+    char*            leaf = NULL;
     char*            eventUri = NULL;
     unsigned int     flags = 0;
     char*            username = NULL;

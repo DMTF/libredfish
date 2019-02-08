@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2018 DMTF. All rights reserved.
+// Copyright 2018-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include "internal_service.h"
@@ -192,11 +192,11 @@ struct MemoryStruct
    * On data receieved from the server this pointer will always point to the first data byte receieved and be reallocated as needed.
    */
   char* memory;
-  /** 
+  /**
    * @brief The size of the memory region pointed to by memory.
    *
    * On data sent to the server this value will be reduced as the memory pointer is incremented.
-   * On data received from the server this value will be increased to represent the total size of the memory pointer 
+   * On data received from the server this value will be increased to represent the total size of the memory pointer
    */
   size_t size;
   /**
@@ -253,7 +253,7 @@ threadRet rawAsyncWorkThread(void* data)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteMemory);
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, curlReadMemory);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, asyncHeaderCallback);
-    curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, curlSeekMemory); 
+    curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, curlSeekMemory);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readChunk);
     curl_easy_setopt(curl, CURLOPT_READDATA, &writeChunk);
 
@@ -337,7 +337,7 @@ threadRet rawAsyncWorkThread(void* data)
         }
         curl_easy_setopt(curl, CURLOPT_TIMEOUT, workItem->request->timeout);
         curl_easy_setopt(curl, CURLOPT_URL, workItem->request->url);
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         res = curl_easy_perform(curl);
         curl_easy_getinfo(curl, CURLINFO_REDIRECT_URL, &redirect);
         if(redirect)
@@ -350,7 +350,7 @@ threadRet rawAsyncWorkThread(void* data)
                 readChunk.size = 0;
                 readChunk.origin = readChunk.memory;
                 readChunk.originalSize = readChunk.size;
-                freeHeaders(response->headers); 
+                freeHeaders(response->headers);
                 response->headers = NULL;
                 curl_easy_setopt(curl, CURLOPT_URL, redirect);
                 res = curl_easy_perform(curl);
@@ -507,7 +507,7 @@ static size_t asyncHeaderCallback(char* buffer, size_t size, size_t nitems, void
     REDFISH_DEBUG_NOTICE_PRINT("%s: Adding %s => %s to %p\n", __FUNCTION__, name, value, response->headers);
     addHeader(&(response->headers), name, value);
     free(tmp);
-    
+
     return nitems * size;
 }
 
