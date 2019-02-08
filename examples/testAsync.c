@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2018 DMTF. All rights reserved.
+// Copyright 2018-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
@@ -348,7 +348,7 @@ static void gotRedfishService(redfishService* service, void* context)
     mutex_t*           mutex = (mutex_t*)context;
     char*              leaf = NULL; 
     gotPayloadContext* myContext;
- 
+
     switch(gRedfishParams.method)
     {
         default:

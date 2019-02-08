@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2018 DMTF. All rights reserved.
+// Copyright 2018-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include "queue.h"
@@ -143,4 +143,4 @@ static queueNode* newQueueNode(void* value)
     ret->next  = NULL;
     return ret;
 }
-/* vim: set tabstop=4 shiftwidth=4 expandtab: */
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017 DMTF. All rights reserved.
+// Copyright 2017-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
@@ -53,6 +53,7 @@ static struct option long_options[] =
     {"token",      required_argument, 0,      'T'},
     {"command",    required_argument, 0,      'c'},
     {"valgrind",   no_argument,       0,      'X'},
+    {"context",    required_argument, 0,      'C'},
     {0, 0, 0, 0}
 };
 
@@ -340,14 +341,15 @@ int main(int argc, char** argv)
     unsigned int     method = 0;
     char*            host = NULL;
     char*            filename = NULL;
-    redfishService*  redfish = NULL; 
+    redfishService*  redfish = NULL;
     char*            query = NULL;
-    char*            leaf = NULL; 
+    char*            leaf = NULL;
     char*            eventUri = NULL;
     unsigned int     flags = 0;
     char*            username = NULL;
     char*            password = NULL;
     char*            token = NULL;
+    char*            userContext = NULL;
     enumeratorAuthentication auth;
     gotPayloadContext* context;
     commandMapping* command = NULL;
@@ -356,7 +358,7 @@ int main(int argc, char** argv)
 
     memset(&auth, 0, sizeof(auth));
 
-    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:X", long_options, &opt_index)) != -1)
+    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:XC:", long_options, &opt_index)) != -1)
     {
         switch(arg)
         {
@@ -428,6 +430,9 @@ int main(int argc, char** argv)
             case 'X':
                 valgrind = true;
                 break;
+            case 'C':
+                userContext = strdup(optarg);
+                break;
         }
     }
     if(host == NULL)
@@ -458,10 +463,11 @@ int main(int argc, char** argv)
     {
         fprintf(stderr, "Unable to create service enumerator\n");
     }
+    safeFree(token);
 
     if(eventUri != NULL)
     {
-        if(registerForEvents(redfish, eventUri, REDFISH_EVENT_TYPE_ALL, printRedfishEvent, NULL) == true)
+        if(registerForEvents(redfish, eventUri, REDFISH_EVENT_TYPE_ALL, printRedfishEvent, userContext) == true)
         {
             signal(SIGINT, inthand);
             printf("Successfully registered. Waiting for events...\n");
@@ -478,8 +484,9 @@ int main(int argc, char** argv)
         {
             printf("Failed to register for events! Cleaning up...\n");
         }
+        safeFree(userContext);
         free(eventUri);
-        cleanupServiceEnumerator(redfish);
+        serviceDecRefAndWait(redfish);
         if(host)
         {
             free(host);
@@ -490,6 +497,7 @@ int main(int argc, char** argv)
         }
         return 0;
     }
+    safeFree(userContext);
 
     if(optind < argc)
     {
@@ -539,7 +547,6 @@ int main(int argc, char** argv)
     }
     safeFree(host);
     safeFree(filename);
-    safeFree(token);
     safeFree(username);
     safeFree(password);
     return 0;

@@ -22,17 +22,24 @@ source_group("Library Sources" FILES ${REDFISH_SRC})
 find_package(CURL REQUIRED)
 find_package(Jansson REQUIRED)
 find_package(CZMQ)
+find_package(OpenSSL)
 
 include_directories(${CURL_INCLUDE_DIR})
 include_directories(${JANSSON_INCLUDE_DIRS})
 
 add_library(redfish SHARED ${REDFISH_SRC} ${REDFISH_HDR_PRIVATE})
+target_link_libraries(redfish jansson curl)
 if(CZMQ_FOUND)
-  target_link_libraries(redfish jansson curl czmq)
+  target_link_libraries(redfish czmq)
 else()
-  target_link_libraries(redfish jansson curl)
   add_definitions( -DNO_CZMQ )
 endif()
+
+if(OPENSSL_FOUND)
+  add_definitions(-DHAVE_OPENSSL)
+  target_link_libraries(redfish ${OPENSSL_SSL_LIBRARY})
+endif()
+
 
 add_executable(redfishtest "${CMAKE_CURRENT_SOURCE_DIR}/examples/test.c")
 target_link_libraries(redfishtest redfish)

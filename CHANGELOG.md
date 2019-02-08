@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.1.6] - 2019-02-08
+- Added ability to listen via TCP/OpenSSL socket
+- Windows build fixes
+
 ## [1.1.5] - 2019-02-01
 - Fixed various leaks
 - Refactored some code to remove duplications

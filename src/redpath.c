@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017 DMTF. All rights reserved.
+// Copyright 2017-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <stdlib.h>
@@ -211,4 +211,4 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
 #endif
     free(index);
 }
-
+/* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */
