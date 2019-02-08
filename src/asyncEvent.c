@@ -69,9 +69,14 @@ typedef struct {
     };
 } EventWorkItem;
 
-static threadRet eventActorTask(void* args);
-static threadRet sseThread(void* args);
-static threadRet tcpThread(void* args);
+#ifndef _MSC_VER
+//Windows needs this for the thread call syntax to be right
+#define WINAPI
+#endif
+
+static threadRet WINAPI eventActorTask(void* args);
+static threadRet WINAPI sseThread(void* args);
+static threadRet WINAPI tcpThread(void* args);
 static bool addTerminationToQueue(redfishService* service);
 static bool addRegistrationToQueue(redfishService* service, bool unregister, redfishEventCallback callback, unsigned int eventTypes, const char* context);
 static bool addEventToQueue(redfishService* service, EventInfo* event, bool copy);
