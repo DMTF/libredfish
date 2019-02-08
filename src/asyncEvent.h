@@ -22,7 +22,7 @@ void startEventThread(redfishService* service);
 void terminateAsyncEventThread(redfishService* service);
 
 bool startSSEListener(redfishService* service, const char* sseUri);
-bool startTCPListener(redfishService* service, int socket);
+bool startTCPListener(redfishService* service, SOCKET socket);
 bool startZeroMQListener(redfishService* service);
 
 #endif

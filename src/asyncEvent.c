@@ -11,6 +11,14 @@
 #include "debug.h"
 #include "redfishEvent.h"
 
+#ifdef _MSC_VER
+#define poll WSAPoll
+#else
+#include <sys/socket.h>
+#include <unistd.h>
+#include <sys/poll.h>
+#endif
+
 #ifdef HAVE_OPENSSL
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
@@ -138,7 +146,7 @@ struct SSEThreadData {
 
 struct TCPThreadData {
     redfishService* service;
-    int socket;
+	SOCKET socket;
 };
 
 bool startSSEListener(redfishService* service, const char* sseUri)
@@ -174,7 +182,7 @@ bool startSSEListener(redfishService* service, const char* sseUri)
     return ret;
 }
 
-bool startTCPListener(redfishService* service, int socket)
+bool startTCPListener(redfishService* service, SOCKET socket)
 {
     struct TCPThreadData* data = malloc(sizeof(struct TCPThreadData));
     if(data == NULL)
@@ -302,8 +310,10 @@ static threadRet sseThread(void* args)
     long httpCode;
     char* uri = data->sseUri;
 
+#ifndef _MSC_VER
     //Need to set this thread detached and make it clean itself up
     pthread_detach(pthread_self());
+#endif
 
     curl = curl_easy_init();
     if(!curl)
@@ -362,14 +372,10 @@ static threadRet sseThread(void* args)
 #endif
 }
 
-#include <sys/socket.h>
-#include <unistd.h>
-#include <sys/poll.h>
-
 static threadRet tcpThread(void* args)
 {
     struct TCPThreadData* data = (struct TCPThreadData*)args;
-    int tmpSock;
+	SOCKET tmpSock;
     char buffer[2048];
     size_t eventCount, i;
     EventInfo* events;
@@ -390,7 +396,11 @@ static threadRet tcpThread(void* args)
     while(1)
     {
         ufds[0].fd = data->socket;
+#ifdef _MSC_VER
+		ufds[0].events = POLLIN;
+#else
         ufds[0].events = POLLIN | POLLNVAL;
+#endif
         // wait for events on the sockets, 0.5 second timeout
         // This let's the thread error out when the socket is closed and no events are received... 
         rv = poll(ufds, 1, 500);
@@ -402,6 +412,8 @@ static threadRet tcpThread(void* args)
 #endif
             free(args);
 #ifdef _MSC_VER
+			rv = WSAGetLastError();
+			REDFISH_DEBUG_CRIT_PRINT("%s: WSAPoll returned %d\n", __FUNCTION__, rv);
             return 0;
 #else
             pthread_exit(NULL);
@@ -455,7 +467,7 @@ static threadRet tcpThread(void* args)
             continue;
         }
 #endif
-        bzero(buffer, 2048);
+        memset(buffer, 0, 2048);
 #ifdef HAVE_OPENSSL
         buffPos = 0;
         while((unsigned int)buffPos < sizeof(buffer)-1)
@@ -482,7 +494,7 @@ static threadRet tcpThread(void* args)
             continue;
         }
 #else
-        read(tmpSock, buffer, 2047);
+        recv(tmpSock, buffer, 2047, 0);
 #endif
         eventCount = getRedfishEventInfoFromRawHttp(buffer, data->service, &events);
         if(eventCount)
@@ -490,7 +502,7 @@ static threadRet tcpThread(void* args)
 #ifdef HAVE_OPENSSL
             SSL_write(ssl,"HTTP/1.1 200 OK\nConnection: Closed\n\n",36);
 #else
-            write(tmpSock,"HTTP/1.1 200 OK\nConnection: Closed\n\n",36);
+            send(tmpSock,"HTTP/1.1 200 OK\nConnection: Closed\n\n",36, 0);
 #endif
         }
         else
@@ -498,13 +510,17 @@ static threadRet tcpThread(void* args)
 #ifdef HAVE_OPENSSL
             SSL_write(ssl,"HTTP/1.1 400 Bad Request\nConnection: Closed\n\n",45);
 #else
-            write(tmpSock,"HTTP/1.1 400 Bad Request\nConnection: Closed\n\n",45);
+			send(tmpSock,"HTTP/1.1 400 Bad Request\nConnection: Closed\n\n",45, 0);
 #endif
         }
 #ifdef HAVE_OPENSSL
         SSL_free(ssl);
 #endif
+#ifdef _MSC_VER
+		closesocket(tmpSock);
+#else
         close(tmpSock);
+#endif
         for(i = 0; i < eventCount; i++)
         {
             addEventToQueue(data->service, &(events[i]), true);

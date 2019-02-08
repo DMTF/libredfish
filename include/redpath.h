@@ -17,7 +17,7 @@
 #define _REDPATH_H_
 #include <stdbool.h>
 
-typedef enum {
+typedef enum _RedPathOp {
     REDPATH_OP_EQUAL=0,
     REDPATH_OP_NOTEQUAL,
     REDPATH_OP_LESS,
