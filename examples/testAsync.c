@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2018 DMTF. All rights reserved.
+// Copyright 2018-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
@@ -338,9 +338,9 @@ redfishParams gRedfishParams = {0};
 static void gotRedfishService(redfishService* service, void* context)
 {
     pthread_mutex_t*   mutex = (pthread_mutex_t*)context;
-    char*              leaf = NULL; 
+    char*              leaf = NULL;
     gotPayloadContext* myContext;
- 
+
     switch(gRedfishParams.method)
     {
         default:
@@ -384,7 +384,7 @@ int main(int argc, char** argv)
     int              opt_index  = 0;
     char*            host = NULL;
     unsigned int     flags = 0;
-    enumeratorAuthentication* auth = NULL; 
+    enumeratorAuthentication* auth = NULL;
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     bool ret;
 

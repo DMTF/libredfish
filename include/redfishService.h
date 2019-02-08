@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017 DMTF. All rights reserved.
+// Copyright 2017-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 
@@ -157,7 +157,7 @@ REDFISH_EXPORT redfishService* createServiceEnumerator(const char* host, const c
  * @param uri The URI to obtain data from (must contain the full URI for the service, i.e. should start with /redfish normally)
  * @return A json representation of the URI content or NULL on error
  * @see getUriFromServiceAsync
- * @deprecated This function if just a wrapper for the async API getUriFromServiceAsync and will not be updated to handle non-JSON returns or 
+ * @deprecated This function if just a wrapper for the async API getUriFromServiceAsync and will not be updated to handle non-JSON returns or
  * other features of the newer API.
  */
 REDFISH_EXPORT json_t* getUriFromService(redfishService* service, const char* uri);
@@ -171,7 +171,7 @@ REDFISH_EXPORT json_t* getUriFromService(redfishService* service, const char* ur
  * @param content The content to send
  * @return A json representation of the URI content or NULL on error
  * @see patchUriFromServiceAsync
- * @deprecated This function if just a wrapper for the async API patchUriFromServiceAsync and will not be updated to handle non-JSON returns or 
+ * @deprecated This function if just a wrapper for the async API patchUriFromServiceAsync and will not be updated to handle non-JSON returns or
  * other features of the newer API.
  */
 REDFISH_EXPORT json_t* patchUriFromService(redfishService* service, const char* uri, const char* content);
@@ -187,7 +187,7 @@ REDFISH_EXPORT json_t* patchUriFromService(redfishService* service, const char* 
  * @param contentType The contentType header to send
  * @return A json representation of the URI content or NULL on error
  * @see postUriFromServiceAsync
- * @deprecated This function if just a wrapper for the async API postUriFromServiceAsync and will not be updated to handle non-JSON returns or 
+ * @deprecated This function if just a wrapper for the async API postUriFromServiceAsync and will not be updated to handle non-JSON returns or
  * other features of the newer API.
  */
 REDFISH_EXPORT json_t* postUriFromService(redfishService* service, const char* uri, const char* content, size_t contentLength, const char* contentType);
@@ -349,7 +349,7 @@ REDFISH_EXPORT bool createServiceEnumeratorAsync(const char* host, const char* r
  * @param payload The redfish payload returned from the call
  * @param context An opaque pointer sent to the original call
  */
-typedef void (*redfishAsyncCallback)(bool success, unsigned short httpCode, redfishPayload* payload, void* context); 
+typedef void (*redfishAsyncCallback)(bool success, unsigned short httpCode, redfishPayload* payload, void* context);
 
 /**
  * @brief Obtain the redfish payload corresponding to the given URI on the service.

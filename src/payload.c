@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017 DMTF. All rights reserved.
+// Copyright 2017-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
@@ -73,7 +73,7 @@ redfishPayload* createRedfishPayloadFromContent(const char* content, size_t cont
         {
             ret->content = malloc(contentLength);
             memcpy(ret->content, content, contentLength);
-        } 
+        }
         ret->contentLength = contentLength;
         ret->contentType = PAYLOAD_CONTENT_OTHER;
         ret->contentTypeStr = safeStrdup(contentType);
@@ -103,7 +103,7 @@ redfishPayload* copyRedfishPayload(const redfishPayload* original)
     }
     if(original->service)
     {
-        ret->service = original->service; 
+        ret->service = original->service;
     }
     if(original->content)
     {
@@ -823,7 +823,7 @@ void gotNextRedPath(bool success, unsigned short httpCode, redfishPayload* paylo
     if(ret == false)
     {
         myContext->callback(ret, 0xFFFF, NULL, myContext->originalContext);
-        cleanupRedPath(myContext->redpath); 
+        cleanupRedPath(myContext->redpath);
     }
     else
     {
@@ -868,7 +868,7 @@ bool getPayloadForPathAsync(redfishPayload* payload, redPathNode* redpath, redfi
     {
         free(myContext);
     }
-    return ret; 
+    return ret;
 }
 
 bool getPayloadForPathStringAsync(redfishPayload* payload, const char* string, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context)
@@ -978,7 +978,7 @@ static bool intCompareOpResult(long long int1, long long int2, RedPathOp op)
             return (int1 <= int2);
         case REDPATH_OP_GREATER_EQUAL:
             return (int1 >= int2);
-        default: 
+        default:
             return false;
     }
 }
@@ -1017,7 +1017,7 @@ static bool getSimpleOpResult(json_t* json, const char* propName, RedPathOp op, 
                 ret = (json != NULL);
                 break;
             }
-            stringProp = json_object_get(json, propName); 
+            stringProp = json_object_get(json, propName);
         case JSON_STRING:
             propStr = json_string_value(stringProp);
             if(propStr == NULL)
@@ -1377,7 +1377,7 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
         myContext->count = max;
         myContext->left = max;
         myContext->validCount = 0;
-        myContext->payloads = calloc(sizeof(redfishPayload*), max); 
+        myContext->payloads = calloc(sizeof(redfishPayload*), max);
         for(i = 0; i < max; i++)
         {
             ret = getPayloadByIndexAsync(members, i, options, opGotPayloadByIndexAsync, myContext);

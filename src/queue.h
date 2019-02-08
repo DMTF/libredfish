@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2018 DMTF. All rights reserved.
+// Copyright 2018-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 
@@ -51,8 +51,8 @@
 /**
  * @brief Compare and swap.
  *
- * This is an atomic operation that compares the content of @ptr 
- * with @comp. If the two are the same then the content of @ptr is 
+ * This is an atomic operation that compares the content of @ptr
+ * with @comp. If the two are the same then the content of @ptr is
  * replaced with @replace.
  *
  * @return true if the value was replaced. false otherwise
@@ -98,12 +98,12 @@ inline bool cas(void* ptr, size_t comp, size_t replace)
  * @brief Compare and swap.
  *
  * This is an atomic operation that compares the content of the first param
- * with the second param. If the two are the same then the content of the first param is 
+ * with the second param. If the two are the same then the content of the first param is
  * replaced with the third param.
  *
  * @return true if the value was replaced. false otherwise
  */
-#define cas               __sync_bool_compare_and_swap 
+#define cas               __sync_bool_compare_and_swap
 #endif
 
 /**
@@ -134,13 +134,13 @@ typedef struct _queue_node
 typedef struct _queue
 {
     /**
-     * @brief The first element in the queue 
+     * @brief The first element in the queue
      *
      * The first element in the queue or the same as divider and last if the queue is empty.
      */
     queueNode* first;
     /**
-     * @brief The division between the producer and consumer side of the queue. 
+     * @brief The division between the producer and consumer side of the queue.
      *
      * This points to a fake element in the list. Everything on the left side of the element has been read
      * by the consumer and is ready to be freed. Everything on the right side of the queue is ready to be read.
@@ -149,7 +149,7 @@ typedef struct _queue
      */
     queueNode* divider;
     /**
-     * @brief The last element in the queue 
+     * @brief The last element in the queue
      *
      * The last element in the queue or the same as divider and first if the queue is empty.
      */

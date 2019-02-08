@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2018 DMTF. All rights reserved.
+// Copyright 2018-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 
@@ -146,7 +146,7 @@ REDFISH_EXPORT int             getPayloadIntValue(redfishPayload* payload);
 /**
  * @brief Obtain the node in the payload identified by the specified nodeName
  *
- * Obtain the node in the payload identified by the specified nodeName. If the node in question is a navigation property to another URI then the 
+ * Obtain the node in the payload identified by the specified nodeName. If the node in question is a navigation property to another URI then the
  * content of that URI will be obtained synchronously.
  *
  * @param payload The payload to get the child node of
@@ -200,7 +200,7 @@ REDFISH_EXPORT redfishPayload* getPayloadForPathString(redfishPayload* payload, 
  * Return the number of elements in the collection.
  *
  * @param payload The payload to get number of elements in
- * @return 0 if the payload is not a collection. The total number of elements in the collection otherwise. 
+ * @return 0 if the payload is not a collection. The total number of elements in the collection otherwise.
  */
 REDFISH_EXPORT size_t          getCollectionSize(redfishPayload* payload);
 /**
@@ -211,7 +211,7 @@ REDFISH_EXPORT size_t          getCollectionSize(redfishPayload* payload);
  * @param payload The payload to update
  * @param propertyName The name of the property to update
  * @param value The new value for the property
- * @return NULL if failure, the resulting redfishPayload on success. 
+ * @return NULL if failure, the resulting redfishPayload on success.
  */
 REDFISH_EXPORT redfishPayload* patchPayloadStringProperty(redfishPayload* payload, const char* propertyName, const char* value);
 /**
@@ -223,7 +223,7 @@ REDFISH_EXPORT redfishPayload* patchPayloadStringProperty(redfishPayload* payloa
  * @param data The character buffer to write
  * @param dataSize The size of the buffer to write
  * @param contentType The value for the "content-type" header
- * @return NULL if failure, the resulting redfishPayload on success. 
+ * @return NULL if failure, the resulting redfishPayload on success.
  */
 REDFISH_EXPORT redfishPayload* postContentToPayload(redfishPayload* target, const char* data, size_t dataSize, const char* contentType);
 /**
@@ -233,7 +233,7 @@ REDFISH_EXPORT redfishPayload* postContentToPayload(redfishPayload* target, cons
  *
  * @param target The payload to update
  * @param payload The payload to write
- * @return NULL if failure, the resulting redfishPayload on success. 
+ * @return NULL if failure, the resulting redfishPayload on success.
  */
 REDFISH_EXPORT redfishPayload* postPayload(redfishPayload* target, redfishPayload* payload);
 /**
@@ -242,7 +242,7 @@ REDFISH_EXPORT redfishPayload* postPayload(redfishPayload* target, redfishPayloa
  * Synchronously send a DELETE operation to the URI the payload was obtained from.
  *
  * @param payload The payload to delete
- * @return False if failure, true on success. 
+ * @return False if failure, true on success.
  */
 REDFISH_EXPORT bool            deletePayload(redfishPayload* payload);
 /**
@@ -258,7 +258,7 @@ REDFISH_EXPORT char*           payloadToString(redfishPayload* payload, bool pre
 /**
  * @brief Free the local copy of the payload
  *
- * Free the local copy of the payload. Does not interact with the redfish service at all. 
+ * Free the local copy of the payload. Does not interact with the redfish service at all.
  *
  * @param payload The payload to free
  */
@@ -267,7 +267,7 @@ REDFISH_EXPORT void            cleanupPayload(redfishPayload* payload);
 /**
  * @brief Obtain the node in the payload identified by the specified nodeName
  *
- * Obtain the node in the payload identified by the specified nodeName. If the node in question is a navigation property to another URI then the 
+ * Obtain the node in the payload identified by the specified nodeName. If the node in question is a navigation property to another URI then the
  * content of that URI will be obtained asynchronously. It is the callback's responsibility to free the returned payload.
  *
  * @param payload The payload to get the child node of
@@ -339,7 +339,7 @@ REDFISH_EXPORT bool            getPayloadForPathStringAsync(redfishPayload* payl
  *
  * @param target The payload to update
  * @param payload The payload to patch
- * @return NULL if failure, the resulting redfishPayload on success. 
+ * @return NULL if failure, the resulting redfishPayload on success.
  * @see cleanupPayload
  */
 REDFISH_EXPORT bool            patchPayloadAsync(redfishPayload* target, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
@@ -350,7 +350,7 @@ REDFISH_EXPORT bool            patchPayloadAsync(redfishPayload* target, redfish
  *
  * @param target The payload to update
  * @param payload The payload to write
- * @return NULL if failure, the resulting redfishPayload on success. 
+ * @return NULL if failure, the resulting redfishPayload on success.
  * @see cleanupPayload
  */
 REDFISH_EXPORT bool            postPayloadAsync(redfishPayload* target, redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
@@ -360,7 +360,7 @@ REDFISH_EXPORT bool            postPayloadAsync(redfishPayload* target, redfishP
  * Asynchronously send a DELETE operation to the URI the payload was obtained from. It is the callback's responsibility to free the returned payload.
  *
  * @param payload The payload to delete
- * @return False if failure, true on success. 
+ * @return False if failure, true on success.
  * @see cleanupPayload
  */
 REDFISH_EXPORT bool            deletePayloadAsync(redfishPayload* payload, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
