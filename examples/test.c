@@ -77,11 +77,41 @@ static commandMapping commands[] = {
     {NULL, NULL}
 };
 
+#ifdef _MSC_VER
+BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
+{
+	stop = 1;
+	switch (fdwCtrlType)
+	{
+		// Handle the CTRL-C signal. 
+	case CTRL_C_EVENT:
+		return TRUE;
+
+		// CTRL-CLOSE: confirm that the user wants to exit. 
+	case CTRL_CLOSE_EVENT:
+		return TRUE;
+
+		// Pass other signals to the next handler. 
+	case CTRL_BREAK_EVENT:
+		return TRUE;
+
+	case CTRL_LOGOFF_EVENT:
+		return FALSE;
+
+	case CTRL_SHUTDOWN_EVENT:
+		return FALSE;
+
+	default:
+		return FALSE;
+	}
+}
+#else
 void inthand(int signum)
 {
     (void)signum;
     stop = 1;
 }
+#endif
 
 void syslogPrintf(int priority, const char* message, ...)
 {
@@ -469,12 +499,16 @@ int main(int argc, char** argv)
     {
         if(registerForEvents(redfish, eventUri, REDFISH_EVENT_TYPE_ALL, printRedfishEvent, userContext) == true)
         {
+#ifdef _MSC_VER
+			SetConsoleCtrlHandler(CtrlHandler, TRUE);
+#else
             signal(SIGINT, inthand);
+#endif
             printf("Successfully registered. Waiting for events...\n");
             while(!stop)
             {
 #ifdef _MSC_VER
-				Sleep(INFINITE);
+				Sleep(1000);
 #else
                 pause();
 #endif
