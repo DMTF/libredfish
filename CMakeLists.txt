@@ -12,7 +12,10 @@ include_directories (${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(REDFISH_HDR_PUBLIC 
    ${CMAKE_CURRENT_SOURCE_DIR}/include/redfish.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/redfishEvent.h
    ${CMAKE_CURRENT_SOURCE_DIR}/include/redfishPayload.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/redfishRawAsync.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/redfishService.h
    ${CMAKE_CURRENT_SOURCE_DIR}/include/redpath.h)
 
 file(GLOB REDFISH_SRC src/*.c src/entities/*.c)
@@ -51,6 +54,11 @@ if(CZMQ_FOUND)
   add_executable(redfishevent "${CMAKE_CURRENT_SOURCE_DIR}/httpd/cgi.c")
   target_link_libraries(redfishevent czmq)
 endif()
+
+install(TARGETS redfishtest redfish
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib)
+install(FILES ${REDFISH_HDR_PUBLIC} DESTINATION include)
 
 ENABLE_TESTING()
 
