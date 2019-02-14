@@ -42,7 +42,7 @@ redfishPayload* createRedfishPayloadFromString(const char* value, redfishService
     json_t* jValue = json_loads(value, 0, &err);
     if(jValue == NULL)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Unable to parse json! %s %s\n", __FUNCTION__, err.text);
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to parse json! %s %s\n", __func__, err.text);
         return NULL;
     }
     return createRedfishPayload(jValue, service);
@@ -56,7 +56,7 @@ redfishPayload* createRedfishPayloadFromString(const char* value, redfishService
 redfishPayload* createRedfishPayloadFromContent(const char* content, size_t contentLength, const char* contentType, redfishService* service)
 {
     redfishPayload* ret;
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. content = %p, contentLength = %lu, contentType = %s, service = %p\n", __FUNCTION__, content, contentLength, contentType, service);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. content = %p, contentLength = %lu, contentType = %s, service = %p\n", __func__, content, contentLength, contentType, service);
     if(contentType == NULL || strncasecmp(contentType, "application/json", 16) == 0)
     {
         return createRedfishPayloadFromString(content, service);
@@ -89,7 +89,7 @@ redfishPayload* createRedfishPayloadFromContent(const char* content, size_t cont
 redfishPayload* copyRedfishPayload(const redfishPayload* original)
 {
     redfishPayload* ret;
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. original = %p\n", __FUNCTION__, original);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. original = %p\n", __func__, original);
 
     if(original == NULL)
     {
@@ -722,7 +722,7 @@ bool getPayloadByNodeNameAsync(redfishPayload* payload, const char* nodeName, re
         }
         if(value == NULL)
         {
-            REDFISH_DEBUG_ERR_PRINT("%s: Payload contains no element named %s\n", __FUNCTION__, nodeName);
+            REDFISH_DEBUG_ERR_PRINT("%s: Payload contains no element named %s\n", __func__, nodeName);
             return false;
         }
     }
@@ -809,7 +809,7 @@ void gotNextRedPath(bool success, unsigned short httpCode, redfishPayload* paylo
     redpathAsyncContext* myContext = (redpathAsyncContext*)context;
     bool ret;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __func__, success, httpCode, payload, context);
 
     if(success == false || httpCode >= 400 || myContext->redpath->next == NULL)
     {
@@ -839,7 +839,7 @@ bool getPayloadForPathAsync(redfishPayload* payload, redPathNode* redpath, redfi
     redpathAsyncContext* myContext;
     bool ret;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, redpath = %p\n", __FUNCTION__, payload, redpath);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, redpath = %p\n", __func__, payload, redpath);
 
     if(!payload || !redpath)
     {
@@ -1001,11 +1001,11 @@ static bool getSimpleOpResult(json_t* json, const char* propName, RedPathOp op, 
     long long intVal, intPropVal;
     bool ret;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. json = %p, propName = %s, op = %u, value = %s\n", __FUNCTION__, json, propName, op, value);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. json = %p, propName = %s, op = %u, value = %s\n", __func__, json, propName, op, value);
 
     if(json == NULL)
     {
-        REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. Null JSON\n", __FUNCTION__);
+        REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. Null JSON\n", __func__);
         return false;
     }
 
@@ -1045,7 +1045,7 @@ static bool getSimpleOpResult(json_t* json, const char* propName, RedPathOp op, 
             ret = false;
             break;
     }
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. %u\n", __FUNCTION__, ret);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. %u\n", __func__, ret);
     return ret;
 }
 
@@ -1112,7 +1112,7 @@ static void opGotPayloadByNodeNameAsync(bool success, unsigned short httpCode, r
     redpathAsyncOpContext* myContext = (redpathAsyncOpContext*)context;
     bool ret = false;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __func__, success, httpCode, payload, context);
 
     if(success == false || httpCode >= 400 || payload == NULL)
     {
@@ -1142,7 +1142,7 @@ static bool getOpResultAsync(redfishPayload* payload, const char* propName, RedP
     bool ret;
     redpathAsyncOpContext* myContext;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __func__, payload, propName, value, context);
 
     if(isPayloadCollection(payload))
     {
@@ -1266,7 +1266,7 @@ static void opGotResultAsync(bool success, unsigned short httpCode, redfishPaylo
 {
     redpathAsyncOpContext* myContext = (redpathAsyncOpContext*)context;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __func__, success, httpCode, payload, context);
 
     if(success == true && httpCode < 300 && payload != NULL)
     {
@@ -1289,7 +1289,7 @@ static void opGotPayloadByIndexAsync(bool success, unsigned short httpCode, redf
     redpathAsyncOpContext* myContext = (redpathAsyncOpContext*)context;
     bool ret;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %u, payload = %p, context = %p\n", __func__, success, httpCode, payload, context);
 
     if(success == true && httpCode < 300 && payload != NULL)
     {
@@ -1320,9 +1320,9 @@ static bool collectionEvalOpAsync(redfishPayload* payload, const char* propName,
     redfishPayload* members;
     redfishPayload* tmp;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __func__, payload, propName, value, context);
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __func__, payload, propName, value, context);
 
     max = getCollectionSize(payload);
     if(max == 0)
@@ -1463,7 +1463,7 @@ static bool arrayEvalOpAsync(redfishPayload* payload, const char* propName, RedP
     redpathAsyncOpContext* myContext;
     redfishPayload* tmp;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __FUNCTION__, payload, propName, value, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. payload = %p, propName = %s, value = %s, context = %p\n", __func__, payload, propName, value, context);
 
     max = json_array_size(payload->json);
     if(max == 0)
