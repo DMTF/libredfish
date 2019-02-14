@@ -14,6 +14,8 @@
 #include "debug.h"
 #include "util.h"
 
+static bool curlInitDone = false;
+
 static void safeFree(void* ptr);
 static void freeHeaders(httpHeader* headers);
 static void initAsyncThread(redfishService* service);
@@ -215,6 +217,12 @@ struct MemoryStruct
   size_t originalSize;
 };
 
+static void cleanupCurl()
+{
+    //Call this when the whole program exits...
+    curl_global_cleanup();
+}
+
 #ifdef _MSC_VER
 threadRet __stdcall rawAsyncWorkThread(void* data)
 #else
@@ -235,7 +243,12 @@ threadRet rawAsyncWorkThread(void* data)
     char* redirect;
     bool noReuse = false;
 
-    curl_global_init(CURL_GLOBAL_DEFAULT);
+    if(curlInitDone == false)
+    {
+        curl_global_init(CURL_GLOBAL_DEFAULT);
+        atexit(cleanupCurl);
+        curlInitDone = true;
+    }
     curl = curl_easy_init();
     if(!curl)
     {
@@ -399,7 +412,6 @@ threadRet rawAsyncWorkThread(void* data)
     }
     safeFree(workItem);
     curl_easy_cleanup(curl);
-    curl_global_cleanup(); //Must be called the same number of times as init...
     if(service->selfTerm)
     {
         freeQueue(service->queue);
