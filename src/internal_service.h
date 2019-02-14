@@ -22,6 +22,7 @@
 #include <czmq.h>
 #endif
 #include "queue.h"
+#include "util.h"
 
 /**
  * @brief A redfish service.
@@ -86,7 +87,7 @@ typedef struct _redfishService {
     /** The thread listening for tcp events **/
     thread tcpThread;
     /** The socket listening for tcp events **/
-    int tcpSocket;
+	SOCKET tcpSocket;
     /** An indicator to the event thread to terminate itself **/
     bool eventTerm;
     /** The uri the event registration is stored at **/

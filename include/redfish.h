@@ -30,6 +30,6 @@ typedef void (*libRedfishDebugFunc)(int priority, const char* message, ...);
  *
  * @param debugFunc The debug function to use, NULL disables debug.
  */
-void libredfishSetDebugFunction(libRedfishDebugFunc debugFunc);
+void REDFISH_EXPORT libredfishSetDebugFunction(libRedfishDebugFunc debugFunc);
 
 #endif

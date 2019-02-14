@@ -1,9 +1,12 @@
 sudo: required
+os:
+- linux
+- windows
 services:
 - docker
 cache:
   directories:
-  - $HOME/.cache
+  - "$HOME/.cache"
 language: C
 env:
   matrix:
@@ -11,15 +14,37 @@ env:
   - OS=el DIST=7
   - OS=fedora DIST=27
   - OS=fedora DIST=26
+  - OS=Windows VISUAL_STUDIO="Visual Studio 15 2017" JANSSON_LIB="jansson.lib" ARCH=x86
+  - OS=Windows VISUAL_STUDIO="Visual Studio 15 2017 Win64" JANSSON_LIB="janssonx64.lib" ARCH=x64
+matrix:
+  exclude:
+  - os: windows
+    env: OS=el DIST=6
+  - os: windows
+    env: OS=el DIST=7
+  - os: windows
+    env: OS=fedora DIST=27
+  - os: windows
+    env: OS=fedora DIST=26
+  - os: linux
+    env: OS=Windows VISUAL_STUDIO="Visual Studio 15 2017" JANSSON_LIB="jansson.lib" ARCH=x86
+  - os: linux
+    env: OS=Windows VISUAL_STUDIO="Visual Studio 15 2017 Win64" JANSSON_LIB="janssonx64.lib" ARCH=x64
 script:
-- git submodule update --init --recursive
-- git describe --long || true
-- git clone https://github.com/packpack/packpack.git packpack
-- packpack/packpack
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then git clone https://github.com/packpack/packpack.git packpack; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then VERSION=${TRAVIS_TAG} packpack/packpack; fi
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then sh -xe travisWinBuild.sh; fi
+before_deploy:
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then rm -f build/*debuginfo* && rm -f build/*debugsource*; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mkdir deploy && cp build/*.rpm deploy/; fi
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cd deploy && 7z a -sdel libredfish-$TRAVIS_TAG-$ARCH.zip * && cd ..; fi
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then sleep 5 && ls deploy/*; fi
 deploy:
-  provider: bintray
-  file: ".bintray.json"
-  user: "pboyd04"
-  skip_cleanup: true # to upload artifacts created during the build
-  key:
-    secure: Y50tSa/3i8FmCMXVG9OOa/7fZgALozuA+wIkjsz3NpxbAWHGashxtpCRMQ1crEyu2FoFMMSlVuxIp2/t8x3/729r93mZino8nSkJryxqnGI9FD6zZe2hld06ba6J8MwX8yL8OeN2aEZpKBtR+I/tNn7LkELlMJzvbQg07KeTA61A3KUQ1zBWvPQ9oLYU3VGtNePlBio+s0hfY/GbyUiAbBu0sc4QJBv+QSUiIzrBoYq1WneVM9Hl7z7z/9DQemPV6QHk2SB5R1omhsWe/7xXvEFdNX+mRt/B1n/YKwkwXv1oibjafzs+MkcP+csVfVfEma1/dbyqF1nVbrBI3hCoWPF5TNVSa6wF/RW/Sj2tz7+GuuXE3102cfRzgS7S7APJOXKd7x1/ODanLD8e9bUCkGKlVQttzAA7yvdoSRT5nzvxR58Zl3QxEQq6DW4VXOB73gXBEOMBX4MmFT5nwFsdx6vZj/RhpbJ0xHS8S4/6fwuMor+pxuCq06imDz2MxZLS01UOAXmSSDETCw/iiKnGRNFtx2ki9pXG7mKyAPoJlBCXFWoBm6LYCXaJKtBlQydYyynQtl3+GhSDh/TmNpoVQzOvreSNZn/7U9wu8QMJ2K9ZsuGyjwARUSPASO87kFOlPRzfNYKuGR1m4NGonHcNV9pkN33pBUvNIi2cFTtr8E4=
+  provider: releases
+  api_key:
+    secure: hu4VIQCve/qYtR65lJ67HEFuhKC7XOQL/G1wzVsAgZ2ImyxlMsphPIRZQxgQSRAbp5AkxPGS7tYELmZHXhae2je0O7fqbEbWin7DmtMFLWgxeDyDJkWDXnkdznvOAS4t7DgDL8bFAEhCxkmqYEzHbMcpdjGi2BsW9QeoyXr9SuWKv+AmRmh/KY3U8qTzzcEwYNP0grkdyrJHI95pZeUBsHxgrAmk3Mo2m6DTrwyLcQk068fvKNBlHeijOXoLaCExOnoi1UCoe5HkESkqjrEV73gnlQf3CA69vLeMUa20mHLkRJqLduKElRA3If+t7WYgwVZzlg5l71S1eIRppkkUJ09PsZT20ONqvJt4YE57lpG8SxDn7tU5ZdeOnvM7tnoKqvGR0+R6iOO/LXngbdbewzVI23iqW8tJ5acyuxkrBeSNSvg3h/TtZE/Zc7kHPM6mztZ5a9GQIywOh6JLQ4cKfbFnS7ZUdExwepeuUAaS+VqiYOwJzJvv3+G90qqKBA6rnXOVdnjtzBbrsY/714cuui2i06oKq4mdycV4DHhDk1UOBj1fCy/QOGMUt77wGd+vz8d1sP5jWZTwZLDJDzY+2kTZki6Qs+nJAGT6fLs+4Mxx5Xyb1OYx26auFIAjmxqACcabbshB7cK1abeRD/+yLRWT7H8+0lr+2/kAJvIzyWk=
+  file_glob: true
+  file: deploy/*
+  skip_cleanup: true
+  on:
+    tags: true

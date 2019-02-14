@@ -4,8 +4,10 @@
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
-#include <unistd.h>
 #include <stdlib.h>
+#ifndef _MSC_VER
+#include <unistd.h>
+#endif
 
 #include "internal_service.h"
 #include "asyncEvent.h"
@@ -54,7 +56,7 @@ static bool createServiceEnumeratorBasicAuthAsync(const char* host, const char* 
 static bool createServiceEnumeratorSessionAuthAsync(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
 static bool createServiceEnumeratorTokenAsync(const char* host, const char* rootUri, const char* token, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
 static bool getVersionsAsync(redfishService* service, const char* rootUri, redfishCreateAsyncCallback callback, void* context);
-static char* getDestinationAddress(const char* addressInfo, int* socket);
+static char* getDestinationAddress(const char* addressInfo, SOCKET* socket);
 
 redfishService* createServiceEnumerator(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags)
 {
@@ -731,7 +733,7 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
     char* eventSubscriptionUri;
     char* destination = (char*)postbackUri;
     bool ret;
-    int socket;
+	SOCKET socket;
     redfishPayload* postPayload;
     asyncToSyncContext* asyncContext;
 
@@ -964,7 +966,7 @@ void cleanupServiceEnumerator(redfishService* service)
 void serviceIncRef(redfishService* service)
 {
 #ifdef _MSC_VER
-#if WIN64
+#if _M_AMD64
     InterlockedIncrement64(&(service->refCount));
 #else
     InterlockedIncrement(&(service->refCount));
@@ -981,8 +983,13 @@ static void freeServicePtr(redfishService* service)
 {
     if(service->tcpSocket != -1)
     {
-        close(service->tcpSocket);
-        service->tcpSocket = -1;
+#ifdef _MSC_VER
+		closesocket(service->tcpSocket);
+		service->tcpSocket = INVALID_SOCKET;
+#else
+		close(service->tcpSocket);
+		service->tcpSocket = -1;
+#endif
 #ifdef _MSC_VER
         WaitForSingleObject(service->tcpThread, INFINITE);
 #else
@@ -1033,7 +1040,7 @@ void serviceDecRef(redfishService* service)
         return;
     }
 #ifdef _MSC_VER
-#if WIN64
+#if _M_AMD64
     newCount = InterlockedDecrement64(&(service->refCount));
 #else
     newCount = InterlockedDecrement(&(service->refCount));
@@ -1057,7 +1064,7 @@ void serviceDecRefAndWait(redfishService* service)
         return;
     }
 #ifdef _MSC_VER
-#if WIN64
+#if _M_AMD64
     newCount = InterlockedDecrement64(&(service->refCount));
 #else
     newCount = InterlockedDecrement(&(service->refCount));
@@ -1678,7 +1685,7 @@ static char* getEventSubscriptionUri(redfishService* service)
         cleanupPayload(eventSub);
         return NULL;
     }
-    ret = strdup(json_string_value(odataId));
+    ret = safeStrdup(json_string_value(odataId));
     cleanupPayload(eventSub);
     return ret;
 }
@@ -1791,10 +1798,10 @@ static unsigned char* base64_encode(const unsigned char* src, size_t len, size_t
 	return out;
 }
 
-static char* getDestinationAddress(const char* addressInfo, int* socket)
+static char* getDestinationAddress(const char* addressInfo, SOCKET* socket)
 {
     char* addressType = NULL;
-    char* interface = getStringTill(addressInfo, ":", &addressType);
+    char* networkInterface = getStringTill(addressInfo, ":", &addressType);
     char* portStr = NULL;
     char* ret = NULL;
     char dest[1024];
@@ -1821,13 +1828,13 @@ static char* getDestinationAddress(const char* addressInfo, int* socket)
     }
     if(strcmp(addressType, "ipv4") == 0)
     {
-        ret = getIpv4Address(interface);
+        ret = getIpv4Address(networkInterface);
     }
     else
     {
-        ret = getIpv6Address(interface);
+        ret = getIpv6Address(networkInterface);
     }
-    free(interface);
+    free(networkInterface);
     if(freeAddressType)
     {
         free(addressType);

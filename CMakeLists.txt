@@ -24,6 +24,9 @@ find_package(Jansson REQUIRED)
 find_package(CZMQ)
 find_package(OpenSSL)
 
+include_directories(${CURL_INCLUDE_DIR})
+include_directories(${JANSSON_INCLUDE_DIRS})
+
 add_library(redfish SHARED ${REDFISH_SRC} ${REDFISH_HDR_PRIVATE})
 target_link_libraries(redfish jansson curl)
 if(CZMQ_FOUND)
@@ -53,4 +56,8 @@ ENABLE_TESTING()
 
 if(CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wdeclaration-after-statement -ggdb3")
+endif()
+if(MSVC)
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /LIBPATH:.. /LIBPATH:../curl/lib")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LIBPATH:.. /LIBPATH:../curl/lib")
 endif()

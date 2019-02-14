@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#ifndef _MSC_VER
 #include <net/if.h>
 #include <ifaddrs.h>
 #include <sys/ioctl.h>
@@ -13,7 +14,16 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#else
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <iphlpapi.h>
+
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "IPHLPAPI.lib")
+#endif
 #include "util.h"
+#include "queue.h"
 #include "debug.h"
 
 char* safeStrdup(const char* str)
@@ -51,11 +61,6 @@ char* getStringTill(const char* string, const char* terminator, char** retEnd)
 
 #ifdef _MSC_VER
 //Windows IP stuff
-#include <winsock2.h>
-#include <iphlpapi.h>
-#include <windows.h>
-#include <stdio.h>
-
 static void initWinsock()
 {
 	WORD wVersionRequested;
@@ -122,7 +127,7 @@ static char* getWindowsIP(const char* _interface, DWORD addressType)
 	adapter = getAdapterByName(_interface, addressType, &bigBuff);
 	if (adapter && adapter->FirstUnicastAddress)
 	{
-		rc = WSAAddressToString(adapter->FirstUnicastAddress->Address.lpSockaddr, adapter->FirstUnicastAddress->Address.iSockaddrLength, NULL, addressStr, &strSize);
+		rc = WSAAddressToStringW(adapter->FirstUnicastAddress->Address.lpSockaddr, adapter->FirstUnicastAddress->Address.iSockaddrLength, NULL, addressStr, &strSize);
 		if (rc != 0)
 		{
 			printf("WSAAddressToString returned %d %d\n", rc, WSAGetLastError());
@@ -144,10 +149,10 @@ static char* getWindowsIP(const char* _interface, DWORD addressType)
 }
 #endif
 
-char* getIpv4Address(const char* interface)
+char* getIpv4Address(const char* networkInterface)
 {
 #ifdef _MSC_VER
-    return getWindowsIP(interface, AF_INET);
+    return getWindowsIP(networkInterface, AF_INET);
 #else
     int fd;
     struct ifreq ifr;
@@ -167,7 +172,7 @@ char* getIpv4Address(const char* interface)
     ifr.ifr_addr.sa_family = AF_INET;
 
     /* I want IP address attached to "eth0" */
-    strncpy(ifr.ifr_name, interface, IFNAMSIZ-1);
+    strncpy(ifr.ifr_name, networkInterface, IFNAMSIZ-1);
 
     ioctl(fd, SIOCGIFADDR, &ifr);
 
@@ -178,10 +183,10 @@ char* getIpv4Address(const char* interface)
 #endif
 }
 
-char* getIpv6Address(const char* interface)
+char* getIpv6Address(const char* networkInterface)
 {
 #ifdef _MSC_VER
-    return getWindowsIP(interface, AF_INET6);
+    return getWindowsIP(networkInterface, AF_INET6);
 #else
     struct ifaddrs* ifap;
     struct ifaddrs* current;
@@ -196,7 +201,7 @@ char* getIpv6Address(const char* interface)
     while(current)
     {
         /*Look only for an interface that has an address, the address is IPv6, and the name matches*/
-        if(current->ifa_addr != NULL && current->ifa_addr->sa_family == AF_INET6 && strcmp(current->ifa_name, interface) == 0)
+        if(current->ifa_addr != NULL && current->ifa_addr->sa_family == AF_INET6 && strcmp(current->ifa_name, networkInterface) == 0)
         {
             break;
         }
@@ -205,7 +210,7 @@ char* getIpv6Address(const char* interface)
     }
     if(current == NULL)
     {
-        REDFISH_DEBUG_WARNING_PRINT("Could not locate interface with name \"%s\"", interface);
+        REDFISH_DEBUG_WARNING_PRINT("Could not locate interface with name \"%s\"", networkInterface);
         freeifaddrs(ifap);
         return NULL;
     }
@@ -221,9 +226,9 @@ char* getIpv6Address(const char* interface)
 #endif
 }
 
-int getSocket(const char* ip, unsigned int* portNum)
+SOCKET getSocket(const char* ip, unsigned int* portNum)
 {
-    int ret;
+	SOCKET ret;
     int domain = AF_INET;
     struct sockaddr_in6 ip6_socket_struct;
     struct sockaddr_in ip4_socket_struct;
@@ -251,7 +256,11 @@ int getSocket(const char* ip, unsigned int* portNum)
     }
     if(bind(ret, addr, size) < 0)
     {
+#ifdef _MSC_VER
+		closesocket(ret);
+#else
         close(ret);
+#endif
         return -1;
     }
     listen(ret, 5);
