@@ -42,7 +42,7 @@ asyncHttpRequest* createRequest(const char* url, httpMethod method, size_t bodys
 
 void addRequestHeader(asyncHttpRequest* request, const char* name, const char* value)
 {
-    REDFISH_DEBUG_NOTICE_PRINT("%s: Adding %s => %s to %p\n", __FUNCTION__, name, value, request->headers);
+    REDFISH_DEBUG_NOTICE_PRINT("%s: Adding %s => %s to %p\n", __func__, name, value, request->headers);
     addHeader(&request->headers, name, value);
 }
 
@@ -134,7 +134,7 @@ void terminateAsyncThread(redfishService* service)
     queuePush(service->queue, workItem);
     if(service->asyncThread == getThreadId())
     {
-        REDFISH_DEBUG_INFO_PRINT("%s: Async thread self cleanup...\n", __FUNCTION__);
+        REDFISH_DEBUG_INFO_PRINT("%s: Async thread self cleanup...\n", __func__);
 #ifndef _MSC_VER
         //Need to set this thread detached and make it clean itself up
         pthread_detach(pthread_self());
@@ -143,7 +143,7 @@ void terminateAsyncThread(redfishService* service)
     }
     else
     {
-        REDFISH_DEBUG_INFO_PRINT("%s: Async thread other thread cleanup...\n", __FUNCTION__);
+        REDFISH_DEBUG_INFO_PRINT("%s: Async thread other thread cleanup...\n", __func__);
 #ifdef _MSC_VER
         WaitForSingleObject(service->asyncThread, INFINITE);
 #else
@@ -355,7 +355,7 @@ threadRet rawAsyncWorkThread(void* data)
         curl_easy_getinfo(curl, CURLINFO_REDIRECT_URL, &redirect);
         if(redirect)
         {
-            REDFISH_DEBUG_INFO_PRINT("%s: Redirect from %s to %s\n", __FUNCTION__, workItem->request->url, redirect);
+            REDFISH_DEBUG_INFO_PRINT("%s: Redirect from %s to %s\n", __func__, workItem->request->url, redirect);
             if(response)
             {
                 safeFree(readChunk.memory);
@@ -379,7 +379,7 @@ threadRet rawAsyncWorkThread(void* data)
         {
             if(res != CURLE_OK)
             {
-                REDFISH_DEBUG_ERR_PRINT("%s: CURL returned %d\n", __FUNCTION__, res);
+                REDFISH_DEBUG_ERR_PRINT("%s: CURL returned %d\n", __func__, res);
                 response->connectError = 1;
                 response->httpResponseCode = 0xFFFF;
                 response->body = NULL;
@@ -397,7 +397,7 @@ threadRet rawAsyncWorkThread(void* data)
 
                 response->connectError = 0;
                 curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response->httpResponseCode);
-                REDFISH_DEBUG_NOTICE_PRINT("%s: Got response for url %s with code %ld\n", __FUNCTION__, workItem->request->url, response->httpResponseCode);
+                REDFISH_DEBUG_NOTICE_PRINT("%s: Got response for url %s with code %ld\n", __func__, workItem->request->url, response->httpResponseCode);
                 response->body = readChunk.memory;
                 response->bodySize = readChunk.size;
             }
@@ -438,7 +438,7 @@ static void freeHeaders(httpHeader* headers)
 {
     httpHeader* node;
     httpHeader* tmp;
-    REDFISH_DEBUG_NOTICE_PRINT("%s: Freeing %p\n", __FUNCTION__, headers);
+    REDFISH_DEBUG_NOTICE_PRINT("%s: Freeing %p\n", __func__, headers);
     if(headers)
     {
         node = headers;
@@ -516,7 +516,7 @@ static size_t asyncHeaderCallback(char* buffer, size_t size, size_t nitems, void
         //Replace \r\n with NULL terminator...
         save[0] = 0;
     }
-    REDFISH_DEBUG_NOTICE_PRINT("%s: Adding %s => %s to %p\n", __FUNCTION__, name, value, response->headers);
+    REDFISH_DEBUG_NOTICE_PRINT("%s: Adding %s => %s to %p\n", __func__, name, value, response->headers);
     addHeader(&(response->headers), name, value);
     free(tmp);
 

@@ -119,7 +119,7 @@ void terminateAsyncEventThread(redfishService* service)
     addTerminationToQueue(service);
     if(service->eventThread == getThreadId())
     {
-        REDFISH_DEBUG_INFO_PRINT("%s: Event thread self cleanup...\n", __FUNCTION__);
+        REDFISH_DEBUG_INFO_PRINT("%s: Event thread self cleanup...\n", __func__);
 #ifndef _MSC_VER
         //Need to set this thread detached and make it clean itself up
         pthread_detach(pthread_self());
@@ -240,7 +240,7 @@ static threadRet WINAPI eventActorTask(void* args)
         switch(wi->type)
         {
             default:
-                REDFISH_DEBUG_ERR_PRINT("%s: Unknown work item type %d!\n", __FUNCTION__, wi->type);
+                REDFISH_DEBUG_ERR_PRINT("%s: Unknown work item type %d!\n", __func__, wi->type);
             case WorkItemTermination:
                 term = true;
                 break;
@@ -249,7 +249,7 @@ static threadRet WINAPI eventActorTask(void* args)
                 wi->registration = NULL;//This is cleaned up, or not as appropirate in the prior call...
                 break;
             case WorkItemEvent:
-                REDFISH_DEBUG_ERR_PRINT("%s: Got new event %p (registrations = %p)\n", __FUNCTION__, wi->event, registrations);
+                REDFISH_DEBUG_ERR_PRINT("%s: Got new event %p (registrations = %p)\n", __func__, wi->event, registrations);
                 current = registrations;
                 while(current)
                 {
@@ -268,7 +268,7 @@ static threadRet WINAPI eventActorTask(void* args)
             break;
         }
     }
-    REDFISH_DEBUG_WARNING_PRINT("%s: Exiting...\n", __FUNCTION__);
+    REDFISH_DEBUG_WARNING_PRINT("%s: Exiting...\n", __func__);
     current = registrations;
     while(current)
     {
@@ -358,7 +358,11 @@ static threadRet WINAPI sseThread(void* args)
     curl_easy_setopt(curl, CURLOPT_URL, uri);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     res = curl_easy_perform(curl);
-    REDFISH_DEBUG_ERR_PRINT("%s: Thread is done %d\n", __FUNCTION__, res);
+    if(res != CURLE_OK)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: CURL returned %d\n", __func__, res);
+    }
+    REDFISH_DEBUG_ERR_PRINT("%s: Thread is done\n", __func__);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     curl_slist_free_all(headers);
     if(httpCode > 400)
@@ -466,7 +470,7 @@ static threadRet WINAPI tcpThread(void* args)
         if(SSL_accept(ssl) <= 0)
         {
             err = ERR_get_error();
-            REDFISH_DEBUG_ERR_PRINT("%s: Unable to complete TLS handshake %u %s\n", __FUNCTION__, err, ERR_error_string(err, NULL));
+            REDFISH_DEBUG_ERR_PRINT("%s: Unable to complete TLS handshake %u %s\n", __func__, err, ERR_error_string(err, NULL));
             SSL_free(ssl);
             close(tmpSock);
             continue;
@@ -478,11 +482,11 @@ static threadRet WINAPI tcpThread(void* args)
         while((unsigned int)buffPos < sizeof(buffer)-1)
         {
             readCount = SSL_read(ssl, buffer+buffPos, 2047-buffPos);
-            //REDFISH_DEBUG_INFO_PRINT("%s: SSL_read returned %d bytes\n", __FUNCTION__, readCount);
-            //REDFISH_DEBUG_INFO_PRINT("%s: Current Buffer is %s\n", __FUNCTION__, buffer);
+            //REDFISH_DEBUG_INFO_PRINT("%s: SSL_read returned %d bytes\n", __func__, readCount);
+            //REDFISH_DEBUG_INFO_PRINT("%s: Current Buffer is %s\n", __func__, buffer);
             if(readCount < 0)
             {
-                REDFISH_DEBUG_ERR_PRINT("%s: Unable to complete SSL read %u %s\n", __FUNCTION__, err, ERR_error_string(err, NULL));
+                REDFISH_DEBUG_ERR_PRINT("%s: Unable to complete SSL read %u %s\n", __func__, err, ERR_error_string(err, NULL));
                 SSL_free(ssl);
                 close(tmpSock);
                 tmpSock = -1;
@@ -799,7 +803,7 @@ static size_t getRedfishEventInfoFromRawHttp(const char* buffer, redfishService*
     const char* bodyStart;
     redfishPayload* payload;
 
-    //REDFISH_DEBUG_DEBUG_PRINT("%s: Got Payload: %s\n", __FUNCTION__, buffer);
+    //REDFISH_DEBUG_DEBUG_PRINT("%s: Got Payload: %s\n", __func__, buffer);
 
     if(strncmp(buffer, "POST", 4) != 0)
     {
@@ -925,7 +929,7 @@ static SSL_CTX* createSSLContext()
     ctx = SSL_CTX_new(method);
     if(!ctx)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Unable to create SSL context\n", __FUNCTION__);
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to create SSL context\n", __func__);
         return NULL;
     }
     SSL_CTX_set_ecdh_auto(ctx, 1);

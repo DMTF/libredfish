@@ -60,7 +60,7 @@ static char* getDestinationAddress(const char* addressInfo, SOCKET* socket);
 
 redfishService* createServiceEnumerator(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags)
 {
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. host = %s, rootUri = %s, auth = %p, flags = %x\n", __FUNCTION__, host, rootUri, auth, flags);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. host = %s, rootUri = %s, auth = %p, flags = %x\n", __func__, host, rootUri, auth, flags);
     if(auth == NULL)
     {
         return createServiceEnumeratorNoAuth(host, rootUri, true, flags);
@@ -143,7 +143,7 @@ void asyncToSyncConverter(bool success, unsigned short httpCode, redfishPayload*
 #ifndef DEBUG
     (void)httpCode;
 #endif
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %d, httpCode = %u, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %d, httpCode = %u, payload = %p, context = %p\n", __func__, success, httpCode, payload, context);
     myContext->success = success;
     myContext->data = payload;
     if(payload != NULL && payload->content != NULL)
@@ -153,7 +153,7 @@ void asyncToSyncConverter(bool success, unsigned short httpCode, redfishPayload*
         {
             memcpy(content, payload->content, payload->contentLength);
             content[payload->contentLength] = 0; //HTTP payloads aren't null terminated...
-            REDFISH_DEBUG_DEBUG_PRINT("%s: Got non-json response to old sync operation %s\n", __FUNCTION__, content);
+            REDFISH_DEBUG_DEBUG_PRINT("%s: Got non-json response to old sync operation %s\n", __func__, content);
             free(content);
         }
     }
@@ -166,7 +166,7 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     asyncToSyncContext* context;
     bool tmp;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s\n", __FUNCTION__, service, uri);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s\n", __func__, service, uri);
 
     if(isOnAsyncThread(service))
     {
@@ -180,13 +180,13 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     context = makeAsyncToSyncContext();
     if(context == NULL)
     {
-        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __FUNCTION__);
+        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __func__);
         return NULL;
     }
     tmp = getUriFromServiceAsync(service,uri, NULL, asyncToSyncConverter, context);
     if(tmp == false)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
+        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __func__);
         cleanupAsyncToSyncContext(context);
         return NULL;
     }
@@ -202,7 +202,7 @@ json_t* getUriFromService(redfishService* service, const char* uri)
         json = NULL;
     }
     cleanupAsyncToSyncContext(context);
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. json = %p\n", __FUNCTION__, json);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. json = %p\n", __func__, json);
     return json;
 }
 
@@ -213,7 +213,7 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     bool tmp;
     redfishPayload* payload;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, content = %s\n", __FUNCTION__, service, uri, content);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, content = %s\n", __func__, service, uri, content);
 
     if(isOnAsyncThread(service))
     {
@@ -227,7 +227,7 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     context = makeAsyncToSyncContext();
     if(context == NULL)
     {
-        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __FUNCTION__);
+        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __func__);
         return NULL;
     }
     payload = createRedfishPayloadFromString(content, service);
@@ -235,7 +235,7 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     cleanupPayload(payload);
     if(tmp == false)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
+        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __func__);
         cleanupAsyncToSyncContext(context);
         return NULL;
     }
@@ -262,7 +262,7 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     redfishPayload* payload;
     char* tmpStr;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, content = %s\n", __FUNCTION__, service, uri, content);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, content = %s\n", __func__, service, uri, content);
 
     if(isOnAsyncThread(service))
     {
@@ -276,7 +276,7 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     context = makeAsyncToSyncContext();
     if(context == NULL)
     {
-        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __FUNCTION__);
+        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __func__);
         return NULL;
     }
     payload = createRedfishPayloadFromContent(content, contentLength, contentType, service);
@@ -284,7 +284,7 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     cleanupPayload(payload);
     if(tmp == false)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
+        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __func__);
         cleanupAsyncToSyncContext(context);
         return NULL;
     }
@@ -301,15 +301,15 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     }
     if(context->success == false)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Old style call got an error, but returned payload!\n", __FUNCTION__);
+        REDFISH_DEBUG_ERR_PRINT("%s: Old style call got an error, but returned payload!\n", __func__);
         tmpStr = json_dumps(json, 0);
-        REDFISH_DEBUG_NOTICE_PRINT("%s: Response payload is %s\n", __FUNCTION__, tmpStr);
+        REDFISH_DEBUG_NOTICE_PRINT("%s: Response payload is %s\n", __func__, tmpStr);
         free(tmpStr);
         json_decref(json);
         json = NULL;
     }
     cleanupAsyncToSyncContext(context);
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit.\n", __FUNCTION__);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit.\n", __func__);
     return json;
 }
 
@@ -318,7 +318,7 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     asyncToSyncContext* context;
     bool tmp;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s\n", __FUNCTION__, service, uri);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s\n", __func__, service, uri);
 
     if(isOnAsyncThread(service))
     {
@@ -332,13 +332,13 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     context = makeAsyncToSyncContext();
     if(context == NULL)
     {
-        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __FUNCTION__);
+        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __func__);
         return false;
     }
     tmp = deleteUriFromServiceAsync(service, uri, NULL, asyncToSyncConverter, context);
     if(tmp == false)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
+        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __func__);
         cleanupAsyncToSyncContext(context);
         return tmp;
     }
@@ -373,7 +373,7 @@ static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* res
     redfishPayload* payload;
     httpHeader* header;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. request = %p, response = %p, context = %p\n", __FUNCTION__, request, response, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. request = %p, response = %p, context = %p\n", __func__, request, response, context);
 
     header = responseGetHeader(response, "X-Auth-Token");
     if(header)
@@ -393,7 +393,7 @@ static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* res
         freeAsyncResponse(response);
         serviceDecRef(myContext->service);
         free(context);
-        REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. Location Redirect...\n", __FUNCTION__);
+        REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. Location Redirect...\n", __func__);
         return;
     }
     if(myContext->callback)
@@ -409,7 +409,7 @@ static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* res
     freeAsyncResponse(response);
     serviceDecRef(myContext->service);
     free(context);
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit.\n", __FUNCTION__);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit.\n", __func__);
 }
 
 static void setupRequestFromOptions(asyncHttpRequest* request, redfishService* service, redfishAsyncOptions* options)
@@ -455,7 +455,7 @@ static void setupRequestFromOptions(asyncHttpRequest* request, redfishService* s
 
 bool createServiceEnumeratorAsync(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags, redfishCreateAsyncCallback callback, void* context)
 {
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. host = %s, rootUri = %s, auth = %p, callback = %p, context = %p\n", __FUNCTION__, host, rootUri, auth, callback, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. host = %s, rootUri = %s, auth = %p, callback = %p, context = %p\n", __func__, host, rootUri, auth, callback, context);
     if(auth == NULL)
     {
         return createServiceEnumeratorNoAuthAsync(host, rootUri, flags, callback, context);
@@ -485,14 +485,14 @@ bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsy
     rawAsyncCallbackContextWrapper* myContext;
     bool ret;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, options = %p, callback = %p, context = %p\n", __FUNCTION__, service, uri, options, callback, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, options = %p, callback = %p, context = %p\n", __func__, service, uri, options, callback, context);
 
     serviceIncRef(service);
 
     url = makeUrlForService(service, uri);
     if(!url)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not make url for uri %s\n", __FUNCTION__, uri);
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not make url for uri %s\n", __func__, uri);
         serviceDecRef(service);
         return false;
     }
@@ -511,7 +511,7 @@ bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsy
     {
         free(myContext);
     }
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. ret = %u\n", __FUNCTION__, ret);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. ret = %u\n", __func__, ret);
     return ret;
 }
 
@@ -522,7 +522,7 @@ bool patchUriFromServiceAsync(redfishService* service, const char* uri, redfishP
     rawAsyncCallbackContextWrapper* myContext;
     bool ret;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, payload = %p\n", __FUNCTION__, service, uri, payload);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, payload = %p\n", __func__, service, uri, payload);
 
     serviceIncRef(service);
 
@@ -659,7 +659,7 @@ void gotServiceRootAsync(bool success, unsigned short httpCode, redfishPayload* 
     redfishPayload* root = payload;
     bool ret;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %p, payload = %p, context = %p\n", __FUNCTION__, success, httpCode, payload, context);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. success = %u, httpCode = %p, payload = %p, context = %p\n", __func__, success, httpCode, payload, context);
 
     if(success == false || httpCode >= 400 || myContext->redpath->next == NULL)
     {
@@ -672,7 +672,7 @@ void gotServiceRootAsync(bool success, unsigned short httpCode, redfishPayload* 
     cleanupPayload(root);
     if(ret == false)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Failed to get next path section immediately...", __FUNCTION__);
+        REDFISH_DEBUG_ERR_PRINT("%s: Failed to get next path section immediately...", __func__);
         myContext->callback(ret, 0xFFFF, NULL, myContext->originalContext);
         cleanupRedPath(myContext->redpath);
     }
@@ -857,7 +857,7 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
     asyncContext = makeAsyncToSyncContext();
     if(asyncContext == NULL)
     {
-        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate asyncContext!\n", __FUNCTION__);
+        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate asyncContext!\n", __func__);
         return false;
     }
     ret = postUriFromServiceAsync(service, eventSubscriptionUri, postPayload, NULL, asyncToSyncConverter, asyncContext);
@@ -865,7 +865,7 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
     cleanupPayload(postPayload);
     if(ret == false)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __FUNCTION__);
+        REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __func__);
         cleanupAsyncToSyncContext(asyncContext);
         return false;
     }
@@ -974,7 +974,7 @@ void serviceIncRef(redfishService* service)
 #else
     __sync_fetch_and_add(&(service->refCount), 1);
 #endif
-    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __FUNCTION__, service->refCount);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __func__, service->refCount);
 }
 
 void terminateAsyncThread(redfishService* service);
@@ -1048,7 +1048,7 @@ void serviceDecRef(redfishService* service)
 #else
     newCount = __sync_fetch_and_sub(&(service->refCount), 1);
 #endif
-    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __FUNCTION__, newCount);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __func__, newCount);
     if(newCount == 0)
     {
         freeServicePtr(service);
@@ -1072,7 +1072,7 @@ void serviceDecRefAndWait(redfishService* service)
 #else
     newCount = __sync_sub_and_fetch(&(service->refCount), 1);
 #endif
-    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __FUNCTION__, newCount);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __func__, newCount);
     if(newCount == 0)
     {
         freeServicePtr(service);
@@ -1485,14 +1485,14 @@ static json_t* getVersions(redfishService* service, const char* rootUri)
 {
     json_t* data;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, rootUri = %s\n", __FUNCTION__, service, rootUri);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, rootUri = %s\n", __func__, service, rootUri);
 
     if(service->flags & REDFISH_FLAG_SERVICE_NO_VERSION_DOC)
     {
         service->versions = json_object();
         if(service->versions == NULL)
         {
-            REDFISH_DEBUG_ERR_PRINT("%s: Error. Unable to allocate simple json object!\n", __FUNCTION__);
+            REDFISH_DEBUG_ERR_PRINT("%s: Error. Unable to allocate simple json object!\n", __func__);
             return NULL;
         }
         addStringToJsonObject(service->versions, "v1", "/redfish/v1");
@@ -1511,7 +1511,7 @@ static json_t* getVersions(redfishService* service, const char* rootUri)
             data = getUriFromService(service, "/redfish/");
         }
     }
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Exited. data = %p\n", __FUNCTION__, data);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Exited. data = %p\n", __func__, data);
     return data;
 }
 
@@ -1592,14 +1592,14 @@ static bool getVersionsAsync(redfishService* service, const char* rootUri, redfi
     bool rc;
     getVersionsContext* myContext;
 
-    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, rootUri = %s\n", __FUNCTION__, service, rootUri);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, rootUri = %s\n", __func__, service, rootUri);
 
     if(service->flags & REDFISH_FLAG_SERVICE_NO_VERSION_DOC)
     {
         service->versions = json_object();
         if(service->versions == NULL)
         {
-            REDFISH_DEBUG_ERR_PRINT("%s: Error. Unable to allocate simple json object!\n", __FUNCTION__);
+            REDFISH_DEBUG_ERR_PRINT("%s: Error. Unable to allocate simple json object!\n", __func__);
             return false;
         }
         addStringToJsonObject(service->versions, "v1", "/redfish/v1");
@@ -1716,7 +1716,7 @@ static redfishPayload* getPayloadFromAsyncResponse(asyncHttpResponse* response, 
 
     if(response == NULL || response->bodySize == 0 || response->body == NULL)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Error, called without response data...\n", __FUNCTION__);
+        REDFISH_DEBUG_ERR_PRINT("%s: Error, called without response data...\n", __func__);
         return NULL;
     }
     header = responseGetHeader(response, "Content-Length");

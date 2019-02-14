@@ -213,7 +213,7 @@ void printRedfishEvent(redfishPayload* event, enumeratorAuthentication* auth, co
 
     (void)context;
 
-    printf("%s: Called!\n", __FUNCTION__);
+    printf("%s: Called!\n", __func__);
     if(auth == NULL)
     {
         printf("No authentication provided\n");

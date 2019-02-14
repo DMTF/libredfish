@@ -17,12 +17,12 @@ static redfishHealth _getResourceHealth(redfishPayload* payload, const char* sub
 
 redfishHealth getResourceHealth(redfishPayload* payload)
 {
-    return _getResourceHealth(payload, "Health", __FUNCTION__);
+    return _getResourceHealth(payload, "Health", __func__);
 }
 
 redfishHealth getResourceRollupHealth(redfishPayload* payload)
 {
-    return _getResourceHealth(payload, "HealthRollup", __FUNCTION__);
+    return _getResourceHealth(payload, "HealthRollup", __func__);
 }
 
 /** A struct to help map the string enum values produced by a redfish service to more C friendly enum values **/
@@ -57,20 +57,20 @@ redfishState getResourceState(redfishPayload* payload)
 
     if(payload == NULL)
     {
-        REDFISH_DEBUG_WARNING_PRINT("%s: Payload is NULL\n", __FUNCTION__);
+        REDFISH_DEBUG_WARNING_PRINT("%s: Payload is NULL\n", __func__);
         return RedfishStateError;
     }
     status = getPayloadByNodeNameNoNetwork(payload, "Status");
     if(status == NULL)
     {
-        REDFISH_DEBUG_WARNING_PRINT("%s: Unable to obtain Status resource from payload...\n", __FUNCTION__);
+        REDFISH_DEBUG_WARNING_PRINT("%s: Unable to obtain Status resource from payload...\n", __func__);
         return RedfishStateError;
     }
     state = getPayloadByNodeNameNoNetwork(status, "State");
     cleanupPayload(status);
     if(state == NULL)
     {
-        REDFISH_DEBUG_WARNING_PRINT("%s: Unable to obtain State resource from payload...\n", __FUNCTION__);
+        REDFISH_DEBUG_WARNING_PRINT("%s: Unable to obtain State resource from payload...\n", __func__);
         return RedfishStateError;
     }
     stateStr = getPayloadStringValue(state);
@@ -87,7 +87,7 @@ redfishState getResourceState(redfishPayload* payload)
             return stateMapping[i].state;
         }
     }
-    REDFISH_DEBUG_WARNING_PRINT("%s: Got unknown state string %s...\n", __FUNCTION__, stateStr);
+    REDFISH_DEBUG_WARNING_PRINT("%s: Got unknown state string %s...\n", __func__, stateStr);
     free(stateStr);
     return RedfishStateUnknown;
 }
@@ -99,13 +99,13 @@ char* getResourceName(redfishPayload* payload)
 
     if(payload == NULL)
     {
-        REDFISH_DEBUG_WARNING_PRINT("%s: Payload is NULL\n", __FUNCTION__);
+        REDFISH_DEBUG_WARNING_PRINT("%s: Payload is NULL\n", __func__);
         return NULL;
     }
     name = getPayloadByNodeNameNoNetwork(payload, "Name");
     if(name == NULL)
     {
-        REDFISH_DEBUG_WARNING_PRINT("%s: Unable to obtain Name resource from payload...\n", __FUNCTION__);
+        REDFISH_DEBUG_WARNING_PRINT("%s: Unable to obtain Name resource from payload...\n", __func__);
         return NULL;
     }
     ret = getPayloadStringValue(name);

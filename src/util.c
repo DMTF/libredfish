@@ -268,7 +268,7 @@ SOCKET getSocket(const char* ip, unsigned int* portNum)
     {
         if(getsockname(ret, addr, &size) == -1)
         {
-            REDFISH_DEBUG_WARNING_PRINT("%s: getsockname returned error! errno = %d", __FUNCTION__, errno);
+            REDFISH_DEBUG_WARNING_PRINT("%s: getsockname returned error! errno = %d", __func__, errno);
         }
         else
         {
