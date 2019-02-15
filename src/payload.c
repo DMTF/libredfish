@@ -42,7 +42,7 @@ redfishPayload* createRedfishPayloadFromString(const char* value, redfishService
     json_t* jValue = json_loads(value, 0, &err);
     if(jValue == NULL)
     {
-        REDFISH_DEBUG_ERR_PRINT("%s: Unable to parse json! %s %s\n", __func__, err.text);
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to parse json! %s\n", __func__, err.text);
         return NULL;
     }
     return createRedfishPayload(jValue, service);
