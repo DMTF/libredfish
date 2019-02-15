@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.1.7] - 2019-02-15
+- Various compiler warning fixes
+- Race condition fix for cURL global access
+
 ## [1.1.6] - 2019-02-08
 - Added ability to listen via TCP/OpenSSL socket
 - Windows build fixes
