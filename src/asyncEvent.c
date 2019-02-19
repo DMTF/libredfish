@@ -241,6 +241,10 @@ static threadRet WINAPI eventActorTask(void* args)
         {
             default:
                 REDFISH_DEBUG_ERR_PRINT("%s: Unknown work item type %d!\n", __func__, wi->type);
+#if __GNUC__ >= 7
+                //Yes, we want this to fall through...
+                __attribute__ ((fallthrough));
+#endif
             case WorkItemTermination:
                 term = true;
                 break;
@@ -393,7 +397,9 @@ static threadRet WINAPI tcpThread(void* args)
 #ifdef HAVE_OPENSSL
     SSL_CTX* ctx;
     SSL* ssl;
+#ifdef _DEBUG
     unsigned long err;
+#endif
     int readCount;
     int buffPos;
 
@@ -469,8 +475,10 @@ static threadRet WINAPI tcpThread(void* args)
         SSL_set_fd(ssl, tmpSock);
         if(SSL_accept(ssl) <= 0)
         {
+#ifdef _DEBUG
             err = ERR_get_error();
             REDFISH_DEBUG_ERR_PRINT("%s: Unable to complete TLS handshake %u %s\n", __func__, err, ERR_error_string(err, NULL));
+#endif
             SSL_free(ssl);
             close(tmpSock);
             continue;
