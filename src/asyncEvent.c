@@ -385,23 +385,25 @@ static threadRet WINAPI sseThread(void* args)
 #endif
 }
 
+#define EVENT_BUFFER_SIZE 12288
+
 static threadRet WINAPI tcpThread(void* args)
 {
     struct TCPThreadData* data = (struct TCPThreadData*)args;
 	SOCKET tmpSock;
-    char buffer[2048];
+    char buffer[EVENT_BUFFER_SIZE];
     size_t eventCount, i;
     EventInfo* events;
     struct pollfd ufds[1];
     int rv;
+    int readCount;
+    int buffPos;
 #ifdef HAVE_OPENSSL
     SSL_CTX* ctx;
     SSL* ssl;
 #ifdef _DEBUG
     unsigned long err;
 #endif
-    int readCount;
-    int buffPos;
 
     initOpenssl();
 
@@ -484,18 +486,28 @@ static threadRet WINAPI tcpThread(void* args)
             continue;
         }
 #endif
-        memset(buffer, 0, 2048);
-#ifdef HAVE_OPENSSL
+        memset(buffer, 0, sizeof(buffer));
         buffPos = 0;
         while((unsigned int)buffPos < sizeof(buffer)-1)
         {
-            readCount = SSL_read(ssl, buffer+buffPos, 2047-buffPos);
-            //REDFISH_DEBUG_INFO_PRINT("%s: SSL_read returned %d bytes\n", __func__, readCount);
+#ifdef HAVE_OPENSSL
+            readCount = SSL_read(ssl, buffer+buffPos, (EVENT_BUFFER_SIZE-1)-buffPos);
+#else
+            readCount = recv(tmpSock, buffer, (EVENT_BUFFER_SIZE-1)-buffPos, 0);
+#endif
+            //REDFISH_DEBUG_INFO_PRINT("%s: recv returned %d bytes\n", __func__, readCount);
             //REDFISH_DEBUG_INFO_PRINT("%s: Current Buffer is %s\n", __func__, buffer);
             if(readCount < 0)
             {
+#ifdef HAVE_OPENSSL
+#ifdef _DEBUG
+                err = ERR_get_error();
                 REDFISH_DEBUG_ERR_PRINT("%s: Unable to complete SSL read %u %s\n", __func__, err, ERR_error_string(err, NULL));
+#endif
                 SSL_free(ssl);
+#else
+                REDFISH_DEBUG_ERR_PRINT("%s: Unable to complete read %u\n", __func__, errno);
+#endif
                 close(tmpSock);
                 tmpSock = -1;
                 break;
@@ -510,9 +522,6 @@ static threadRet WINAPI tcpThread(void* args)
         {
             continue;
         }
-#else
-        recv(tmpSock, buffer, 2047, 0);
-#endif
         eventCount = getRedfishEventInfoFromRawHttp(buffer, data->service, &events);
         if(eventCount)
         {
