@@ -965,6 +965,11 @@ void cleanupServiceEnumerator(redfishService* service)
 
 void serviceIncRef(redfishService* service)
 {
+    if(service->freeing)
+    {
+        //service is currntly being free'd. Don't do anything...
+        return;
+    }
 #ifdef _MSC_VER
 #if _M_AMD64
     InterlockedIncrement64(&(service->refCount));
@@ -996,10 +1001,17 @@ static void freeServicePtr(redfishService* service)
         pthread_join(service->tcpThread, NULL);
 #endif
     }
+    service->freeing = true;
     if(service->eventRegistrationUri)
     {
         deleteUriFromServiceAsync(service, service->eventRegistrationUri, NULL, NULL, NULL);
         free(service->eventRegistrationUri);
+    }
+    REDFISH_DEBUG_INFO_PRINT("%s: Service session URI = %s\n", __func__, service->sessionUri);
+    if(service->sessionUri)
+    {
+        deleteUriFromServiceAsync(service, service->sessionUri, NULL, NULL, NULL);
+        free(service->sessionUri);
     }
     if(service->eventThreadQueue != NULL)
     {
@@ -1039,6 +1051,11 @@ void serviceDecRef(redfishService* service)
     {
         return;
     }
+    if(service->freeing)
+    {
+        //service is currntly being free'd. Don't do anything...
+        return;
+    }
 #ifdef _MSC_VER
 #if _M_AMD64
     newCount = InterlockedDecrement64(&(service->refCount));
@@ -1046,7 +1063,7 @@ void serviceDecRef(redfishService* service)
     newCount = InterlockedDecrement(&(service->refCount));
 #endif
 #else
-    newCount = __sync_fetch_and_sub(&(service->refCount), 1);
+    newCount = __sync_sub_and_fetch(&(service->refCount), 1);
 #endif
     REDFISH_DEBUG_DEBUG_PRINT("%s: New count = %u\n", __func__, newCount);
     if(newCount == 0)
@@ -1252,6 +1269,12 @@ static redfishService* createServiceEnumeratorSessionAuth(const char* host, cons
         cleanupServiceEnumerator(ret);
         return NULL;
     }
+    post = json_object_get(sessionPayload, "@odata.id");
+    if(post)
+    {
+        ret->sessionUri = safeStrdup(json_string_value(post));
+        REDFISH_DEBUG_INFO_PRINT("%s: Got Session URI %s\n", __func__, ret->sessionUri);
+    }
     json_decref(sessionPayload);
     cleanupPayload(links);
     free(content);
@@ -1274,6 +1297,8 @@ static void didSessionAuthPost(bool success, unsigned short httpCode, redfishPay
 
     if(payload)
     {
+        myContext->service->sessionUri = getPayloadUri(payload);
+        REDFISH_DEBUG_INFO_PRINT("%s: Got Session URI %s\n", __func__, myContext->service->sessionUri);
         cleanupPayload(payload);
     }
 
@@ -1297,7 +1322,7 @@ static void didSessionAuthPost(bool success, unsigned short httpCode, redfishPay
         serviceDecRef(myContext->service);
         free(myContext);
         return;
-    }
+    } 
     myContext->originalCallback(myContext->service, myContext->originalContext);
     free(myContext->username);
     free(myContext->password);

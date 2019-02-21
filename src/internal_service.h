@@ -96,6 +96,10 @@ typedef struct _redfishService {
     /** Ths listener for Zero MQ async events **/
     zactor_t* zeroMQListener;
 #endif
+    /** The uri the session is stored at **/
+    char* sessionUri;
+    /** The service is being free'd **/
+    bool freeing;
 } redfishService;
 
 #endif
