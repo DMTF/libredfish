@@ -385,23 +385,25 @@ static threadRet WINAPI sseThread(void* args)
 #endif
 }
 
+#define EVENT_BUFFER_SIZE 12288
+
 static threadRet WINAPI tcpThread(void* args)
 {
     struct TCPThreadData* data = (struct TCPThreadData*)args;
 	SOCKET tmpSock;
-    char buffer[2048];
+    char buffer[EVENT_BUFFER_SIZE];
     size_t eventCount, i;
     EventInfo* events;
     struct pollfd ufds[1];
     int rv;
+    int readCount;
 #ifdef HAVE_OPENSSL
+    int buffPos;
     SSL_CTX* ctx;
     SSL* ssl;
 #ifdef _DEBUG
     unsigned long err;
 #endif
-    int readCount;
-    int buffPos;
 
     initOpenssl();
 
@@ -416,6 +418,7 @@ static threadRet WINAPI tcpThread(void* args)
 #else
         ufds[0].events = POLLIN | POLLNVAL;
 #endif
+        ufds[0].revents = 0;
         // wait for events on the sockets, 0.5 second timeout
         // This let's the thread error out when the socket is closed and no events are received... 
         rv = poll(ufds, 1, 500);
@@ -458,6 +461,7 @@ static threadRet WINAPI tcpThread(void* args)
         tmpSock = accept(data->socket, NULL, NULL);
         if(tmpSock < 0)
         {
+            REDFISH_DEBUG_ERR_PRINT("%s: Unable to open client socket!\n", __func__);
 #ifdef HAVE_OPENSSL
             SSL_CTX_free(ctx);
             cleanupOpenssl();
@@ -484,17 +488,20 @@ static threadRet WINAPI tcpThread(void* args)
             continue;
         }
 #endif
-        memset(buffer, 0, 2048);
+        memset(buffer, 0, sizeof(buffer));
 #ifdef HAVE_OPENSSL
         buffPos = 0;
         while((unsigned int)buffPos < sizeof(buffer)-1)
         {
-            readCount = SSL_read(ssl, buffer+buffPos, 2047-buffPos);
+            readCount = SSL_read(ssl, buffer+buffPos, (EVENT_BUFFER_SIZE-1)-buffPos);
             //REDFISH_DEBUG_INFO_PRINT("%s: SSL_read returned %d bytes\n", __func__, readCount);
             //REDFISH_DEBUG_INFO_PRINT("%s: Current Buffer is %s\n", __func__, buffer);
             if(readCount < 0)
             {
+#ifdef _DEBUG
+                err = ERR_get_error();
                 REDFISH_DEBUG_ERR_PRINT("%s: Unable to complete SSL read %u %s\n", __func__, err, ERR_error_string(err, NULL));
+#endif
                 SSL_free(ssl);
                 close(tmpSock);
                 tmpSock = -1;
@@ -506,13 +513,27 @@ static threadRet WINAPI tcpThread(void* args)
             }
             buffPos += readCount;
         }
+#else
+        readCount = recv(tmpSock, buffer, (EVENT_BUFFER_SIZE-1), 0);
+        //REDFISH_DEBUG_INFO_PRINT("%s: recv returned %d bytes\n", __func__, readCount);
+        //REDFISH_DEBUG_INFO_PRINT("%s: Current Buffer is %s\n", __func__, buffer);
+        if(readCount >= (EVENT_BUFFER_SIZE-1))
+        {
+            //Too large!
+            REDFISH_DEBUG_ERR_PRINT("%s: Event payload is too large for buffer!\n", __func__);
+            send(tmpSock,"HTTP/1.1 413 Request Entity Too Large\nConnection: Closed\n\n",58, 0);
+#ifdef _MSC_VER
+           	closesocket(tmpSock);
+#else
+            close(tmpSock);
+#endif
+            tmpSock = -1;
+        }
+#endif
         if(tmpSock == -1)
         {
             continue;
         }
-#else
-        recv(tmpSock, buffer, 2047, 0);
-#endif
         eventCount = getRedfishEventInfoFromRawHttp(buffer, data->service, &events);
         if(eventCount)
         {
@@ -524,6 +545,7 @@ static threadRet WINAPI tcpThread(void* args)
         }
         else
         {
+            REDFISH_DEBUG_ERR_PRINT("%s: Unrecognized payload!\n", __func__);
 #ifdef HAVE_OPENSSL
             SSL_write(ssl,"HTTP/1.1 400 Bad Request\nConnection: Closed\n\n",45);
 #else
