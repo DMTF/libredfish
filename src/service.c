@@ -858,6 +858,8 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
     if(asyncContext == NULL)
     {
         REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate asyncContext!\n", __func__);
+        free(eventSubscriptionUri);
+        cleanupPayload(postPayload);
         return false;
     }
     ret = postUriFromServiceAsync(service, eventSubscriptionUri, postPayload, NULL, asyncToSyncConverter, asyncContext);
@@ -1835,10 +1837,6 @@ static char* getDestinationAddress(const char* addressInfo, SOCKET* socket)
         ret = getIpv6Address(networkInterface);
     }
     free(networkInterface);
-    if(freeAddressType)
-    {
-        free(addressType);
-    }
     *socket = getSocket(ret, &port);
     if(strcmp(addressType, "ipv4") == 0)
     {
@@ -1856,6 +1854,10 @@ static char* getDestinationAddress(const char* addressInfo, SOCKET* socket)
 #else
         snprintf(dest, sizeof(dest)-1, "http://[%s]:%u", ret, port);
 #endif
+    }
+    if(freeAddressType)
+    {
+        free(addressType);
     }
     free(ret);
     return safeStrdup(dest);

@@ -264,7 +264,8 @@ SOCKET getSocket(const char* ip, unsigned int* portNum)
         return -1;
     }
     listen(ret, 5);
-    if(portNum)
+    //If portNum is passed in as 0 then need to return the actual socket number used...
+    if(*portNum)
     {
         if(getsockname(ret, addr, &size) == -1)
         {

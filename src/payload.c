@@ -1018,6 +1018,10 @@ static bool getSimpleOpResult(json_t* json, const char* propName, RedPathOp op, 
                 break;
             }
             stringProp = json_object_get(json, propName);
+#if __GNUC__ >= 7
+            //Yes, we want this to fall through...
+            __attribute__ ((fallthrough));
+#endif
         case JSON_STRING:
             propStr = json_string_value(stringProp);
             if(propStr == NULL)
