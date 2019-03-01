@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.1.8] - 2019-03-01
+- Fixed new gcc compiler warnings
+- Increased the event payload size to 12KB
+- Added automatic cleanup of sessions
+
 ## [1.1.7] - 2019-02-15
 - Various compiler warning fixes
 - Race condition fix for cURL global access
