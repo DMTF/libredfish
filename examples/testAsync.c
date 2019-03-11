@@ -18,6 +18,8 @@
 #define mutex_t           SRWLOCK
 #define mutex_lock        AcquireSRWLockExclusive
 #define mutex_unlock      ReleaseSRWLockExclusive
+//Windows sleep function is capital and in milliseconds
+#define sleep(x) Sleep((x)*1000);
 #endif
 #include <signal.h>
 
