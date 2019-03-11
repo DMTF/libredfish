@@ -8,6 +8,8 @@
 #include <getopt.h>
 #ifndef _MSC_VER
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
 #define mutex_t           pthread_mutex_t
 #define mutex_lock        pthread_mutex_lock
 #define mutex_unlock      pthread_mutex_unlock
@@ -86,8 +88,6 @@ void inthand(int signum)
     stop = 1;
 }
 
-#include <sys/types.h>
-#include <sys/syscall.h>
 
 void syslogPrintf(int priority, const char* message, ...)
 {
@@ -96,7 +96,11 @@ void syslogPrintf(int priority, const char* message, ...)
 
     if(priority <= verbose)
     {
+#ifndef _MSC_VER
         pid_t pid = syscall(__NR_gettid);
+#else
+        DWORD pid = GetCurrentThreadId();
+#endif
         fprintf(stderr, "[Thread %u]: ", pid);
         vfprintf(stderr, message, args);
     }
