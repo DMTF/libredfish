@@ -56,6 +56,7 @@ static struct option long_options[] =
     {"verbose",    no_argument,       0,      'v'},
     {"token",      required_argument, 0,      'T'},
     {"command",    required_argument, 0,      'c'},
+    {"valgrind",   no_argument,       0,      'X'},
     {0, 0, 0, 0}
 };
 
@@ -85,6 +86,9 @@ void inthand(int signum)
     stop = 1;
 }
 
+#include <sys/types.h>
+#include <sys/syscall.h>
+
 void syslogPrintf(int priority, const char* message, ...)
 {
     va_list args;
@@ -92,6 +96,8 @@ void syslogPrintf(int priority, const char* message, ...)
 
     if(priority <= verbose)
     {
+        pid_t pid = syscall(__NR_gettid);
+        fprintf(stderr, "[Thread %u]: ", pid);
         vfprintf(stderr, message, args);
     }
     va_end(args);
@@ -394,6 +400,7 @@ int main(int argc, char** argv)
     unsigned int     flags = 0;
     enumeratorAuthentication* auth = NULL;
     bool ret;
+    bool valgrind = false;
 #ifndef _MSC_VER
     mutex_t          mutex = PTHREAD_MUTEX_INITIALIZER;
 #else
@@ -402,9 +409,7 @@ int main(int argc, char** argv)
     InitializeSRWLock(&mutex);
 #endif
 
-    memset(&auth, 0, sizeof(auth));
-
-    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:", long_options, &opt_index)) != -1)
+    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:X", long_options, &opt_index)) != -1)
     {
         switch(arg)
         {
@@ -456,6 +461,7 @@ int main(int argc, char** argv)
                 if(auth == NULL)
                 {
                     auth = malloc(sizeof(enumeratorAuthentication));
+                    auth->authType = REDFISH_AUTH_BASIC;
                 }
                 auth->authCodes.userPass.username = strdup(optarg);
                 break;
@@ -463,6 +469,7 @@ int main(int argc, char** argv)
                 if(auth == NULL)
                 {
                     auth = malloc(sizeof(enumeratorAuthentication));
+                    auth->authType = REDFISH_AUTH_BASIC;
                 }
                 auth->authCodes.userPass.password = strdup(optarg);
                 break;
@@ -486,6 +493,9 @@ int main(int argc, char** argv)
                 break;
             case 'c':
                 gRedfishParams.command = getCommandByString(optarg);
+                break;
+            case 'X':
+                valgrind = true;
                 break;
         }
     }
@@ -511,12 +521,19 @@ int main(int argc, char** argv)
     {
         //Wait till the callback is done...
         mutex_lock(&mutex);
+        if(valgrind)
+        {
+            sleep(1);
+        }
     }
     else
     {
         fprintf(stderr, "createServiceEnumeratorAsync returned false!\n");
     }
 
+    safeFree(auth->authCodes.userPass.username);
+    safeFree(auth->authCodes.userPass.password);
+    safeFree(auth);
     safeFree(host);
     safeFree(gRedfishParams.filename);
     return 0;

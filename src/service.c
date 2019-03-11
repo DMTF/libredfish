@@ -1289,9 +1289,33 @@ typedef struct {
     redfishService* service;
 } createServiceSessionAuthAsyncContext;
 
+#ifdef _MSC_VER
+threadRet __stdcall doSessionCallbackInSeperateThread(void* data)
+#else
+threadRet doSessionCallbackInSeperateThread(void* data)
+#endif
+{
+    createServiceSessionAuthAsyncContext* myContext = (createServiceSessionAuthAsyncContext*)data;
+
+    myContext->originalCallback(myContext->service, myContext->originalContext);
+    free(myContext->username);
+    free(myContext->password);
+    free(myContext);
+#ifdef _MSC_VER
+	return 0;
+#else
+    pthread_exit(NULL);
+    return NULL;
+#endif
+}
+
 static void didSessionAuthPost(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
 {
     createServiceSessionAuthAsyncContext* myContext = (createServiceSessionAuthAsyncContext*)context;
+#ifndef _MSC_VER
+    pthread_attr_t attr;
+    pthread_t thread;
+#endif
 
     (void)httpCode;
 
@@ -1323,10 +1347,14 @@ static void didSessionAuthPost(bool success, unsigned short httpCode, redfishPay
         free(myContext);
         return;
     } 
-    myContext->originalCallback(myContext->service, myContext->originalContext);
-    free(myContext->username);
-    free(myContext->password);
-    free(myContext);
+#ifndef _MSC_VER
+    //In order to be more useful and let callers actually cleanup things in their callback we're doing this on a seperate thread...
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_create(&thread, &attr, doSessionCallbackInSeperateThread, myContext);
+#else
+	CreateThread(NULL, 0, doSessionCallbackInSeperateThread, myContext, 0, NULL);
+#endif
 }
 
 static redfishPayload* createAuthPayload(const char* username, const char* password, redfishService* service)
