@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.1.9] - 2019-03-26
+- Made change to ensure session based auth calls back in separate thread
+
 ## [1.1.8] - 2019-03-01
 - Fixed new gcc compiler warnings
 - Increased the event payload size to 12KB
