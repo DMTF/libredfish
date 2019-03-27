@@ -57,23 +57,27 @@ static struct option long_options[] =
     {0, 0, 0, 0}
 };
 
-typedef void (*commandFunc)(redfishPayload* payload);
+typedef void (*commandFunc)(redfishPayload* payload, int argc, char** argv);
 
 typedef struct {
     const char* commandName;
     commandFunc function;
 } commandMapping;
 
-static void getHealth(redfishPayload* payload);
-static void getRollup(redfishPayload* payload);
-static void getState(redfishPayload* payload);
-static void getName(redfishPayload* payload);
+static void getHealth(redfishPayload* payload, int argc, char** argv);
+static void getRollup(redfishPayload* payload, int argc, char** argv);
+static void getState(redfishPayload* payload, int argc, char** argv);
+static void getName(redfishPayload* payload, int argc, char** argv);
+static void getLED(redfishPayload* payload, int argc, char** argv);
+static void setLED(redfishPayload* payload, int argc, char** argv);
 
 static commandMapping commands[] = {
     {"getHealth", getHealth},
     {"getRollup", getRollup},
     {"getState", getState},
     {"getName", getName},
+    {"getLED", getLED},
+    {"setLED", setLED},
     {NULL, NULL}
 };
 
@@ -281,7 +285,7 @@ void gotPayload(bool success, unsigned short httpCode, redfishPayload* payload, 
     {
         if(myContext->command)
         {
-            myContext->command->function(payload);
+            myContext->command->function(payload, myContext->argc, myContext->argv);
             cleanupPayload(payload);
             free(context);
             return;
@@ -294,9 +298,9 @@ void gotPayload(bool success, unsigned short httpCode, redfishPayload* payload, 
                 free(context);
                 break;
             case 1:
-                if(myContext->leaf && optind < myContext->argc)
+                if(myContext->leaf && myContext->argc > 1)
                 {
-                    snprintf(tmp, sizeof(tmp), "{\"%s\": \"%s\"}", myContext->leaf, myContext->argv[optind]);
+                    snprintf(tmp, sizeof(tmp), "{\"%s\": \"%s\"}", myContext->leaf, myContext->argv[1]);
                     post = createRedfishPayloadFromString(tmp, myContext->redfish);
                     res = patchPayloadAsync(payload, post, NULL, patchDone, context);
                     cleanupPayload(post);
@@ -559,8 +563,8 @@ int main(int argc, char** argv)
     context->query = query;
     context->filename = filename;
     context->redfish = redfish;
-    context->argc = argc;
-    context->argv = argv;
+    context->argc = argc - (optind-1);
+    context->argv = &(argv[optind-1]);
     context->command = command;
     if(query)
     {
@@ -621,9 +625,11 @@ static void printHealth(redfishHealth health, const char* healthType)
     printf("Resource %s is %s (%d)\n", healthType, healthStr, health);
 }
 
-static void getHealth(redfishPayload* payload)
+static void getHealth(redfishPayload* payload, int argc, char** argv)
 {
     redfishHealth health;
+    (void)argc;
+    (void)argv;
     if(payload == NULL)
     {
         fprintf(stderr, "Payload is NULL!\n");
@@ -633,9 +639,11 @@ static void getHealth(redfishPayload* payload)
     printHealth(health, "health");
 }
 
-static void getRollup(redfishPayload* payload)
+static void getRollup(redfishPayload* payload, int argc, char** argv)
 {
     redfishHealth health;
+    (void)argc;
+    (void)argv;
     if(payload == NULL)
     {
         fprintf(stderr, "Payload is NULL!\n");
@@ -645,10 +653,12 @@ static void getRollup(redfishPayload* payload)
     printHealth(health, "rollup health");
 }
 
-static void getState(redfishPayload* payload)
+static void getState(redfishPayload* payload, int argc, char** argv)
 {
     redfishState state;
     const char* stateStr;
+    (void)argc;
+    (void)argv;
     if(payload == NULL)
     {
         fprintf(stderr, "Payload is NULL!\n");
@@ -703,9 +713,11 @@ static void getState(redfishPayload* payload)
     printf("Resource state is %s (%d)\n", stateStr, state);
 }
 
-static void getName(redfishPayload* payload)
+static void getName(redfishPayload* payload, int argc, char** argv)
 {
     char* name;
+    (void)argc;
+    (void)argv;
     if(payload == NULL)
     {
         fprintf(stderr, "Payload is NULL!\n");
@@ -719,6 +731,76 @@ static void getName(redfishPayload* payload)
     }
     printf("Name is \"%s\"\n", name);
     free(name);
+}
+
+static void getLED(redfishPayload* payload, int argc, char** argv)
+{
+    redfishIndicatorLED led;
+    char* ledStr;
+    (void)argc;
+    (void)argv;
+    if(payload == NULL)
+    {
+        fprintf(stderr, "Payload is NULL!\n");
+        return;
+    }
+    led = getIndicatorLED(payload);
+    switch(led)
+    {
+        case RedfishIndicatorLEDError:
+            ledStr = "Error";
+            break;
+        case RedfishIndicatorLEDUnknown:
+            ledStr = "Unknown";
+            break;
+        case RedfishIndicatorLEDLit:
+            ledStr = "Lit";
+            break;
+        case RedfishIndicatorLEDBlinking:
+            ledStr = "Blinking";
+            break;
+        case RedfishIndicatorLEDOff:
+            ledStr = "Off";
+            break;
+        default:
+            ledStr = "Non-enum value";
+            break;
+    }
+    printf("Resource IndicatorLED is %s (%d)\n", ledStr, led);
+}
+
+static void gotCommandResPayload(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    printf("Success: %d\n", success);
+    printf("HTTP Code: %u\n", httpCode);
+    printPayload(payload);
+    (void)context;
+    cleanupPayload(payload);
+}
+
+static void setLED(redfishPayload* payload, int argc, char** argv)
+{
+    redfishIndicatorLED newState = RedfishIndicatorLEDUnknown;
+    int ret;
+    if(argc < 1)
+    {
+        fprintf(stderr, "Missing parameter of what to set the LED to\n");
+        return;
+    }
+    if(strcasecmp(argv[1], "Off") == 0)
+    {
+        newState = RedfishIndicatorLEDOff;
+    }
+    else if(strcasecmp(argv[1], "Lit") == 0)
+    {
+        newState = RedfishIndicatorLEDLit;
+    }
+    else if(strcasecmp(argv[1], "Blinking") == 0)
+    {
+        newState = RedfishIndicatorLEDBlinking;
+    }
+    ret = setIndicatorLEDAsync(payload, newState, gotCommandResPayload, NULL);
+    printf("setIndicatorLED returned %d\n", ret);
 }
 
 /* vim: set tabstop=4 shiftwidth=4 expandtab: */
