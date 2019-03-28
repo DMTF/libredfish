@@ -366,6 +366,15 @@ typedef struct
     redfishService*      service;
 } rawAsyncCallbackContextWrapper;
 
+static bool isRedirectCode(unsigned short httpCode)
+{
+    if(httpCode == 201 || httpCode == 202 || (httpCode >= 300 && httpCode < 400))
+    {
+        return true;
+    }
+    return false;
+}
+
 static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* response, void* context)
 {
     bool success = false;
@@ -384,17 +393,20 @@ static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* res
         }
         myContext->service->sessionToken = safeStrdup(header->value);
     }
-    if(response->httpResponseCode == 201)
+    if(myContext->service->flags & REDFISH_FLAG_SERVICE_BAD_REDIRECTS || isRedirectCode(response->httpResponseCode))
     {
         //This is a created response, go get the actual payload...
         header = responseGetHeader(response, "Location");
-        getUriFromServiceAsync(myContext->service, header->value, myContext->originalOptions, myContext->callback, myContext->originalContext);
-        freeAsyncRequest(request);
-        freeAsyncResponse(response);
-        serviceDecRef(myContext->service);
-        free(context);
-        REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. Location Redirect...\n", __func__);
-        return;
+        if(header)
+        {
+            getUriFromServiceAsync(myContext->service, header->value, myContext->originalOptions, myContext->callback, myContext->originalContext);
+            freeAsyncRequest(request);
+            freeAsyncResponse(response);
+            serviceDecRef(myContext->service);
+            free(context);
+            REDFISH_DEBUG_DEBUG_PRINT("%s: Exit. Location Redirect...\n", __func__);
+            return;
+        }
     }
     if(myContext->callback)
     {
