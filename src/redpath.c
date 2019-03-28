@@ -54,6 +54,11 @@ redPathNode* parseRedPath(const char* path)
     node->isRoot = false;
     curPath = getStringTill(path, "/", &end);
     endNode = node;
+    if(curPath == NULL)
+    {
+        free(node);
+        return NULL;
+    }
     parseNode(curPath, node, &endNode);
     free(curPath);
     if(end != NULL)
@@ -103,6 +108,12 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
     char* nodeName = getStringTill(path, "[", &indexStart);
     size_t tmpIndex;
     char* opChars;
+
+    if(nodeName == NULL)
+    {
+        //Can only occur if malloc fails...
+        return;
+    }
 
     if(strcmp(nodeName, "*") == 0)
     {
