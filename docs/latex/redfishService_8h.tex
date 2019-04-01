@@ -1,0 +1,847 @@
+\hypertarget{redfishService_8h}{}\section{include/redfish\+Service.h File Reference}
+\label{redfishService_8h}\index{include/redfish\+Service.\+h@{include/redfish\+Service.\+h}}
+
+
+File containing the interface for the service level interactions.  
+
+
+{\ttfamily \#include $<$jansson.\+h$>$}\newline
+{\ttfamily \#include $<$curl/curl.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$pthread.\+h$>$}\newline
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structredfishPayload}{redfish\+Payload}
+\begin{DoxyCompactList}\small\item\em A representation of a redfish payload. \end{DoxyCompactList}\item 
+struct \hyperlink{structenumeratorAuthentication}{enumerator\+Authentication}
+\begin{DoxyCompactList}\small\item\em A representation of how to authenticate to the service. \end{DoxyCompactList}\item 
+struct \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT}
+\item 
+\#define \hyperlink{redfishService_8h_ae06bb1dffec1c8aa0d199aee5228f33d}{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+A\+S\+IC}~0
+\item 
+\#define \hyperlink{redfishService_8h_a799b0d18033d3b59cc0a29ef1e2a57a4}{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+E\+A\+R\+E\+R\+\_\+\+T\+O\+K\+EN}~1
+\item 
+\#define \hyperlink{redfishService_8h_a06712548760bacdb0a305ffdc8e43865}{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+S\+E\+S\+S\+I\+ON}~2
+\item 
+\#define \hyperlink{redfishService_8h_a8e48b7cef7e4d2f9127c4086dadbfbe5}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+S\+T\+A\+T\+U\+S\+C\+H\+A\+N\+GE}~0x00000001
+\item 
+\#define \hyperlink{redfishService_8h_a73e6a1c746c0148e43fe05192f850684}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+U\+P\+D\+A\+T\+ED}~0x00000002
+\item 
+\#define \hyperlink{redfishService_8h_a9aea80400a0a7d2ac1bf1e62cd18eac8}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+A\+D\+D\+ED}~0x00000004
+\item 
+\#define \hyperlink{redfishService_8h_a817eb524c54f1b09ade08c618b71b367}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+R\+E\+M\+O\+V\+ED}~0x00000008
+\item 
+\#define \hyperlink{redfishService_8h_a425d2948d86065fb39437e44340852a0}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+L\+E\+RT}~0x00000010
+\item 
+\#define \hyperlink{redfishService_8h_ab227963c9b5ef29b77dc36f4548557a1}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+LL}~0x0000001F
+\item 
+\#define \hyperlink{redfishService_8h_a5173159a2d4de1ab946f0e088aa199ea}{R\+E\+D\+F\+I\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+N\+O\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+D\+OC}~0x00000001
+\item 
+\#define \hyperlink{redfishService_8h_a46edf470d904259befa3d4b700c46ec4}{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+A\+LL}~0x\+F\+F\+F\+F\+F\+F\+FF
+\item 
+\#define \hyperlink{redfishService_8h_a9194056c0e51a33352f11cbf14ee6e45}{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+J\+S\+ON}~1
+\item 
+\#define \hyperlink{redfishService_8h_aeb097b20dd59c8620f1fcf6a23fcb0bb}{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+X\+ML}~2
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \hyperlink{struct__redfishService}{\+\_\+redfish\+Service} \hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service}
+\item 
+typedef void($\ast$ \hyperlink{redfishService_8h_a758b03d26a0d4f87974b4e16fbd833e8}{redfish\+Event\+Callback}) (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$event, \hyperlink{structenumeratorAuthentication}{enumerator\+Authentication} $\ast$auth, const char $\ast$context)
+\item 
+\mbox{\Hypertarget{redfishService_8h_a4944f978b6f2978a9b738a7e32fbc869}\label{redfishService_8h_a4944f978b6f2978a9b738a7e32fbc869}} 
+typedef void($\ast$ {\bfseries redfish\+Create\+Async\+Callback}) (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, void $\ast$context)
+\item 
+typedef void($\ast$ \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}) (bool success, unsigned short http\+Code, \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, void $\ast$context)
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{redfishService_8h_a743ef6fcbb87f07021f20c5c0073dc34}{redfish\+Content\+Type} \{ \hyperlink{redfishService_8h_a743ef6fcbb87f07021f20c5c0073dc34ad51e5d76e671f40a0555c9f78d81db7c}{P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+J\+S\+ON}, 
+\hyperlink{redfishService_8h_a743ef6fcbb87f07021f20c5c0073dc34a2e53e9ae6554ccc4aa500319217627e0}{P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+O\+T\+H\+ER} = 0x\+FF
+ \}\begin{DoxyCompactList}\small\item\em Content type of the \hyperlink{structredfishPayload}{redfish\+Payload} object. \end{DoxyCompactList}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$ \hyperlink{redfishService_8h_aceb7a6969d7b24eada179daa8213aa03}{create\+Service\+Enumerator} (const char $\ast$host, const char $\ast$root\+Uri, \hyperlink{structenumeratorAuthentication}{enumerator\+Authentication} $\ast$auth, unsigned int flags)
+\begin{DoxyCompactList}\small\item\em Create a redfish service connection. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} json\+\_\+t $\ast$ \hyperlink{redfishService_8h_ad5a421ce6f6dd733cf992ba2e545f813}{get\+Uri\+From\+Service} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$uri)
+\begin{DoxyCompactList}\small\item\em Obtain the J\+S\+ON payload corresponding to the given U\+RI on the service. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} json\+\_\+t $\ast$ \hyperlink{redfishService_8h_a7598224d867cc9fa64decfc676044982}{patch\+Uri\+From\+Service} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$uri, const char $\ast$content)
+\begin{DoxyCompactList}\small\item\em Use a P\+A\+T\+CH operation on a given U\+RI. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} json\+\_\+t $\ast$ \hyperlink{redfishService_8h_a0263a582ab99f28f59030f9d2efbb170}{post\+Uri\+From\+Service} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$uri, const char $\ast$content, size\+\_\+t content\+Length, const char $\ast$content\+Type)
+\begin{DoxyCompactList}\small\item\em Use a P\+O\+ST operation on a given U\+RI. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishService_8h_a26546fa9362698aadb5e0af0e58125a8}{delete\+Uri\+From\+Service} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$uri)
+\begin{DoxyCompactList}\small\item\em Use a D\+E\+L\+E\+TE operation on a given U\+RI. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishService_8h_a630c82b6bc6524c82063dfb3c3b00d97}{register\+For\+Events} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$postback\+Uri, unsigned int event\+Types, \hyperlink{redfishService_8h_a758b03d26a0d4f87974b4e16fbd833e8}{redfish\+Event\+Callback} callback, const char $\ast$context)
+\begin{DoxyCompactList}\small\item\em Register for notification of async redfish events. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishService_8h_a0b2e6b5ba996617292c2c217fa3df987}{get\+Redfish\+Service\+Root} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$version)
+\begin{DoxyCompactList}\small\item\em Obtain the redfish service root. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishService_8h_a653ccf567fbb3bc032ad5d7763ccdafb}{get\+Payload\+By\+Path} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$path)
+\begin{DoxyCompactList}\small\item\em Obtain the redfish payload corresponding to the redpath. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void \hyperlink{redfishService_8h_a01b64b10e6e2621b3428f87081560d96}{cleanup\+Service\+Enumerator} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service)
+\begin{DoxyCompactList}\small\item\em Free the service connection. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void \hyperlink{redfishService_8h_a7d8b48234234266f10e527ec98557696}{service\+Inc\+Ref} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service)
+\begin{DoxyCompactList}\small\item\em Indicate that this connection is in use. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void \hyperlink{redfishService_8h_a9eca63661192742cc484598dd2cdecb2}{service\+Dec\+Ref} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service)
+\begin{DoxyCompactList}\small\item\em Indicate that this connection is no longer in use. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void \hyperlink{redfishService_8h_a13218a9759398c35d36964e91ddf950a}{service\+Dec\+Ref\+And\+Wait} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service)
+\begin{DoxyCompactList}\small\item\em Indicate that this connection is no longer in use. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishService_8h_a19352418b992089a5d30abc016141387}{create\+Service\+Enumerator\+Async} (const char $\ast$host, const char $\ast$root\+Uri, \hyperlink{structenumeratorAuthentication}{enumerator\+Authentication} $\ast$auth, unsigned int flags, redfish\+Create\+Async\+Callback callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em Create a redfish service connection asynchronously. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishService_8h_a26a517860495fd4c08949448bffd897b}{get\+Uri\+From\+Service\+Async} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$uri, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em Obtain the redfish payload corresponding to the given U\+RI on the service. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishService_8h_ae16b1b82f5e15a6adac57f87adbf2100}{patch\+Uri\+From\+Service\+Async} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$uri, \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em Initiate a P\+A\+T\+CH to the given U\+RI on the service. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishService_8h_ab123d5e1b61aedf0701359967d63ca2f}{post\+Uri\+From\+Service\+Async} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$uri, \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em Initiate a P\+O\+ST to the given U\+RI on the service. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishService_8h_a3fc4d3ebac15cfb160bc494f5f3a9736}{delete\+Uri\+From\+Service\+Async} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$uri, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em Initiate a D\+E\+L\+E\+TE to the given U\+RI on the service. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishService_8h_aad44434e9739e36c0f31170b35d9f50b}{get\+Redfish\+Service\+Root\+Async} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$version, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em Obtain the redfish service root. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishService_8h_a9aec493ad6504aaa68678896248858a4}{get\+Payload\+By\+Path\+Async} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$path, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em Obtain the redfish payload corresponding to the redpath. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File containing the interface for the service level interactions. 
+
+\begin{DoxyAuthor}{Author}
+Patrick Boyd This file explains the interface for interacting with a remote Redfish service. 
+\end{DoxyAuthor}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{redfishService_8h_a46edf470d904259befa3d4b700c46ec4}\label{redfishService_8h_a46edf470d904259befa3d4b700c46ec4}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+A\+LL@{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+A\+LL}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+A\+LL@{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+A\+LL}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+A\+LL}{REDFISH\_ACCEPT\_ALL}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+A\+LL~0x\+F\+F\+F\+F\+F\+F\+FF}
+
+Accept any type of response \mbox{\Hypertarget{redfishService_8h_a9194056c0e51a33352f11cbf14ee6e45}\label{redfishService_8h_a9194056c0e51a33352f11cbf14ee6e45}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+J\+S\+ON@{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+J\+S\+ON}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+J\+S\+ON@{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+J\+S\+ON}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+J\+S\+ON}{REDFISH\_ACCEPT\_JSON}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+J\+S\+ON~1}
+
+Accept a J\+S\+ON response \mbox{\Hypertarget{redfishService_8h_aeb097b20dd59c8620f1fcf6a23fcb0bb}\label{redfishService_8h_aeb097b20dd59c8620f1fcf6a23fcb0bb}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+X\+ML@{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+X\+ML}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+X\+ML@{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+X\+ML}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+X\+ML}{REDFISH\_ACCEPT\_XML}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+C\+C\+E\+P\+T\+\_\+\+X\+ML~2}
+
+Accept an X\+ML response \mbox{\Hypertarget{redfishService_8h_ae06bb1dffec1c8aa0d199aee5228f33d}\label{redfishService_8h_ae06bb1dffec1c8aa0d199aee5228f33d}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+A\+S\+IC@{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+A\+S\+IC}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+A\+S\+IC@{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+A\+S\+IC}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+A\+S\+IC}{REDFISH\_AUTH\_BASIC}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+A\+S\+IC~0}
+
+The connection should use H\+T\+TP basic authentication to authenticate to the Redfish service \mbox{\Hypertarget{redfishService_8h_a799b0d18033d3b59cc0a29ef1e2a57a4}\label{redfishService_8h_a799b0d18033d3b59cc0a29ef1e2a57a4}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+E\+A\+R\+E\+R\+\_\+\+T\+O\+K\+EN@{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+E\+A\+R\+E\+R\+\_\+\+T\+O\+K\+EN}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+E\+A\+R\+E\+R\+\_\+\+T\+O\+K\+EN@{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+E\+A\+R\+E\+R\+\_\+\+T\+O\+K\+EN}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+E\+A\+R\+E\+R\+\_\+\+T\+O\+K\+EN}{REDFISH\_AUTH\_BEARER\_TOKEN}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+E\+A\+R\+E\+R\+\_\+\+T\+O\+K\+EN~1}
+
+The connection should use a bearer token to authenticate to the Redfish service \mbox{\Hypertarget{redfishService_8h_a06712548760bacdb0a305ffdc8e43865}\label{redfishService_8h_a06712548760bacdb0a305ffdc8e43865}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+S\+E\+S\+S\+I\+ON@{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+S\+E\+S\+S\+I\+ON}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+S\+E\+S\+S\+I\+ON@{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+S\+E\+S\+S\+I\+ON}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+S\+E\+S\+S\+I\+ON}{REDFISH\_AUTH\_SESSION}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+S\+E\+S\+S\+I\+ON~2}
+
+The connection should use Redfish service authentication as documented in the Redfish specification to authenticate to the Redfish service \mbox{\Hypertarget{redfishService_8h_a425d2948d86065fb39437e44340852a0}\label{redfishService_8h_a425d2948d86065fb39437e44340852a0}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+L\+E\+RT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+L\+E\+RT}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+L\+E\+RT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+L\+E\+RT}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+L\+E\+RT}{REDFISH\_EVENT\_TYPE\_ALERT}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+L\+E\+RT~0x00000010}
+
+A value corresponding to Event\+Types.\+Alert \mbox{\Hypertarget{redfishService_8h_ab227963c9b5ef29b77dc36f4548557a1}\label{redfishService_8h_ab227963c9b5ef29b77dc36f4548557a1}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+LL@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+LL}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+LL@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+LL}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+LL}{REDFISH\_EVENT\_TYPE\_ALL}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+LL~0x0000001F}
+
+A value corresponding to all currrently known event types \mbox{\Hypertarget{redfishService_8h_a9aea80400a0a7d2ac1bf1e62cd18eac8}\label{redfishService_8h_a9aea80400a0a7d2ac1bf1e62cd18eac8}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+A\+D\+D\+ED@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+A\+D\+D\+ED}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+A\+D\+D\+ED@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+A\+D\+D\+ED}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+A\+D\+D\+ED}{REDFISH\_EVENT\_TYPE\_RESOURCEADDED}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+A\+D\+D\+ED~0x00000004}
+
+A value corresponding to Event\+Types.\+Resource\+Added \mbox{\Hypertarget{redfishService_8h_a817eb524c54f1b09ade08c618b71b367}\label{redfishService_8h_a817eb524c54f1b09ade08c618b71b367}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+R\+E\+M\+O\+V\+ED@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+R\+E\+M\+O\+V\+ED}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+R\+E\+M\+O\+V\+ED@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+R\+E\+M\+O\+V\+ED}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+R\+E\+M\+O\+V\+ED}{REDFISH\_EVENT\_TYPE\_RESOURCEREMOVED}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+R\+E\+M\+O\+V\+ED~0x00000008}
+
+A value corresponding to Event\+Types.\+Resource\+Removed \mbox{\Hypertarget{redfishService_8h_a73e6a1c746c0148e43fe05192f850684}\label{redfishService_8h_a73e6a1c746c0148e43fe05192f850684}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+U\+P\+D\+A\+T\+ED@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+U\+P\+D\+A\+T\+ED}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+U\+P\+D\+A\+T\+ED@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+U\+P\+D\+A\+T\+ED}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+U\+P\+D\+A\+T\+ED}{REDFISH\_EVENT\_TYPE\_RESOURCEUPDATED}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+E\+S\+O\+U\+R\+C\+E\+U\+P\+D\+A\+T\+ED~0x00000002}
+
+A value corresponding to Event\+Types.\+Resource\+Updated \mbox{\Hypertarget{redfishService_8h_a8e48b7cef7e4d2f9127c4086dadbfbe5}\label{redfishService_8h_a8e48b7cef7e4d2f9127c4086dadbfbe5}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+S\+T\+A\+T\+U\+S\+C\+H\+A\+N\+GE@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+S\+T\+A\+T\+U\+S\+C\+H\+A\+N\+GE}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+S\+T\+A\+T\+U\+S\+C\+H\+A\+N\+GE@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+S\+T\+A\+T\+U\+S\+C\+H\+A\+N\+GE}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+S\+T\+A\+T\+U\+S\+C\+H\+A\+N\+GE}{REDFISH\_EVENT\_TYPE\_STATUSCHANGE}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+\+T\+Y\+P\+E\+\_\+\+S\+T\+A\+T\+U\+S\+C\+H\+A\+N\+GE~0x00000001}
+
+A value corresponding to Event\+Types.\+Status\+Change \mbox{\Hypertarget{redfishService_8h_adde99f84609730688c6f817991c93390}\label{redfishService_8h_adde99f84609730688c6f817991c93390}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT}{REDFISH\_EXPORT}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT}
+
+This function should be exposed outside the library \mbox{\Hypertarget{redfishService_8h_a5173159a2d4de1ab946f0e088aa199ea}\label{redfishService_8h_a5173159a2d4de1ab946f0e088aa199ea}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+N\+O\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+D\+OC@{R\+E\+D\+F\+I\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+N\+O\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+D\+OC}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+N\+O\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+D\+OC@{R\+E\+D\+F\+I\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+N\+O\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+D\+OC}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+N\+O\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+D\+OC}{REDFISH\_FLAG\_SERVICE\_NO\_VERSION\_DOC}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+N\+O\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+D\+OC~0x00000001}
+
+A flag used to indicate that the Redfish Service lacks the version document (in violation of the Redfish spec) 
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}\label{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!redfish\+Async\+Callback@{redfish\+Async\+Callback}}
+\index{redfish\+Async\+Callback@{redfish\+Async\+Callback}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{redfish\+Async\+Callback}{redfishAsyncCallback}}
+{\footnotesize\ttfamily typedef void($\ast$ redfish\+Async\+Callback) (bool success, unsigned short http\+Code, \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, void $\ast$context)}
+
+Callback for Redfish async calls
+
+
+\begin{DoxyParams}{Parameters}
+{\em success} & Indicates if the call was successful or not \\
+\hline
+{\em http\+Code} & The H\+T\+TP status code returned by the service \\
+\hline
+{\em payload} & The redfish payload returned from the call \\
+\hline
+{\em context} & An opaque pointer sent to the original call \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{redfishService_8h_a758b03d26a0d4f87974b4e16fbd833e8}\label{redfishService_8h_a758b03d26a0d4f87974b4e16fbd833e8}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!redfish\+Event\+Callback@{redfish\+Event\+Callback}}
+\index{redfish\+Event\+Callback@{redfish\+Event\+Callback}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{redfish\+Event\+Callback}{redfishEventCallback}}
+{\footnotesize\ttfamily typedef void($\ast$ redfish\+Event\+Callback) (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$event, \hyperlink{structenumeratorAuthentication}{enumerator\+Authentication} $\ast$auth, const char $\ast$context)}
+
+Callback for Redfish events
+
+
+\begin{DoxyParams}{Parameters}
+{\em event} & The \hyperlink{structredfishPayload}{redfish\+Payload} from the event \\
+\hline
+{\em auth} & The authentication data provided by the caller or null if none \\
+\hline
+{\em context} & user specified value \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}\label{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!redfish\+Service@{redfish\+Service}}
+\index{redfish\+Service@{redfish\+Service}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{redfish\+Service}{redfishService}}
+{\footnotesize\ttfamily typedef struct \hyperlink{struct__redfishService}{\+\_\+redfish\+Service} \hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service}}
+
+The redfish service data 
+
+\subsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{redfishService_8h_a743ef6fcbb87f07021f20c5c0073dc34}\label{redfishService_8h_a743ef6fcbb87f07021f20c5c0073dc34}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!redfish\+Content\+Type@{redfish\+Content\+Type}}
+\index{redfish\+Content\+Type@{redfish\+Content\+Type}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{redfish\+Content\+Type}{redfishContentType}}
+{\footnotesize\ttfamily enum \hyperlink{redfishService_8h_a743ef6fcbb87f07021f20c5c0073dc34}{redfish\+Content\+Type}}
+
+
+
+Content type of the \hyperlink{structredfishPayload}{redfish\+Payload} object. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+J\+S\+ON@{P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+J\+S\+ON}!redfish\+Service.\+h@{redfish\+Service.\+h}}\index{redfish\+Service.\+h@{redfish\+Service.\+h}!P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+J\+S\+ON@{P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+J\+S\+ON}}}\mbox{\Hypertarget{redfishService_8h_a743ef6fcbb87f07021f20c5c0073dc34ad51e5d76e671f40a0555c9f78d81db7c}\label{redfishService_8h_a743ef6fcbb87f07021f20c5c0073dc34ad51e5d76e671f40a0555c9f78d81db7c}} 
+P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+J\+S\+ON&Payload is J\+S\+ON \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+O\+T\+H\+ER@{P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+O\+T\+H\+ER}!redfish\+Service.\+h@{redfish\+Service.\+h}}\index{redfish\+Service.\+h@{redfish\+Service.\+h}!P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+O\+T\+H\+ER@{P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+O\+T\+H\+ER}}}\mbox{\Hypertarget{redfishService_8h_a743ef6fcbb87f07021f20c5c0073dc34a2e53e9ae6554ccc4aa500319217627e0}\label{redfishService_8h_a743ef6fcbb87f07021f20c5c0073dc34a2e53e9ae6554ccc4aa500319217627e0}} 
+P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+O\+T\+H\+ER&Payload is something else \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{redfishService_8h_a01b64b10e6e2621b3428f87081560d96}\label{redfishService_8h_a01b64b10e6e2621b3428f87081560d96}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!cleanup\+Service\+Enumerator@{cleanup\+Service\+Enumerator}}
+\index{cleanup\+Service\+Enumerator@{cleanup\+Service\+Enumerator}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{cleanup\+Service\+Enumerator()}{cleanupServiceEnumerator()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void cleanup\+Service\+Enumerator (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service }\end{DoxyParamCaption})}
+
+
+
+Free the service connection. 
+
+Free the redfish service connection object and associated data.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to free \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_a9eca63661192742cc484598dd2cdecb2}{service\+Dec\+Ref} 
+
+\hyperlink{redfishService_8h_a13218a9759398c35d36964e91ddf950a}{service\+Dec\+Ref\+And\+Wait} 
+\end{DoxySeeAlso}
+\begin{DoxyRefDesc}{Deprecated}
+\item[\hyperlink{deprecated__deprecated000007}{Deprecated}]This function if just a wrapper for the async A\+PI service\+Dec\+Ref. \end{DoxyRefDesc}
+\mbox{\Hypertarget{redfishService_8h_aceb7a6969d7b24eada179daa8213aa03}\label{redfishService_8h_aceb7a6969d7b24eada179daa8213aa03}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!create\+Service\+Enumerator@{create\+Service\+Enumerator}}
+\index{create\+Service\+Enumerator@{create\+Service\+Enumerator}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{create\+Service\+Enumerator()}{createServiceEnumerator()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service}$\ast$ create\+Service\+Enumerator (\begin{DoxyParamCaption}\item[{const char $\ast$}]{host,  }\item[{const char $\ast$}]{root\+Uri,  }\item[{\hyperlink{structenumeratorAuthentication}{enumerator\+Authentication} $\ast$}]{auth,  }\item[{unsigned int}]{flags }\end{DoxyParamCaption})}
+
+
+
+Create a redfish service connection. 
+
+Create a new redfish service connection.
+
+Host examples\+: \tabulinesep=1mm
+\begin{longtabu} spread 0pt [c]{*{3}{|X[-1]}|}
+\hline
+\rowcolor{\tableheadbgcolor}\textbf{ Connection Type }&\textbf{ Host Identity Type }&\textbf{ Example  }\\\cline{1-3}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\rowcolor{\tableheadbgcolor}\textbf{ Connection Type }&\textbf{ Host Identity Type }&\textbf{ Example  }\\\cline{1-3}
+\endhead
+H\+T\+TP &Domain Name &\href{http://example.com}{\tt http\+://example.\+com} \\\cline{1-3}
+H\+T\+T\+PS &Domain Name &\href{https://example.com}{\tt https\+://example.\+com} \\\cline{1-3}
+H\+T\+TP &I\+Pv4 &\href{http://127.0.0.1}{\tt http\+://127.\+0.\+0.\+1} \\\cline{1-3}
+H\+T\+T\+PS &I\+Pv4 &\href{https://127.0.0.1}{\tt https\+://127.\+0.\+0.\+1} \\\cline{1-3}
+H\+T\+TP &I\+Pv6 &\href{http://}{\tt http\+://}\mbox{[}\+:\+:1\mbox{]} \\\cline{1-3}
+H\+T\+T\+PS &I\+Pv6 &\href{https://}{\tt https\+://}\mbox{[}\+:\+:1\mbox{]} \\\cline{1-3}
+\end{longtabu}
+
+\begin{DoxyParams}{Parameters}
+{\em host} & The host to connect to. This must contain the protocol schema see above for more details. \\
+\hline
+{\em root\+Uri} & The root U\+RI of the redfish service. If N\+U\+LL the connection with assume /redfish \\
+\hline
+{\em auth} & The authentication method to use for the redfish service. If N\+U\+LL the connection will be made with no authentication \\
+\hline
+{\em flags} & Any extra flags to pass to the service \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A new redfish service structure representing the connection. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_a9eca63661192742cc484598dd2cdecb2}{service\+Dec\+Ref} 
+
+\hyperlink{redfishService_8h_a13218a9759398c35d36964e91ddf950a}{service\+Dec\+Ref\+And\+Wait} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishService_8h_a19352418b992089a5d30abc016141387}\label{redfishService_8h_a19352418b992089a5d30abc016141387}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!create\+Service\+Enumerator\+Async@{create\+Service\+Enumerator\+Async}}
+\index{create\+Service\+Enumerator\+Async@{create\+Service\+Enumerator\+Async}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{create\+Service\+Enumerator\+Async()}{createServiceEnumeratorAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool create\+Service\+Enumerator\+Async (\begin{DoxyParamCaption}\item[{const char $\ast$}]{host,  }\item[{const char $\ast$}]{root\+Uri,  }\item[{\hyperlink{structenumeratorAuthentication}{enumerator\+Authentication} $\ast$}]{auth,  }\item[{unsigned int}]{flags,  }\item[{redfish\+Create\+Async\+Callback}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Create a redfish service connection asynchronously. 
+
+Create a new redfish service connection asynchronously.
+
+Host examples\+: \tabulinesep=1mm
+\begin{longtabu} spread 0pt [c]{*{3}{|X[-1]}|}
+\hline
+\rowcolor{\tableheadbgcolor}\textbf{ Connection Type }&\textbf{ Host Identity Type }&\textbf{ Example  }\\\cline{1-3}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\rowcolor{\tableheadbgcolor}\textbf{ Connection Type }&\textbf{ Host Identity Type }&\textbf{ Example  }\\\cline{1-3}
+\endhead
+H\+T\+TP &Domain Name &\href{http://example.com}{\tt http\+://example.\+com} \\\cline{1-3}
+H\+T\+T\+PS &Domain Name &\href{https://example.com}{\tt https\+://example.\+com} \\\cline{1-3}
+H\+T\+TP &I\+Pv4 &\href{http://127.0.0.1}{\tt http\+://127.\+0.\+0.\+1} \\\cline{1-3}
+H\+T\+T\+PS &I\+Pv4 &\href{https://127.0.0.1}{\tt https\+://127.\+0.\+0.\+1} \\\cline{1-3}
+H\+T\+TP &I\+Pv6 &\href{http://}{\tt http\+://}\mbox{[}\+:\+:1\mbox{]} \\\cline{1-3}
+H\+T\+T\+PS &I\+Pv6 &\href{https://}{\tt https\+://}\mbox{[}\+:\+:1\mbox{]} \\\cline{1-3}
+\end{longtabu}
+
+\begin{DoxyParams}{Parameters}
+{\em host} & The host to connect to. This must contain the protocol schema see above for more details. \\
+\hline
+{\em root\+Uri} & The root U\+RI of the redfish service. If N\+U\+LL the connection with assume /redfish \\
+\hline
+{\em auth} & The authentication method to use for the redfish service. If N\+U\+LL the connection will be made with no authentication \\
+\hline
+{\em flags} & Any extra flags to pass to the service \\
+\hline
+{\em callback} & The callback to call when the service is created \\
+\hline
+{\em context} & The context to pass to the callback \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the callback will be called, false otherwise. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_aceb7a6969d7b24eada179daa8213aa03}{create\+Service\+Enumerator} 
+
+\hyperlink{redfishService_8h_a9eca63661192742cc484598dd2cdecb2}{service\+Dec\+Ref} 
+
+\hyperlink{redfishService_8h_a13218a9759398c35d36964e91ddf950a}{service\+Dec\+Ref\+And\+Wait} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishService_8h_a26546fa9362698aadb5e0af0e58125a8}\label{redfishService_8h_a26546fa9362698aadb5e0af0e58125a8}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!delete\+Uri\+From\+Service@{delete\+Uri\+From\+Service}}
+\index{delete\+Uri\+From\+Service@{delete\+Uri\+From\+Service}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{delete\+Uri\+From\+Service()}{deleteUriFromService()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool delete\+Uri\+From\+Service (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{uri }\end{DoxyParamCaption})}
+
+
+
+Use a D\+E\+L\+E\+TE operation on a given U\+RI. 
+
+Send a D\+E\+L\+E\+TE operation to the given U\+RI on the service synchronously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to send data to \\
+\hline
+{\em uri} & The U\+RI to send data to (must contain the full U\+RI for the service, i.\+e. should start with /redfish normally) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A boolean indicating success or failure 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_a3fc4d3ebac15cfb160bc494f5f3a9736}{delete\+Uri\+From\+Service\+Async} 
+\end{DoxySeeAlso}
+\begin{DoxyRefDesc}{Deprecated}
+\item[\hyperlink{deprecated__deprecated000004}{Deprecated}]This function if just a wrapper for the async A\+PI delete\+Uri\+From\+Service\+Async and will not be updated for other features of the newer A\+PI. \end{DoxyRefDesc}
+\mbox{\Hypertarget{redfishService_8h_a3fc4d3ebac15cfb160bc494f5f3a9736}\label{redfishService_8h_a3fc4d3ebac15cfb160bc494f5f3a9736}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!delete\+Uri\+From\+Service\+Async@{delete\+Uri\+From\+Service\+Async}}
+\index{delete\+Uri\+From\+Service\+Async@{delete\+Uri\+From\+Service\+Async}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{delete\+Uri\+From\+Service\+Async()}{deleteUriFromServiceAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool delete\+Uri\+From\+Service\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{uri,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Initiate a D\+E\+L\+E\+TE to the given U\+RI on the service. 
+
+Initiate a D\+E\+L\+E\+TE operation to the given U\+RI on the service and asynchronously obtain the resulting payload
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to send data to \\
+\hline
+{\em uri} & The U\+RI to send data to (must contain the full U\+RI for the service, i.\+e. should start with /redfish normally) \\
+\hline
+{\em options} & Options to use for this request or any subsequent requests triggered by this request. If N\+U\+LL a resonable set of defaults will be used \\
+\hline
+{\em callback} & A function to call upon completion of the request \\
+\hline
+{\em context} & An opaque data pointer to pass to the callback function \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+false if the request could not be started. True otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishService_8h_a653ccf567fbb3bc032ad5d7763ccdafb}\label{redfishService_8h_a653ccf567fbb3bc032ad5d7763ccdafb}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!get\+Payload\+By\+Path@{get\+Payload\+By\+Path}}
+\index{get\+Payload\+By\+Path@{get\+Payload\+By\+Path}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+By\+Path()}{getPayloadByPath()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ get\+Payload\+By\+Path (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{path }\end{DoxyParamCaption})}
+
+
+
+Obtain the redfish payload corresponding to the redpath. 
+
+Obtain the redfish payload corresponding to the redpath on the service synchronously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to obtain data from \\
+\hline
+{\em path} & A redpath string to use to locate data. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A payload representing the data at the path or N\+U\+LL on error 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_a9aec493ad6504aaa68678896248858a4}{get\+Payload\+By\+Path\+Async} 
+\end{DoxySeeAlso}
+\begin{DoxyRefDesc}{Deprecated}
+\item[\hyperlink{deprecated__deprecated000006}{Deprecated}]This function if just a wrapper for the async A\+PI get\+Payload\+By\+Path\+Async and will not be updated for other features of the newer A\+PI. \end{DoxyRefDesc}
+\mbox{\Hypertarget{redfishService_8h_a9aec493ad6504aaa68678896248858a4}\label{redfishService_8h_a9aec493ad6504aaa68678896248858a4}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!get\+Payload\+By\+Path\+Async@{get\+Payload\+By\+Path\+Async}}
+\index{get\+Payload\+By\+Path\+Async@{get\+Payload\+By\+Path\+Async}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+By\+Path\+Async()}{getPayloadByPathAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool get\+Payload\+By\+Path\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{path,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Obtain the redfish payload corresponding to the redpath. 
+
+Obtain the redfish payload corresponding to the redpath on the service asynchronously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to obtain data from \\
+\hline
+{\em path} & A redpath string to use to locate data. \\
+\hline
+{\em options} & Options to use for this request or any subsequent requests triggered by this request. If N\+U\+LL a resonable set of defaults will be used \\
+\hline
+{\em callback} & A function to call upon completion of the request \\
+\hline
+{\em context} & An opaque data pointer to pass to the callback function \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+false if the request could not be started. True otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishService_8h_a0b2e6b5ba996617292c2c217fa3df987}\label{redfishService_8h_a0b2e6b5ba996617292c2c217fa3df987}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!get\+Redfish\+Service\+Root@{get\+Redfish\+Service\+Root}}
+\index{get\+Redfish\+Service\+Root@{get\+Redfish\+Service\+Root}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{get\+Redfish\+Service\+Root()}{getRedfishServiceRoot()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ get\+Redfish\+Service\+Root (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{version }\end{DoxyParamCaption})}
+
+
+
+Obtain the redfish service root. 
+
+Obtain the redfish service root on the service synchronously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to obtain data from \\
+\hline
+{\em version} & The redfish version to obtain the root of. Assumes \char`\"{}v1\char`\"{} if N\+U\+LL. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A payload representing the Service Root 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_aad44434e9739e36c0f31170b35d9f50b}{get\+Redfish\+Service\+Root\+Async} 
+\end{DoxySeeAlso}
+\begin{DoxyRefDesc}{Deprecated}
+\item[\hyperlink{deprecated__deprecated000005}{Deprecated}]This function if just a wrapper for the async A\+PI get\+Redfish\+Service\+Root\+Async and will not be updated for other features of the newer A\+PI. \end{DoxyRefDesc}
+\mbox{\Hypertarget{redfishService_8h_aad44434e9739e36c0f31170b35d9f50b}\label{redfishService_8h_aad44434e9739e36c0f31170b35d9f50b}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!get\+Redfish\+Service\+Root\+Async@{get\+Redfish\+Service\+Root\+Async}}
+\index{get\+Redfish\+Service\+Root\+Async@{get\+Redfish\+Service\+Root\+Async}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{get\+Redfish\+Service\+Root\+Async()}{getRedfishServiceRootAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool get\+Redfish\+Service\+Root\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{version,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Obtain the redfish service root. 
+
+Obtain the redfish service root on the service asynchronously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to obtain data from \\
+\hline
+{\em version} & The redfish version to obtain the root of. Assumes \char`\"{}v1\char`\"{} if N\+U\+LL. \\
+\hline
+{\em options} & Options to use for this request or any subsequent requests triggered by this request. If N\+U\+LL a resonable set of defaults will be used \\
+\hline
+{\em callback} & A function to call upon completion of the request \\
+\hline
+{\em context} & An opaque data pointer to pass to the callback function \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+false if the request could not be started. True otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishService_8h_ad5a421ce6f6dd733cf992ba2e545f813}\label{redfishService_8h_ad5a421ce6f6dd733cf992ba2e545f813}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!get\+Uri\+From\+Service@{get\+Uri\+From\+Service}}
+\index{get\+Uri\+From\+Service@{get\+Uri\+From\+Service}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{get\+Uri\+From\+Service()}{getUriFromService()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} json\+\_\+t$\ast$ get\+Uri\+From\+Service (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{uri }\end{DoxyParamCaption})}
+
+
+
+Obtain the J\+S\+ON payload corresponding to the given U\+RI on the service. 
+
+Obtain the J\+S\+ON payload corresponding to the given U\+RI on the service synchronously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to obtain data from \\
+\hline
+{\em uri} & The U\+RI to obtain data from (must contain the full U\+RI for the service, i.\+e. should start with /redfish normally) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A json representation of the U\+RI content or N\+U\+LL on error 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_a26a517860495fd4c08949448bffd897b}{get\+Uri\+From\+Service\+Async} 
+\end{DoxySeeAlso}
+\begin{DoxyRefDesc}{Deprecated}
+\item[\hyperlink{deprecated__deprecated000001}{Deprecated}]This function if just a wrapper for the async A\+PI get\+Uri\+From\+Service\+Async and will not be updated to handle non-\/\+J\+S\+ON returns or other features of the newer A\+PI. \end{DoxyRefDesc}
+\mbox{\Hypertarget{redfishService_8h_a26a517860495fd4c08949448bffd897b}\label{redfishService_8h_a26a517860495fd4c08949448bffd897b}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!get\+Uri\+From\+Service\+Async@{get\+Uri\+From\+Service\+Async}}
+\index{get\+Uri\+From\+Service\+Async@{get\+Uri\+From\+Service\+Async}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{get\+Uri\+From\+Service\+Async()}{getUriFromServiceAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool get\+Uri\+From\+Service\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{uri,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Obtain the redfish payload corresponding to the given U\+RI on the service. 
+
+Obtain the redfish payload corresponding to the given U\+RI on the service asynchronously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to obtain data from \\
+\hline
+{\em uri} & The U\+RI to obtain data from (must contain the full U\+RI for the service, i.\+e. should start with /redfish normally) \\
+\hline
+{\em options} & Options to use for this request or any subsequent requests triggered by this request. If N\+U\+LL a resonable set of defaults will be used \\
+\hline
+{\em callback} & A function to call upon completion of the request \\
+\hline
+{\em context} & An opaque data pointer to pass to the callback function \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+false if the request could not be started. True otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishService_8h_a7598224d867cc9fa64decfc676044982}\label{redfishService_8h_a7598224d867cc9fa64decfc676044982}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!patch\+Uri\+From\+Service@{patch\+Uri\+From\+Service}}
+\index{patch\+Uri\+From\+Service@{patch\+Uri\+From\+Service}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{patch\+Uri\+From\+Service()}{patchUriFromService()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} json\+\_\+t$\ast$ patch\+Uri\+From\+Service (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{uri,  }\item[{const char $\ast$}]{content }\end{DoxyParamCaption})}
+
+
+
+Use a P\+A\+T\+CH operation on a given U\+RI. 
+
+Send a patch operation to the given U\+RI on the service synchronously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to send data to \\
+\hline
+{\em uri} & The U\+RI to send data to (must contain the full U\+RI for the service, i.\+e. should start with /redfish normally) \\
+\hline
+{\em content} & The content to send \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A json representation of the U\+RI content or N\+U\+LL on error 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_ae16b1b82f5e15a6adac57f87adbf2100}{patch\+Uri\+From\+Service\+Async} 
+\end{DoxySeeAlso}
+\begin{DoxyRefDesc}{Deprecated}
+\item[\hyperlink{deprecated__deprecated000002}{Deprecated}]This function if just a wrapper for the async A\+PI patch\+Uri\+From\+Service\+Async and will not be updated to handle non-\/\+J\+S\+ON returns or other features of the newer A\+PI. \end{DoxyRefDesc}
+\mbox{\Hypertarget{redfishService_8h_ae16b1b82f5e15a6adac57f87adbf2100}\label{redfishService_8h_ae16b1b82f5e15a6adac57f87adbf2100}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!patch\+Uri\+From\+Service\+Async@{patch\+Uri\+From\+Service\+Async}}
+\index{patch\+Uri\+From\+Service\+Async@{patch\+Uri\+From\+Service\+Async}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{patch\+Uri\+From\+Service\+Async()}{patchUriFromServiceAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool patch\+Uri\+From\+Service\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{uri,  }\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Initiate a P\+A\+T\+CH to the given U\+RI on the service. 
+
+Initiate a P\+A\+T\+CH operation to the given U\+RI on the service and asynchronously obtain the resulting payload
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to send data to \\
+\hline
+{\em uri} & The U\+RI to send data to (must contain the full U\+RI for the service, i.\+e. should start with /redfish normally) \\
+\hline
+{\em payload} & The payload to send to the U\+RI \\
+\hline
+{\em options} & Options to use for this request or any subsequent requests triggered by this request. If N\+U\+LL a resonable set of defaults will be used \\
+\hline
+{\em callback} & A function to call upon completion of the request \\
+\hline
+{\em context} & An opaque data pointer to pass to the callback function \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+false if the request could not be started. True otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishService_8h_a0263a582ab99f28f59030f9d2efbb170}\label{redfishService_8h_a0263a582ab99f28f59030f9d2efbb170}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!post\+Uri\+From\+Service@{post\+Uri\+From\+Service}}
+\index{post\+Uri\+From\+Service@{post\+Uri\+From\+Service}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{post\+Uri\+From\+Service()}{postUriFromService()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} json\+\_\+t$\ast$ post\+Uri\+From\+Service (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{uri,  }\item[{const char $\ast$}]{content,  }\item[{size\+\_\+t}]{content\+Length,  }\item[{const char $\ast$}]{content\+Type }\end{DoxyParamCaption})}
+
+
+
+Use a P\+O\+ST operation on a given U\+RI. 
+
+Send a P\+O\+ST operation to the given U\+RI on the service synchronously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to send data to \\
+\hline
+{\em uri} & The U\+RI to send data to (must contain the full U\+RI for the service, i.\+e. should start with /redfish normally) \\
+\hline
+{\em content} & The content to send \\
+\hline
+{\em content\+Length} & The size of the content buffer \\
+\hline
+{\em content\+Type} & The content\+Type header to send \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A json representation of the U\+RI content or N\+U\+LL on error 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_ab123d5e1b61aedf0701359967d63ca2f}{post\+Uri\+From\+Service\+Async} 
+\end{DoxySeeAlso}
+\begin{DoxyRefDesc}{Deprecated}
+\item[\hyperlink{deprecated__deprecated000003}{Deprecated}]This function if just a wrapper for the async A\+PI post\+Uri\+From\+Service\+Async and will not be updated to handle non-\/\+J\+S\+ON returns or other features of the newer A\+PI. \end{DoxyRefDesc}
+\mbox{\Hypertarget{redfishService_8h_ab123d5e1b61aedf0701359967d63ca2f}\label{redfishService_8h_ab123d5e1b61aedf0701359967d63ca2f}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!post\+Uri\+From\+Service\+Async@{post\+Uri\+From\+Service\+Async}}
+\index{post\+Uri\+From\+Service\+Async@{post\+Uri\+From\+Service\+Async}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{post\+Uri\+From\+Service\+Async()}{postUriFromServiceAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool post\+Uri\+From\+Service\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{uri,  }\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Initiate a P\+O\+ST to the given U\+RI on the service. 
+
+Initiate a P\+O\+ST operation to the given U\+RI on the service and asynchronously obtain the resulting payload
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to send data to \\
+\hline
+{\em uri} & The U\+RI to send data to (must contain the full U\+RI for the service, i.\+e. should start with /redfish normally) \\
+\hline
+{\em payload} & The payload to send to the U\+RI \\
+\hline
+{\em options} & Options to use for this request or any subsequent requests triggered by this request. If N\+U\+LL a resonable set of defaults will be used \\
+\hline
+{\em callback} & A function to call upon completion of the request \\
+\hline
+{\em context} & An opaque data pointer to pass to the callback function \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+false if the request could not be started. True otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishService_8h_a630c82b6bc6524c82063dfb3c3b00d97}\label{redfishService_8h_a630c82b6bc6524c82063dfb3c3b00d97}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!register\+For\+Events@{register\+For\+Events}}
+\index{register\+For\+Events@{register\+For\+Events}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{register\+For\+Events()}{registerForEvents()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool register\+For\+Events (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{const char $\ast$}]{postback\+Uri,  }\item[{unsigned int}]{event\+Types,  }\item[{\hyperlink{redfishService_8h_a758b03d26a0d4f87974b4e16fbd833e8}{redfish\+Event\+Callback}}]{callback,  }\item[{const char $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Register for notification of async redfish events. 
+
+Register for notification of async redfish events.
+
+Postback examples\+: If the postback\+Uri starts with libredfish\+: then libredfish will create a socket to listen to events directly. The format for this is libredfish\+:$<$interface name$>$=\char`\"{}\char`\"{}$>$\mbox{[}\+:$<$ipv4/ipv6$>$\mbox{[}\+:$<$port$>$\mbox{]}\mbox{]} To use this format the caller must supply the name of the interface to listen on (libredfish will aquire the interfaces IP to send to the redfish server) By default I\+Pv4 and a random port number will be used. However a caller can specify to listen on I\+Pv6 and specify a port number if desired.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to obtain events from \\
+\hline
+{\em postback\+Uri} & The U\+RI for the redfish service to send events to. This must point to an event listener that can send events back to this process. See the httpd/cgi.\+c for an example \\
+\hline
+{\em event\+Types} & The event types to be notified about \\
+\hline
+{\em callback} & The function to call upon reciept of an event \\
+\hline
+{\em context} & An event context to pass to the Redfish Service \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A boolean indicating success or failure 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishService_8h_a9eca63661192742cc484598dd2cdecb2}\label{redfishService_8h_a9eca63661192742cc484598dd2cdecb2}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!service\+Dec\+Ref@{service\+Dec\+Ref}}
+\index{service\+Dec\+Ref@{service\+Dec\+Ref}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{service\+Dec\+Ref()}{serviceDecRef()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void service\+Dec\+Ref (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service }\end{DoxyParamCaption})}
+
+
+
+Indicate that this connection is no longer in use. 
+
+Indicate that this connection is no longer in use. Once the internal reference count reaches 0 the assocated data will be freed. Therefore this function or service\+Dec\+Ref\+And\+Wait should be called an equivalent number of times to service\+Inc\+Ref -\/1 (as the initial create will set the count to 1).
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to indicate is no longer in use \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_aceb7a6969d7b24eada179daa8213aa03}{create\+Service\+Enumerator} 
+
+\hyperlink{redfishService_8h_a7d8b48234234266f10e527ec98557696}{service\+Inc\+Ref} 
+
+\hyperlink{redfishService_8h_a13218a9759398c35d36964e91ddf950a}{service\+Dec\+Ref\+And\+Wait} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishService_8h_a13218a9759398c35d36964e91ddf950a}\label{redfishService_8h_a13218a9759398c35d36964e91ddf950a}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!service\+Dec\+Ref\+And\+Wait@{service\+Dec\+Ref\+And\+Wait}}
+\index{service\+Dec\+Ref\+And\+Wait@{service\+Dec\+Ref\+And\+Wait}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{service\+Dec\+Ref\+And\+Wait()}{serviceDecRefAndWait()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void service\+Dec\+Ref\+And\+Wait (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service }\end{DoxyParamCaption})}
+
+
+
+Indicate that this connection is no longer in use. 
+
+Indicate that this connection is no longer in use and wait until no one else is using it either. This function is similar to service\+Dec\+Ref. However, it will wait until all outstanding requests are processed before returning.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to indicate is no longer in use \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_aceb7a6969d7b24eada179daa8213aa03}{create\+Service\+Enumerator} 
+
+\hyperlink{redfishService_8h_a7d8b48234234266f10e527ec98557696}{service\+Inc\+Ref} 
+
+\hyperlink{redfishService_8h_a9eca63661192742cc484598dd2cdecb2}{service\+Dec\+Ref} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishService_8h_a7d8b48234234266f10e527ec98557696}\label{redfishService_8h_a7d8b48234234266f10e527ec98557696}} 
+\index{redfish\+Service.\+h@{redfish\+Service.\+h}!service\+Inc\+Ref@{service\+Inc\+Ref}}
+\index{service\+Inc\+Ref@{service\+Inc\+Ref}!redfish\+Service.\+h@{redfish\+Service.\+h}}
+\subsubsection{\texorpdfstring{service\+Inc\+Ref()}{serviceIncRef()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void service\+Inc\+Ref (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service }\end{DoxyParamCaption})}
+
+
+
+Indicate that this connection is in use. 
+
+Indicate that this connection is in use. This will increase the internal reference count of the service.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The service to indicate is in use \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_aceb7a6969d7b24eada179daa8213aa03}{create\+Service\+Enumerator} 
+
+\hyperlink{redfishService_8h_a9eca63661192742cc484598dd2cdecb2}{service\+Dec\+Ref} 
+
+\hyperlink{redfishService_8h_a13218a9759398c35d36964e91ddf950a}{service\+Dec\+Ref\+And\+Wait} 
+\end{DoxySeeAlso}

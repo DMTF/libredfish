@@ -1,0 +1,883 @@
+\hypertarget{redfishPayload_8h}{}\section{include/redfish\+Payload.h File Reference}
+\label{redfishPayload_8h}\index{include/redfish\+Payload.\+h@{include/redfish\+Payload.\+h}}
+
+
+File containing the interface for payload level interactions.  
+
+
+{\ttfamily \#include \char`\"{}redfish\+Service.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}redpath.\+h\char`\"{}}\newline
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_a8dae2b951ab099a2d09c00bf3f66602a}{create\+Redfish\+Payload} (json\+\_\+t $\ast$value, \hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service)
+\begin{DoxyCompactList}\small\item\em Create a redfish payload from json and a service. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_a845a66ea806f2834f906cc58ed384ac4}{create\+Redfish\+Payload\+From\+String} (const char $\ast$value, \hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service)
+\begin{DoxyCompactList}\small\item\em Create a redfish payload from a string and a service. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_acb1cb235275e7c54e66ddbae9c99367a}{create\+Redfish\+Payload\+From\+Content} (const char $\ast$content, size\+\_\+t content\+Length, const char $\ast$content\+Type, \hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service)
+\begin{DoxyCompactList}\small\item\em Create a redfish payload from a H\+T\+TP response. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_a2c38a91ca1668e41aecc86b17405da28}{copy\+Redfish\+Payload} (const \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$original)
+\begin{DoxyCompactList}\small\item\em Create a copy of a Redfish Payload. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishPayload_8h_ab0ff441ae69d3703b8f4dac427875b3d}{is\+Payload\+Collection} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Is the payload a Redfish Collection? \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishPayload_8h_af7a22a2f4bf44cd4e0fdc7e4032c92f2}{is\+Payload\+Array} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Is the payload an array? \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} size\+\_\+t \hyperlink{redfishPayload_8h_aca78a9bd89eb60721720bfa61323a0bb}{get\+Payload\+Size} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Get the size of the payload if it were represented as a character buffer. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} char $\ast$ \hyperlink{redfishPayload_8h_a48d682c7ff2d2336dcde1b4b1127a866}{get\+Payload\+Body} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Get the payload as a character buffer. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} char $\ast$ \hyperlink{redfishPayload_8h_a55c549d1933a6db9fe6a7440a275ca6f}{get\+Payload\+Content\+Type} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Get the payload content type. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} char $\ast$ \hyperlink{redfishPayload_8h_a3e72b6deb42193d4d60dad40c2c4e1ec}{get\+Payload\+Uri} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Get the payload uri. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} char $\ast$ \hyperlink{redfishPayload_8h_a6c623a4272dff0f2f46edeea9d403e2f}{get\+Payload\+String\+Value} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Get the string value for the payload. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} int \hyperlink{redfishPayload_8h_a84e916220f025aac29011fe569d74cb0}{get\+Payload\+Int\+Value} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Get the int value for the payload. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_a4812006521c9777618485e33610343b8}{get\+Payload\+By\+Node\+Name} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, const char $\ast$node\+Name)
+\begin{DoxyCompactList}\small\item\em Obtain the node in the payload identified by the specified node\+Name. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_aa84debd190ebdf6a46b675e45ed3773b}{get\+Payload\+By\+Index} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, size\+\_\+t index)
+\begin{DoxyCompactList}\small\item\em Obtain the node in the payload by index. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_ab9f1f15ce60210d3c6c63103a0c1b1fb}{get\+Payload\+For\+Path} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, \hyperlink{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}{red\+Path\+Node} $\ast$redpath)
+\begin{DoxyCompactList}\small\item\em Obtain the child payload according to Redpath. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_a9c68d2bfc7f359cce2d6eeafd2e88719}{get\+Payload\+For\+Path\+String} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, const char $\ast$string)
+\begin{DoxyCompactList}\small\item\em Obtain the child payload according to Redpath string. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} size\+\_\+t \hyperlink{redfishPayload_8h_a650b1c7a0204c26c2a65ac14acfed5cb}{get\+Collection\+Size} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Obtain the number of members of a collection. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_a941a8faa2ba63fcc21ca68562a2bb077}{patch\+Payload\+String\+Property} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, const char $\ast$property\+Name, const char $\ast$value)
+\begin{DoxyCompactList}\small\item\em P\+A\+T\+CH a string property of the payload (works for enums too). \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_a6c400b6cd053c7baa0718ca81121b8a3}{post\+Content\+To\+Payload} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$target, const char $\ast$data, size\+\_\+t data\+Size, const char $\ast$content\+Type)
+\begin{DoxyCompactList}\small\item\em P\+O\+ST new data to the U\+RI reresented by a payload. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_af0aa0e51450906d17fe99198a620482c}{post\+Payload} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$target, \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em P\+O\+ST a new payload to the U\+RI reresented by a payload. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishPayload_8h_a96f83ad7bd5f5d1e102966ea597e59cb}{delete\+Payload} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em D\+E\+L\+E\+TE a redfish payload. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} char $\ast$ \hyperlink{redfishPayload_8h_a3919c8e2430df1a7cf15154064967fc9}{payload\+To\+String} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, bool pretty\+Print)
+\begin{DoxyCompactList}\small\item\em Convert a payload to a string. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void \hyperlink{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}{cleanup\+Payload} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Free the local copy of the payload. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishPayload_8h_a6d97649240abf4aa52dd2da21d3351a2}{get\+Payload\+By\+Node\+Name\+Async} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, const char $\ast$node\+Name, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em Obtain the node in the payload identified by the specified node\+Name. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishPayload_8h_ad8a49fce403efdf61fd8b060ddbe272f}{get\+Payload\+By\+Index\+Async} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, size\+\_\+t index, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em Obtain the node in the payload by index. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishPayload_8h_a3e5db128591ef52dc05844136ad2cad3}{get\+Payload\+For\+Path\+Async} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, \hyperlink{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}{red\+Path\+Node} $\ast$redpath, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em Obtain the child payload according to Redpath. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishPayload_8h_abfa18863c18431987d8a18cc76bb3807}{get\+Payload\+For\+Path\+String\+Async} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, const char $\ast$string, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em Obtain the child payload according to Redpath string. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishPayload_8h_abfa53c5c066c71a1ca8162a8b30c1c36}{patch\+Payload\+Async} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$target, \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em P\+A\+T\+CH a payload to the U\+RI reresented by a target asynchronously. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishPayload_8h_ac7ea07cadc3b169ce26088051cafdaaa}{post\+Payload\+Async} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$target, \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em P\+O\+ST a new payload to the U\+RI reresented by a target asynchronously. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishPayload_8h_a65414de4edfdf93e19784f24442ae31d}{delete\+Payload\+Async} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$options, \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em D\+E\+L\+E\+TE a redfish payload asynchronously. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_a4805577970902d867fa2947673e157b6}{get\+Payload\+By\+Node\+Name\+No\+Network} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, const char $\ast$node\+Name)
+\begin{DoxyCompactList}\small\item\em Obtain the node in the payload identified by the specified node\+Name. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{redfishPayload_8h_a179c923257a8d396439e59b5f75359a3}{get\+Payload\+By\+Index\+No\+Network} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload, size\+\_\+t index)
+\begin{DoxyCompactList}\small\item\em Obtain the node in the payload by index. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File containing the interface for payload level interactions. 
+
+\begin{DoxyAuthor}{Author}
+Patrick Boyd This file explains the interface for the payload level interactions with a redfish service 
+\end{DoxyAuthor}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}\label{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!cleanup\+Payload@{cleanup\+Payload}}
+\index{cleanup\+Payload@{cleanup\+Payload}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{cleanup\+Payload()}{cleanupPayload()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void cleanup\+Payload (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Free the local copy of the payload. 
+
+Free the local copy of the payload. Does not interact with the redfish service at all.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to free \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{redfishPayload_8h_a2c38a91ca1668e41aecc86b17405da28}\label{redfishPayload_8h_a2c38a91ca1668e41aecc86b17405da28}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!copy\+Redfish\+Payload@{copy\+Redfish\+Payload}}
+\index{copy\+Redfish\+Payload@{copy\+Redfish\+Payload}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{copy\+Redfish\+Payload()}{copyRedfishPayload()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ copy\+Redfish\+Payload (\begin{DoxyParamCaption}\item[{const \hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{original }\end{DoxyParamCaption})}
+
+
+
+Create a copy of a Redfish Payload. 
+
+Create a new redfish payload with the same contents as the original payload
+
+
+\begin{DoxyParams}{Parameters}
+{\em original} & The original payload data to copy. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A new redfish payload structure 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}{cleanup\+Payload} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a8dae2b951ab099a2d09c00bf3f66602a}\label{redfishPayload_8h_a8dae2b951ab099a2d09c00bf3f66602a}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!create\+Redfish\+Payload@{create\+Redfish\+Payload}}
+\index{create\+Redfish\+Payload@{create\+Redfish\+Payload}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{create\+Redfish\+Payload()}{createRedfishPayload()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ create\+Redfish\+Payload (\begin{DoxyParamCaption}\item[{json\+\_\+t $\ast$}]{value,  }\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service }\end{DoxyParamCaption})}
+
+
+
+Create a redfish payload from json and a service. 
+
+Create a new redfish payload representation from a json\+\_\+t$\ast$ and a service
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & The json value that is the payload content \\
+\hline
+{\em service} & The redfish service for this payload \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A new redfish payload structure 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}{cleanup\+Payload} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_acb1cb235275e7c54e66ddbae9c99367a}\label{redfishPayload_8h_acb1cb235275e7c54e66ddbae9c99367a}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!create\+Redfish\+Payload\+From\+Content@{create\+Redfish\+Payload\+From\+Content}}
+\index{create\+Redfish\+Payload\+From\+Content@{create\+Redfish\+Payload\+From\+Content}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{create\+Redfish\+Payload\+From\+Content()}{createRedfishPayloadFromContent()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ create\+Redfish\+Payload\+From\+Content (\begin{DoxyParamCaption}\item[{const char $\ast$}]{content,  }\item[{size\+\_\+t}]{content\+Length,  }\item[{const char $\ast$}]{content\+Type,  }\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service }\end{DoxyParamCaption})}
+
+
+
+Create a redfish payload from a H\+T\+TP response. 
+
+Create a new redfish payload representation from data obtained from an H\+T\+TP response
+
+
+\begin{DoxyParams}{Parameters}
+{\em content} & The content for the payload. If the content\+Type indicates J\+S\+ON this will be automatically parsed. \\
+\hline
+{\em content\+Length} & The length of the content buffer \\
+\hline
+{\em content\+Type} & The type of the content according to the H\+T\+TP server \\
+\hline
+{\em service} & The redfish service for this payload \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A new redfish payload structure 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}{cleanup\+Payload} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a845a66ea806f2834f906cc58ed384ac4}\label{redfishPayload_8h_a845a66ea806f2834f906cc58ed384ac4}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!create\+Redfish\+Payload\+From\+String@{create\+Redfish\+Payload\+From\+String}}
+\index{create\+Redfish\+Payload\+From\+String@{create\+Redfish\+Payload\+From\+String}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{create\+Redfish\+Payload\+From\+String()}{createRedfishPayloadFromString()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ create\+Redfish\+Payload\+From\+String (\begin{DoxyParamCaption}\item[{const char $\ast$}]{value,  }\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service }\end{DoxyParamCaption})}
+
+
+
+Create a redfish payload from a string and a service. 
+
+Create a new redfish payload representation from a char$\ast$ and a service
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & The json string value that is the payload content \\
+\hline
+{\em service} & The redfish service for this payload \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A new redfish payload structure 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}{cleanup\+Payload} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a96f83ad7bd5f5d1e102966ea597e59cb}\label{redfishPayload_8h_a96f83ad7bd5f5d1e102966ea597e59cb}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!delete\+Payload@{delete\+Payload}}
+\index{delete\+Payload@{delete\+Payload}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{delete\+Payload()}{deletePayload()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool delete\+Payload (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+D\+E\+L\+E\+TE a redfish payload. 
+
+Synchronously send a D\+E\+L\+E\+TE operation to the U\+RI the payload was obtained from.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to delete \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+False if failure, true on success. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_a65414de4edfdf93e19784f24442ae31d}\label{redfishPayload_8h_a65414de4edfdf93e19784f24442ae31d}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!delete\+Payload\+Async@{delete\+Payload\+Async}}
+\index{delete\+Payload\+Async@{delete\+Payload\+Async}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{delete\+Payload\+Async()}{deletePayloadAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool delete\+Payload\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+D\+E\+L\+E\+TE a redfish payload asynchronously. 
+
+Asynchronously send a D\+E\+L\+E\+TE operation to the U\+RI the payload was obtained from. It is the callback\textquotesingle{}s responsibility to free the returned payload.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to delete \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+False if failure, true on success. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}{cleanup\+Payload} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a650b1c7a0204c26c2a65ac14acfed5cb}\label{redfishPayload_8h_a650b1c7a0204c26c2a65ac14acfed5cb}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Collection\+Size@{get\+Collection\+Size}}
+\index{get\+Collection\+Size@{get\+Collection\+Size}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Collection\+Size()}{getCollectionSize()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} size\+\_\+t get\+Collection\+Size (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Obtain the number of members of a collection. 
+
+Return the number of elements in the collection.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get number of elements in \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if the payload is not a collection. The total number of elements in the collection otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_a48d682c7ff2d2336dcde1b4b1127a866}\label{redfishPayload_8h_a48d682c7ff2d2336dcde1b4b1127a866}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+Body@{get\+Payload\+Body}}
+\index{get\+Payload\+Body@{get\+Payload\+Body}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+Body()}{getPayloadBody()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} char$\ast$ get\+Payload\+Body (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Get the payload as a character buffer. 
+
+Return the payload represented as a character buffer (i.\+e. to be sent over the network)
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to check \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The payload as a character buffer 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_aa84debd190ebdf6a46b675e45ed3773b}\label{redfishPayload_8h_aa84debd190ebdf6a46b675e45ed3773b}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+By\+Index@{get\+Payload\+By\+Index}}
+\index{get\+Payload\+By\+Index@{get\+Payload\+By\+Index}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+By\+Index()}{getPayloadByIndex()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ get\+Payload\+By\+Index (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{size\+\_\+t}]{index }\end{DoxyParamCaption})}
+
+
+
+Obtain the node in the payload by index. 
+
+Obtain the node in the payload by zero-\/based index.
+\begin{DoxyItemize}
+\item If the payload is an array it will be the Nth element of the array.
+\item If the payload is a collection it will be the Nth element in the Members element.
+\item If the payload is an object it will be the element at the Nth key in the object.
+\item If the payload is any other type it will return N\+U\+LL.
+\item If the element obtained is a navigation property to another U\+RI then the content of that U\+RI will be obtained synchronously.
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the child node of \\
+\hline
+{\em index} & The index of the payload to obtain \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The child payload or N\+U\+LL if it does not exist or could not be obtained. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_ad8a49fce403efdf61fd8b060ddbe272f}{get\+Payload\+By\+Index\+Async} 
+
+\hyperlink{redfishPayload_8h_a179c923257a8d396439e59b5f75359a3}{get\+Payload\+By\+Index\+No\+Network} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_ad8a49fce403efdf61fd8b060ddbe272f}\label{redfishPayload_8h_ad8a49fce403efdf61fd8b060ddbe272f}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+By\+Index\+Async@{get\+Payload\+By\+Index\+Async}}
+\index{get\+Payload\+By\+Index\+Async@{get\+Payload\+By\+Index\+Async}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+By\+Index\+Async()}{getPayloadByIndexAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool get\+Payload\+By\+Index\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{size\+\_\+t}]{index,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Obtain the node in the payload by index. 
+
+Obtain the node in the payload by zero-\/based index.
+\begin{DoxyItemize}
+\item If the payload is an array it will be the Nth element of the array.
+\item If the payload is a collection it will be the Nth element in the Members element.
+\item If the payload is an object it will be the element at the Nth key in the object.
+\item If the payload is any other type it will return N\+U\+LL.
+\item If the element obtained is a navigation property to another U\+RI then the content of that U\+RI will be obtained asynchronously. It is the callback\textquotesingle{}s responsibility to free the returned payload.
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the child node of \\
+\hline
+{\em index} & The index of the payload to obtain \\
+\hline
+{\em options} & The redfish options to use if needing to obtain another U\+RI or N\+U\+LL for defaults \\
+\hline
+{\em callback} & The callback to use when the payload is obtained \\
+\hline
+{\em context} & An opaque data pointer to send to the callback \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the request could start. False otherwise. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_aa84debd190ebdf6a46b675e45ed3773b}{get\+Payload\+By\+Index} 
+
+\hyperlink{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}{cleanup\+Payload} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a179c923257a8d396439e59b5f75359a3}\label{redfishPayload_8h_a179c923257a8d396439e59b5f75359a3}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+By\+Index\+No\+Network@{get\+Payload\+By\+Index\+No\+Network}}
+\index{get\+Payload\+By\+Index\+No\+Network@{get\+Payload\+By\+Index\+No\+Network}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+By\+Index\+No\+Network()}{getPayloadByIndexNoNetwork()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ get\+Payload\+By\+Index\+No\+Network (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{size\+\_\+t}]{index }\end{DoxyParamCaption})}
+
+
+
+Obtain the node in the payload by index. 
+
+Obtain the node in the payload by zero-\/based index. If the node in question is a navigation property to another U\+RI then return the navigation property.
+\begin{DoxyItemize}
+\item If the payload is an array it will be the Nth element of the array.
+\item If the payload is a collection it will be the Nth element in the Members element.
+\item If the payload is an object it will be the element at the Nth key in the object.
+\item If the payload is any other type it will return N\+U\+LL.
+\item If the element obtained is a navigation property to another U\+RI then the content of that U\+RI will be obtained synchronously.
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the child node of \\
+\hline
+{\em index} & The index of the payload to obtain \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The child payload or N\+U\+LL if it does not exist or could not be obtained. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_ad8a49fce403efdf61fd8b060ddbe272f}{get\+Payload\+By\+Index\+Async} 
+
+\hyperlink{redfishPayload_8h_aa84debd190ebdf6a46b675e45ed3773b}{get\+Payload\+By\+Index} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a4812006521c9777618485e33610343b8}\label{redfishPayload_8h_a4812006521c9777618485e33610343b8}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+By\+Node\+Name@{get\+Payload\+By\+Node\+Name}}
+\index{get\+Payload\+By\+Node\+Name@{get\+Payload\+By\+Node\+Name}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+By\+Node\+Name()}{getPayloadByNodeName()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ get\+Payload\+By\+Node\+Name (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{const char $\ast$}]{node\+Name }\end{DoxyParamCaption})}
+
+
+
+Obtain the node in the payload identified by the specified node\+Name. 
+
+Obtain the node in the payload identified by the specified node\+Name. If the node in question is a navigation property to another U\+RI then the content of that U\+RI will be obtained synchronously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the child node of \\
+\hline
+{\em node\+Name} & The name of the node to obtain \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The child node or N\+U\+LL if it does not exist or could not be obtained. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_a6d97649240abf4aa52dd2da21d3351a2}{get\+Payload\+By\+Node\+Name\+Async} 
+
+\hyperlink{redfishPayload_8h_a4805577970902d867fa2947673e157b6}{get\+Payload\+By\+Node\+Name\+No\+Network} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a6d97649240abf4aa52dd2da21d3351a2}\label{redfishPayload_8h_a6d97649240abf4aa52dd2da21d3351a2}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+By\+Node\+Name\+Async@{get\+Payload\+By\+Node\+Name\+Async}}
+\index{get\+Payload\+By\+Node\+Name\+Async@{get\+Payload\+By\+Node\+Name\+Async}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+By\+Node\+Name\+Async()}{getPayloadByNodeNameAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool get\+Payload\+By\+Node\+Name\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{const char $\ast$}]{node\+Name,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Obtain the node in the payload identified by the specified node\+Name. 
+
+Obtain the node in the payload identified by the specified node\+Name. If the node in question is a navigation property to another U\+RI then the content of that U\+RI will be obtained asynchronously. It is the callback\textquotesingle{}s responsibility to free the returned payload.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the child node of \\
+\hline
+{\em node\+Name} & The name of the node to obtain \\
+\hline
+{\em options} & The redfish options to use if needing to obtain another U\+RI or N\+U\+LL for defaults \\
+\hline
+{\em callback} & The callback to use when the payload is obtained \\
+\hline
+{\em context} & An opaque data pointer to send to the callback \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the request could start. False otherwise. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_a6d97649240abf4aa52dd2da21d3351a2}{get\+Payload\+By\+Node\+Name\+Async} 
+
+\hyperlink{redfishPayload_8h_a4812006521c9777618485e33610343b8}{get\+Payload\+By\+Node\+Name} 
+
+\hyperlink{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}{cleanup\+Payload} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a4805577970902d867fa2947673e157b6}\label{redfishPayload_8h_a4805577970902d867fa2947673e157b6}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+By\+Node\+Name\+No\+Network@{get\+Payload\+By\+Node\+Name\+No\+Network}}
+\index{get\+Payload\+By\+Node\+Name\+No\+Network@{get\+Payload\+By\+Node\+Name\+No\+Network}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+By\+Node\+Name\+No\+Network()}{getPayloadByNodeNameNoNetwork()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ get\+Payload\+By\+Node\+Name\+No\+Network (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{const char $\ast$}]{node\+Name }\end{DoxyParamCaption})}
+
+
+
+Obtain the node in the payload identified by the specified node\+Name. 
+
+Obtain the node in the payload identified by the specified node\+Name. If the node in question is a navigation property to another U\+RI then return the navigation property.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the child node of \\
+\hline
+{\em node\+Name} & The name of the node to obtain \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The child node or N\+U\+LL if it does not exist or could not be obtained. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_a6d97649240abf4aa52dd2da21d3351a2}{get\+Payload\+By\+Node\+Name\+Async} 
+
+\hyperlink{redfishPayload_8h_a4812006521c9777618485e33610343b8}{get\+Payload\+By\+Node\+Name} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a55c549d1933a6db9fe6a7440a275ca6f}\label{redfishPayload_8h_a55c549d1933a6db9fe6a7440a275ca6f}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+Content\+Type@{get\+Payload\+Content\+Type}}
+\index{get\+Payload\+Content\+Type@{get\+Payload\+Content\+Type}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+Content\+Type()}{getPayloadContentType()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} char$\ast$ get\+Payload\+Content\+Type (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Get the payload content type. 
+
+Get the payload content type as specified in R\+F\+C7231
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to check \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The content type string 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_ab9f1f15ce60210d3c6c63103a0c1b1fb}\label{redfishPayload_8h_ab9f1f15ce60210d3c6c63103a0c1b1fb}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+For\+Path@{get\+Payload\+For\+Path}}
+\index{get\+Payload\+For\+Path@{get\+Payload\+For\+Path}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+For\+Path()}{getPayloadForPath()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ get\+Payload\+For\+Path (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{\hyperlink{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}{red\+Path\+Node} $\ast$}]{redpath }\end{DoxyParamCaption})}
+
+
+
+Obtain the child payload according to Redpath. 
+
+Obtain a child node identified by redpath synchronously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the child node of \\
+\hline
+{\em redpath} & The parsed redpath to use to obtain the child \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The child payload or N\+U\+LL if it does not exist or could not be obtained. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_a3e5db128591ef52dc05844136ad2cad3}{get\+Payload\+For\+Path\+Async} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a3e5db128591ef52dc05844136ad2cad3}\label{redfishPayload_8h_a3e5db128591ef52dc05844136ad2cad3}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+For\+Path\+Async@{get\+Payload\+For\+Path\+Async}}
+\index{get\+Payload\+For\+Path\+Async@{get\+Payload\+For\+Path\+Async}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+For\+Path\+Async()}{getPayloadForPathAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool get\+Payload\+For\+Path\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{\hyperlink{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}{red\+Path\+Node} $\ast$}]{redpath,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Obtain the child payload according to Redpath. 
+
+Obtain a child node identified by redpath asynchronously. It is the callback\textquotesingle{}s responsibility to free the returned payload.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the child node of \\
+\hline
+{\em redpath} & The parsed redpath to use to obtain the child \\
+\hline
+{\em options} & The redfish options to use if needing to obtain another U\+RI or N\+U\+LL for defaults \\
+\hline
+{\em callback} & The callback to use when the payload is obtained \\
+\hline
+{\em context} & An opaque data pointer to send to the callback \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the request could start. False otherwise. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_ab9f1f15ce60210d3c6c63103a0c1b1fb}{get\+Payload\+For\+Path} 
+
+\hyperlink{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}{cleanup\+Payload} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a9c68d2bfc7f359cce2d6eeafd2e88719}\label{redfishPayload_8h_a9c68d2bfc7f359cce2d6eeafd2e88719}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+For\+Path\+String@{get\+Payload\+For\+Path\+String}}
+\index{get\+Payload\+For\+Path\+String@{get\+Payload\+For\+Path\+String}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+For\+Path\+String()}{getPayloadForPathString()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ get\+Payload\+For\+Path\+String (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{const char $\ast$}]{string }\end{DoxyParamCaption})}
+
+
+
+Obtain the child payload according to Redpath string. 
+
+Parse the redpath string and obtain a child node identified by redpath synchronously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the child node of \\
+\hline
+{\em string} & The string redpath to use to obtain the child \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The child payload or N\+U\+LL if it does not exist or could not be obtained. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_abfa18863c18431987d8a18cc76bb3807}\label{redfishPayload_8h_abfa18863c18431987d8a18cc76bb3807}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+For\+Path\+String\+Async@{get\+Payload\+For\+Path\+String\+Async}}
+\index{get\+Payload\+For\+Path\+String\+Async@{get\+Payload\+For\+Path\+String\+Async}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+For\+Path\+String\+Async()}{getPayloadForPathStringAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool get\+Payload\+For\+Path\+String\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{const char $\ast$}]{string,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Obtain the child payload according to Redpath string. 
+
+Parse the redpath string and obtain a child node identified by redpath asynchronously. It is the callback\textquotesingle{}s responsibility to free the returned payload.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the child node of \\
+\hline
+{\em string} & The string redpath to use to obtain the child \\
+\hline
+{\em options} & The redfish options to use if needing to obtain another U\+RI or N\+U\+LL for defaults \\
+\hline
+{\em callback} & The callback to use when the payload is obtained \\
+\hline
+{\em context} & An opaque data pointer to send to the callback \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the request could start. False otherwise. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_a9c68d2bfc7f359cce2d6eeafd2e88719}{get\+Payload\+For\+Path\+String} 
+
+\hyperlink{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}{cleanup\+Payload} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a84e916220f025aac29011fe569d74cb0}\label{redfishPayload_8h_a84e916220f025aac29011fe569d74cb0}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+Int\+Value@{get\+Payload\+Int\+Value}}
+\index{get\+Payload\+Int\+Value@{get\+Payload\+Int\+Value}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+Int\+Value()}{getPayloadIntValue()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} int get\+Payload\+Int\+Value (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Get the int value for the payload. 
+
+If the value of the payload is not an int (i.\+e. is a float, string, object, array, etc.) Return 0. Otherwise return the int contained in the payload
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the int value of \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+int contained in the payload or 0 if not a string entity 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_aca78a9bd89eb60721720bfa61323a0bb}\label{redfishPayload_8h_aca78a9bd89eb60721720bfa61323a0bb}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+Size@{get\+Payload\+Size}}
+\index{get\+Payload\+Size@{get\+Payload\+Size}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+Size()}{getPayloadSize()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} size\+\_\+t get\+Payload\+Size (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Get the size of the payload if it were represented as a character buffer. 
+
+Return the size of the payload if it were represented as a character buffer (i.\+e. to be sent over the network)
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to check \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The size of the payload in bytes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_a6c623a4272dff0f2f46edeea9d403e2f}\label{redfishPayload_8h_a6c623a4272dff0f2f46edeea9d403e2f}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+String\+Value@{get\+Payload\+String\+Value}}
+\index{get\+Payload\+String\+Value@{get\+Payload\+String\+Value}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+String\+Value()}{getPayloadStringValue()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} char$\ast$ get\+Payload\+String\+Value (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Get the string value for the payload. 
+
+If the value of the payload is not a string (i.\+e. is a number, object, array, etc.) Return N\+U\+LL. Otherwise return the string contained in the payload
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the string value of \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+string contained in the payload or N\+U\+LL if not a string entity 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_a3e72b6deb42193d4d60dad40c2c4e1ec}\label{redfishPayload_8h_a3e72b6deb42193d4d60dad40c2c4e1ec}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!get\+Payload\+Uri@{get\+Payload\+Uri}}
+\index{get\+Payload\+Uri@{get\+Payload\+Uri}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{get\+Payload\+Uri()}{getPayloadUri()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} char$\ast$ get\+Payload\+Uri (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Get the payload uri. 
+
+Get the payload uri (the .id)
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to return the U\+RI of \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The uri 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_af7a22a2f4bf44cd4e0fdc7e4032c92f2}\label{redfishPayload_8h_af7a22a2f4bf44cd4e0fdc7e4032c92f2}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!is\+Payload\+Array@{is\+Payload\+Array}}
+\index{is\+Payload\+Array@{is\+Payload\+Array}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{is\+Payload\+Array()}{isPayloadArray()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool is\+Payload\+Array (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Is the payload an array? 
+
+Is the payload an array? While O\+Data uses the term collection pretty loosly and would call an array a collection. This function only returns true on arrays.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to check \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the payload is an array, False otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_ab0ff441ae69d3703b8f4dac427875b3d}\label{redfishPayload_8h_ab0ff441ae69d3703b8f4dac427875b3d}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!is\+Payload\+Collection@{is\+Payload\+Collection}}
+\index{is\+Payload\+Collection@{is\+Payload\+Collection}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{is\+Payload\+Collection()}{isPayloadCollection()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool is\+Payload\+Collection (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Is the payload a Redfish Collection? 
+
+Is the payload a Redfish Collection or not? While O\+Data uses the term collection pretty loosly and would call an array a collection. This function only returns true on Redfish Collections (i.\+e. something that is a Resource\+Collection).
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to check \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the payload is a Redfish Collection, False otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_abfa53c5c066c71a1ca8162a8b30c1c36}\label{redfishPayload_8h_abfa53c5c066c71a1ca8162a8b30c1c36}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!patch\+Payload\+Async@{patch\+Payload\+Async}}
+\index{patch\+Payload\+Async@{patch\+Payload\+Async}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{patch\+Payload\+Async()}{patchPayloadAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool patch\+Payload\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{target,  }\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+P\+A\+T\+CH a payload to the U\+RI reresented by a target asynchronously. 
+
+Asynchronously P\+A\+T\+CH a payload to the U\+RI the target was obtained from. It is the callback\textquotesingle{}s responsibility to free the returned payload.
+
+
+\begin{DoxyParams}{Parameters}
+{\em target} & The payload to update \\
+\hline
+{\em payload} & The payload to patch \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+N\+U\+LL if failure, the resulting \hyperlink{structredfishPayload}{redfish\+Payload} on success. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}{cleanup\+Payload} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishPayload_8h_a941a8faa2ba63fcc21ca68562a2bb077}\label{redfishPayload_8h_a941a8faa2ba63fcc21ca68562a2bb077}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!patch\+Payload\+String\+Property@{patch\+Payload\+String\+Property}}
+\index{patch\+Payload\+String\+Property@{patch\+Payload\+String\+Property}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{patch\+Payload\+String\+Property()}{patchPayloadStringProperty()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ patch\+Payload\+String\+Property (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{const char $\ast$}]{property\+Name,  }\item[{const char $\ast$}]{value }\end{DoxyParamCaption})}
+
+
+
+P\+A\+T\+CH a string property of the payload (works for enums too). 
+
+Synchronously P\+A\+T\+CH a string or enum property of a redfish payload with a new value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to update \\
+\hline
+{\em property\+Name} & The name of the property to update \\
+\hline
+{\em value} & The new value for the property \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+N\+U\+LL if failure, the resulting \hyperlink{structredfishPayload}{redfish\+Payload} on success. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_a3919c8e2430df1a7cf15154064967fc9}\label{redfishPayload_8h_a3919c8e2430df1a7cf15154064967fc9}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!payload\+To\+String@{payload\+To\+String}}
+\index{payload\+To\+String@{payload\+To\+String}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{payload\+To\+String()}{payloadToString()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} char$\ast$ payload\+To\+String (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{bool}]{pretty\+Print }\end{DoxyParamCaption})}
+
+
+
+Convert a payload to a string. 
+
+Convert a payload to a string value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to convert \\
+\hline
+{\em pretty\+Print} & Set to true will indicate the output should use newlines and spaces to enhance readability \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+N\+U\+LL on failure, a string representation of the payload otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_a6c400b6cd053c7baa0718ca81121b8a3}\label{redfishPayload_8h_a6c400b6cd053c7baa0718ca81121b8a3}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!post\+Content\+To\+Payload@{post\+Content\+To\+Payload}}
+\index{post\+Content\+To\+Payload@{post\+Content\+To\+Payload}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{post\+Content\+To\+Payload()}{postContentToPayload()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ post\+Content\+To\+Payload (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{target,  }\item[{const char $\ast$}]{data,  }\item[{size\+\_\+t}]{data\+Size,  }\item[{const char $\ast$}]{content\+Type }\end{DoxyParamCaption})}
+
+
+
+P\+O\+ST new data to the U\+RI reresented by a payload. 
+
+Synchronously P\+O\+ST a character buffer to the U\+RI the payload was obtained from.
+
+
+\begin{DoxyParams}{Parameters}
+{\em target} & The payload to update \\
+\hline
+{\em data} & The character buffer to write \\
+\hline
+{\em data\+Size} & The size of the buffer to write \\
+\hline
+{\em content\+Type} & The value for the \char`\"{}content-\/type\char`\"{} header \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+N\+U\+LL if failure, the resulting \hyperlink{structredfishPayload}{redfish\+Payload} on success. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_af0aa0e51450906d17fe99198a620482c}\label{redfishPayload_8h_af0aa0e51450906d17fe99198a620482c}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!post\+Payload@{post\+Payload}}
+\index{post\+Payload@{post\+Payload}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{post\+Payload()}{postPayload()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ post\+Payload (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{target,  }\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+P\+O\+ST a new payload to the U\+RI reresented by a payload. 
+
+Synchronously P\+O\+ST a new payload to the U\+RI the payload was obtained from.
+
+
+\begin{DoxyParams}{Parameters}
+{\em target} & The payload to update \\
+\hline
+{\em payload} & The payload to write \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+N\+U\+LL if failure, the resulting \hyperlink{structredfishPayload}{redfish\+Payload} on success. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishPayload_8h_ac7ea07cadc3b169ce26088051cafdaaa}\label{redfishPayload_8h_ac7ea07cadc3b169ce26088051cafdaaa}} 
+\index{redfish\+Payload.\+h@{redfish\+Payload.\+h}!post\+Payload\+Async@{post\+Payload\+Async}}
+\index{post\+Payload\+Async@{post\+Payload\+Async}!redfish\+Payload.\+h@{redfish\+Payload.\+h}}
+\subsubsection{\texorpdfstring{post\+Payload\+Async()}{postPayloadAsync()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool post\+Payload\+Async (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{target,  }\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload,  }\item[{\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$}]{options,  }\item[{\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+P\+O\+ST a new payload to the U\+RI reresented by a target asynchronously. 
+
+Asynchronously P\+O\+ST a new payload to the U\+RI the target was obtained from. It is the callback\textquotesingle{}s responsibility to free the returned payload.
+
+
+\begin{DoxyParams}{Parameters}
+{\em target} & The payload to update \\
+\hline
+{\em payload} & The payload to write \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+N\+U\+LL if failure, the resulting \hyperlink{structredfishPayload}{redfish\+Payload} on success. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishPayload_8h_a11de94dfaa4491e1a4cc887c0b24996e}{cleanup\+Payload} 
+\end{DoxySeeAlso}

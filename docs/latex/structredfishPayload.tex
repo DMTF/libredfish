@@ -1,0 +1,75 @@
+\hypertarget{structredfishPayload}{}\section{redfish\+Payload Struct Reference}
+\label{structredfishPayload}\index{redfish\+Payload@{redfish\+Payload}}
+
+
+A representation of a redfish payload.  
+
+
+
+
+{\ttfamily \#include $<$redfish\+Service.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+json\+\_\+t $\ast$ \hyperlink{structredfishPayload_a8b13b895defa81ff8cb3948d948cea15}{json}
+\item 
+\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$ \hyperlink{structredfishPayload_a0b04265e9d24b01897b3ddf031fa8fb7}{service}
+\item 
+char $\ast$ \hyperlink{structredfishPayload_aefe9bc46c07b92a1a2e5e110606ef628}{content}
+\item 
+size\+\_\+t \hyperlink{structredfishPayload_a0bced960effff58415523bd38510f793}{content\+Length}
+\item 
+\hyperlink{redfishService_8h_a743ef6fcbb87f07021f20c5c0073dc34}{redfish\+Content\+Type} \hyperlink{structredfishPayload_a95d4e3135f102a3b50fd7f2f24ef4c20}{content\+Type}
+\item 
+char $\ast$ \hyperlink{structredfishPayload_abe0f2b7cd57a69505715b9711a7c6e7c}{content\+Type\+Str}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A representation of a redfish payload. 
+
+A structure representing a redfish payload to send or receive 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structredfishPayload_aefe9bc46c07b92a1a2e5e110606ef628}\label{structredfishPayload_aefe9bc46c07b92a1a2e5e110606ef628}} 
+\index{redfish\+Payload@{redfish\+Payload}!content@{content}}
+\index{content@{content}!redfish\+Payload@{redfish\+Payload}}
+\subsubsection{\texorpdfstring{content}{content}}
+{\footnotesize\ttfamily char$\ast$ redfish\+Payload\+::content}
+
+The raw payload content. Only valid if content\+Type is P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+O\+T\+H\+ER \mbox{\Hypertarget{structredfishPayload_a0bced960effff58415523bd38510f793}\label{structredfishPayload_a0bced960effff58415523bd38510f793}} 
+\index{redfish\+Payload@{redfish\+Payload}!content\+Length@{content\+Length}}
+\index{content\+Length@{content\+Length}!redfish\+Payload@{redfish\+Payload}}
+\subsubsection{\texorpdfstring{content\+Length}{contentLength}}
+{\footnotesize\ttfamily size\+\_\+t redfish\+Payload\+::content\+Length}
+
+The raw payload lengh. Only valid if content\+Type is P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+O\+T\+H\+ER \mbox{\Hypertarget{structredfishPayload_a95d4e3135f102a3b50fd7f2f24ef4c20}\label{structredfishPayload_a95d4e3135f102a3b50fd7f2f24ef4c20}} 
+\index{redfish\+Payload@{redfish\+Payload}!content\+Type@{content\+Type}}
+\index{content\+Type@{content\+Type}!redfish\+Payload@{redfish\+Payload}}
+\subsubsection{\texorpdfstring{content\+Type}{contentType}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_a743ef6fcbb87f07021f20c5c0073dc34}{redfish\+Content\+Type} redfish\+Payload\+::content\+Type}
+
+The content type of the payload \mbox{\Hypertarget{structredfishPayload_abe0f2b7cd57a69505715b9711a7c6e7c}\label{structredfishPayload_abe0f2b7cd57a69505715b9711a7c6e7c}} 
+\index{redfish\+Payload@{redfish\+Payload}!content\+Type\+Str@{content\+Type\+Str}}
+\index{content\+Type\+Str@{content\+Type\+Str}!redfish\+Payload@{redfish\+Payload}}
+\subsubsection{\texorpdfstring{content\+Type\+Str}{contentTypeStr}}
+{\footnotesize\ttfamily char$\ast$ redfish\+Payload\+::content\+Type\+Str}
+
+The content type string. Only valid if content\+Type is P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+O\+T\+H\+ER \mbox{\Hypertarget{structredfishPayload_a8b13b895defa81ff8cb3948d948cea15}\label{structredfishPayload_a8b13b895defa81ff8cb3948d948cea15}} 
+\index{redfish\+Payload@{redfish\+Payload}!json@{json}}
+\index{json@{json}!redfish\+Payload@{redfish\+Payload}}
+\subsubsection{\texorpdfstring{json}{json}}
+{\footnotesize\ttfamily json\+\_\+t$\ast$ redfish\+Payload\+::json}
+
+The json for the payload. Only valid if content\+Type is P\+A\+Y\+L\+O\+A\+D\+\_\+\+C\+O\+N\+T\+E\+N\+T\+\_\+\+J\+S\+ON \mbox{\Hypertarget{structredfishPayload_a0b04265e9d24b01897b3ddf031fa8fb7}\label{structredfishPayload_a0b04265e9d24b01897b3ddf031fa8fb7}} 
+\index{redfish\+Payload@{redfish\+Payload}!service@{service}}
+\index{service@{service}!redfish\+Payload@{redfish\+Payload}}
+\subsubsection{\texorpdfstring{service}{service}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service}$\ast$ redfish\+Payload\+::service}
+
+The redfish service this payload was created by or should be sent to 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/\hyperlink{redfishService_8h}{redfish\+Service.\+h}\end{DoxyCompactItemize}

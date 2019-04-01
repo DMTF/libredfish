@@ -1,0 +1,67 @@
+\hypertarget{struct__asyncHttpResponse}{}\section{\+\_\+async\+Http\+Response Struct Reference}
+\label{struct__asyncHttpResponse}\index{\+\_\+async\+Http\+Response@{\+\_\+async\+Http\+Response}}
+
+
+An asynchronous H\+T\+T\+P(s) response.  
+
+
+
+
+{\ttfamily \#include $<$redfish\+Raw\+Async.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{struct__asyncHttpResponse_a0f9394289504da22db846788a19ccf66}{connect\+Error}
+\item 
+long \hyperlink{struct__asyncHttpResponse_a97fac4e7095590d7cc4e8ccb2dfd753b}{http\+Response\+Code}
+\item 
+\hyperlink{redfishRawAsync_8h_a3ee36950587f4749a62b080e3e157280}{http\+Header} $\ast$ \hyperlink{struct__asyncHttpResponse_a1de52b16a28ada8e4b25f22a09a37212}{headers}
+\item 
+size\+\_\+t \hyperlink{struct__asyncHttpResponse_a25cf7e4fe3454983f74d12cb12c92960}{body\+Size}
+\item 
+char $\ast$ \hyperlink{struct__asyncHttpResponse_aecf03a88cefe1e39c1ac8b164c254aec}{body}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+An asynchronous H\+T\+T\+P(s) response. 
+
+A structure with all the information returned by the server. 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{struct__asyncHttpResponse_aecf03a88cefe1e39c1ac8b164c254aec}\label{struct__asyncHttpResponse_aecf03a88cefe1e39c1ac8b164c254aec}} 
+\index{\+\_\+async\+Http\+Response@{\+\_\+async\+Http\+Response}!body@{body}}
+\index{body@{body}!\+\_\+async\+Http\+Response@{\+\_\+async\+Http\+Response}}
+\subsubsection{\texorpdfstring{body}{body}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+async\+Http\+Response\+::body}
+
+The response payload body. char$\ast$ is used for convience. Binary data can be passed and the body\+Size parameter dictates the length \mbox{\Hypertarget{struct__asyncHttpResponse_a25cf7e4fe3454983f74d12cb12c92960}\label{struct__asyncHttpResponse_a25cf7e4fe3454983f74d12cb12c92960}} 
+\index{\+\_\+async\+Http\+Response@{\+\_\+async\+Http\+Response}!body\+Size@{body\+Size}}
+\index{body\+Size@{body\+Size}!\+\_\+async\+Http\+Response@{\+\_\+async\+Http\+Response}}
+\subsubsection{\texorpdfstring{body\+Size}{bodySize}}
+{\footnotesize\ttfamily size\+\_\+t \+\_\+async\+Http\+Response\+::body\+Size}
+
+The size of the body of the payload sent by the server \mbox{\Hypertarget{struct__asyncHttpResponse_a0f9394289504da22db846788a19ccf66}\label{struct__asyncHttpResponse_a0f9394289504da22db846788a19ccf66}} 
+\index{\+\_\+async\+Http\+Response@{\+\_\+async\+Http\+Response}!connect\+Error@{connect\+Error}}
+\index{connect\+Error@{connect\+Error}!\+\_\+async\+Http\+Response@{\+\_\+async\+Http\+Response}}
+\subsubsection{\texorpdfstring{connect\+Error}{connectError}}
+{\footnotesize\ttfamily int \+\_\+async\+Http\+Response\+::connect\+Error}
+
+0 on success, another value if the connection failed \mbox{\Hypertarget{struct__asyncHttpResponse_a1de52b16a28ada8e4b25f22a09a37212}\label{struct__asyncHttpResponse_a1de52b16a28ada8e4b25f22a09a37212}} 
+\index{\+\_\+async\+Http\+Response@{\+\_\+async\+Http\+Response}!headers@{headers}}
+\index{headers@{headers}!\+\_\+async\+Http\+Response@{\+\_\+async\+Http\+Response}}
+\subsubsection{\texorpdfstring{headers}{headers}}
+{\footnotesize\ttfamily \hyperlink{redfishRawAsync_8h_a3ee36950587f4749a62b080e3e157280}{http\+Header}$\ast$ \+\_\+async\+Http\+Response\+::headers}
+
+Headers sent by the server \mbox{\Hypertarget{struct__asyncHttpResponse_a97fac4e7095590d7cc4e8ccb2dfd753b}\label{struct__asyncHttpResponse_a97fac4e7095590d7cc4e8ccb2dfd753b}} 
+\index{\+\_\+async\+Http\+Response@{\+\_\+async\+Http\+Response}!http\+Response\+Code@{http\+Response\+Code}}
+\index{http\+Response\+Code@{http\+Response\+Code}!\+\_\+async\+Http\+Response@{\+\_\+async\+Http\+Response}}
+\subsubsection{\texorpdfstring{http\+Response\+Code}{httpResponseCode}}
+{\footnotesize\ttfamily long \+\_\+async\+Http\+Response\+::http\+Response\+Code}
+
+The H\+T\+TP response code sent by the server 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/\hyperlink{redfishRawAsync_8h}{redfish\+Raw\+Async.\+h}\end{DoxyCompactItemize}

@@ -1,0 +1,318 @@
+\hypertarget{queue_8h}{}\section{src/queue.h File Reference}
+\label{queue_8h}\index{src/queue.\+h@{src/queue.\+h}}
+
+
+File containing the interface for the internal queue.  
+
+
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$pthread.\+h$>$}\newline
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct__queue__node}{\+\_\+queue\+\_\+node}
+\begin{DoxyCompactList}\small\item\em A simple linked list node. \end{DoxyCompactList}\item 
+struct \hyperlink{struct__queue}{\+\_\+queue}
+\begin{DoxyCompactList}\small\item\em A mostly lock free queue. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{queue_8h_a8c80af1d72030a9dc70c3a2c3e46ae9a}{mutex}~pthread\+\_\+mutex\+\_\+t
+\item 
+\#define \hyperlink{queue_8h_a18a0de1af5a8524b75bf94d6b14701b4}{condition}~pthread\+\_\+cond\+\_\+t
+\item 
+\#define \hyperlink{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}{thread}~pthread\+\_\+t
+\item 
+\#define \hyperlink{queue_8h_ac5ab272260fc5c97a64100a65f5544a0}{thread\+Ret}~void$\ast$
+\item 
+\#define \hyperlink{queue_8h_a91d00934c021a1dbdf3ed66c8abdde0f}{mutex\+\_\+init}(m)~pthread\+\_\+mutex\+\_\+init((m), N\+U\+LL)
+\item 
+\#define \hyperlink{queue_8h_a1b9da5b560704e6021d4d281b5b83461}{mutex\+\_\+lock}~pthread\+\_\+mutex\+\_\+lock
+\item 
+\#define \hyperlink{queue_8h_a1d5fd784685227c3291dc67cbf5a88ef}{mutex\+\_\+unlock}~pthread\+\_\+mutex\+\_\+unlock
+\item 
+\#define \hyperlink{queue_8h_a7f4f7d1ead834461cf02070641311c95}{mutex\+\_\+destroy}~pthread\+\_\+mutex\+\_\+destroy
+\item 
+\#define \hyperlink{queue_8h_a0bc9a2d764e810c68745285061874b44}{cond\+\_\+init}(c)~pthread\+\_\+cond\+\_\+init((c), N\+U\+LL)
+\item 
+\#define \hyperlink{queue_8h_aad6a10537cf490458cf1a9dd74dae2fc}{cond\+\_\+broadcast}~pthread\+\_\+cond\+\_\+broadcast
+\item 
+\#define \hyperlink{queue_8h_a121cc4757b24dfc13e49e83d41cd6433}{cond\+\_\+wait}~pthread\+\_\+cond\+\_\+wait
+\item 
+\#define \hyperlink{queue_8h_abfc730481c44410a9a3d80b572d06e86}{cond\+\_\+destroy}~pthread\+\_\+cond\+\_\+destroy
+\item 
+\#define \hyperlink{queue_8h_a4ca9f8585107345bcf6730457a04c0bd}{cas}~\+\_\+\+\_\+sync\+\_\+bool\+\_\+compare\+\_\+and\+\_\+swap
+\begin{DoxyCompactList}\small\item\em Compare and swap. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \hyperlink{struct__queue__node}{\+\_\+queue\+\_\+node} \hyperlink{queue_8h_ae1857eedcea35e26ec2c78b7b122b095}{queue\+Node}
+\begin{DoxyCompactList}\small\item\em A simple linked list node. \end{DoxyCompactList}\item 
+typedef struct \hyperlink{struct__queue}{\+\_\+queue} \hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue}
+\begin{DoxyCompactList}\small\item\em A mostly lock free queue. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue} $\ast$ \hyperlink{queue_8h_abc1f84950399a22528dfb5cbd1d46e0d}{new\+Queue} ()
+\begin{DoxyCompactList}\small\item\em Create a new queue. \end{DoxyCompactList}\item 
+void \hyperlink{queue_8h_aa4727b72ed89cd406d2809482181b959}{free\+Queue} (\hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue} $\ast$q)
+\begin{DoxyCompactList}\small\item\em Free the queue and any remaining elements. \end{DoxyCompactList}\item 
+unsigned int \hyperlink{queue_8h_a0c3b75138978ca512bfcaa9966d426bf}{queue\+Push} (\hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue} $\ast$q, void $\ast$value)
+\begin{DoxyCompactList}\small\item\em Add an element to the end of the queue. \end{DoxyCompactList}\item 
+unsigned int \hyperlink{queue_8h_aa590441e100509d0b45b65b3bc8422ac}{queue\+Pop} (\hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue} $\ast$q, void $\ast$$\ast$value)
+\begin{DoxyCompactList}\small\item\em Remove an element from the queue. \end{DoxyCompactList}\item 
+unsigned int \hyperlink{queue_8h_a7241172368cd17733584b72bac30b7bf}{queue\+Pop\+No\+Wait} (\hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue} $\ast$q, void $\ast$$\ast$value)
+\begin{DoxyCompactList}\small\item\em Remove an element from the queue. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File containing the interface for the internal queue. 
+
+\begin{DoxyAuthor}{Author}
+Patrick Boyd This file explains the interface for the internal queue used to process async H\+T\+TP calls 
+\end{DoxyAuthor}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{queue_8h_a4ca9f8585107345bcf6730457a04c0bd}\label{queue_8h_a4ca9f8585107345bcf6730457a04c0bd}} 
+\index{queue.\+h@{queue.\+h}!cas@{cas}}
+\index{cas@{cas}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{cas}{cas}}
+{\footnotesize\ttfamily \#define cas~\+\_\+\+\_\+sync\+\_\+bool\+\_\+compare\+\_\+and\+\_\+swap}
+
+
+
+Compare and swap. 
+
+This is an atomic operation that compares the content of the first param with the second param. If the two are the same then the content of the first param is replaced with the third param.
+
+\begin{DoxyReturn}{Returns}
+true if the value was replaced. false otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{queue_8h_aad6a10537cf490458cf1a9dd74dae2fc}\label{queue_8h_aad6a10537cf490458cf1a9dd74dae2fc}} 
+\index{queue.\+h@{queue.\+h}!cond\+\_\+broadcast@{cond\+\_\+broadcast}}
+\index{cond\+\_\+broadcast@{cond\+\_\+broadcast}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{cond\+\_\+broadcast}{cond\_broadcast}}
+{\footnotesize\ttfamily \#define cond\+\_\+broadcast~pthread\+\_\+cond\+\_\+broadcast}
+
+Broadcast a condition \mbox{\Hypertarget{queue_8h_abfc730481c44410a9a3d80b572d06e86}\label{queue_8h_abfc730481c44410a9a3d80b572d06e86}} 
+\index{queue.\+h@{queue.\+h}!cond\+\_\+destroy@{cond\+\_\+destroy}}
+\index{cond\+\_\+destroy@{cond\+\_\+destroy}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{cond\+\_\+destroy}{cond\_destroy}}
+{\footnotesize\ttfamily \#define cond\+\_\+destroy~pthread\+\_\+cond\+\_\+destroy}
+
+Free/\+Destroy a condition \mbox{\Hypertarget{queue_8h_a0bc9a2d764e810c68745285061874b44}\label{queue_8h_a0bc9a2d764e810c68745285061874b44}} 
+\index{queue.\+h@{queue.\+h}!cond\+\_\+init@{cond\+\_\+init}}
+\index{cond\+\_\+init@{cond\+\_\+init}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{cond\+\_\+init}{cond\_init}}
+{\footnotesize\ttfamily \#define cond\+\_\+init(\begin{DoxyParamCaption}\item[{}]{c }\end{DoxyParamCaption})~pthread\+\_\+cond\+\_\+init((c), N\+U\+LL)}
+
+Initialize a condition \mbox{\Hypertarget{queue_8h_a121cc4757b24dfc13e49e83d41cd6433}\label{queue_8h_a121cc4757b24dfc13e49e83d41cd6433}} 
+\index{queue.\+h@{queue.\+h}!cond\+\_\+wait@{cond\+\_\+wait}}
+\index{cond\+\_\+wait@{cond\+\_\+wait}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{cond\+\_\+wait}{cond\_wait}}
+{\footnotesize\ttfamily \#define cond\+\_\+wait~pthread\+\_\+cond\+\_\+wait}
+
+Wait for a condition signal/broadcast \mbox{\Hypertarget{queue_8h_a18a0de1af5a8524b75bf94d6b14701b4}\label{queue_8h_a18a0de1af5a8524b75bf94d6b14701b4}} 
+\index{queue.\+h@{queue.\+h}!condition@{condition}}
+\index{condition@{condition}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{condition}{condition}}
+{\footnotesize\ttfamily \#define condition~pthread\+\_\+cond\+\_\+t}
+
+A condition, in the case of P\+O\+S\+IX systems a pthread condition variable is used \mbox{\Hypertarget{queue_8h_a8c80af1d72030a9dc70c3a2c3e46ae9a}\label{queue_8h_a8c80af1d72030a9dc70c3a2c3e46ae9a}} 
+\index{queue.\+h@{queue.\+h}!mutex@{mutex}}
+\index{mutex@{mutex}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{mutex}{mutex}}
+{\footnotesize\ttfamily \#define mutex~pthread\+\_\+mutex\+\_\+t}
+
+A mutex, in the cae of P\+O\+S\+IX systems a pthread mutex is used \mbox{\Hypertarget{queue_8h_a7f4f7d1ead834461cf02070641311c95}\label{queue_8h_a7f4f7d1ead834461cf02070641311c95}} 
+\index{queue.\+h@{queue.\+h}!mutex\+\_\+destroy@{mutex\+\_\+destroy}}
+\index{mutex\+\_\+destroy@{mutex\+\_\+destroy}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{mutex\+\_\+destroy}{mutex\_destroy}}
+{\footnotesize\ttfamily \#define mutex\+\_\+destroy~pthread\+\_\+mutex\+\_\+destroy}
+
+Free/\+Destroy a mutex \mbox{\Hypertarget{queue_8h_a91d00934c021a1dbdf3ed66c8abdde0f}\label{queue_8h_a91d00934c021a1dbdf3ed66c8abdde0f}} 
+\index{queue.\+h@{queue.\+h}!mutex\+\_\+init@{mutex\+\_\+init}}
+\index{mutex\+\_\+init@{mutex\+\_\+init}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{mutex\+\_\+init}{mutex\_init}}
+{\footnotesize\ttfamily \#define mutex\+\_\+init(\begin{DoxyParamCaption}\item[{}]{m }\end{DoxyParamCaption})~pthread\+\_\+mutex\+\_\+init((m), N\+U\+LL)}
+
+Initialize a mutex \mbox{\Hypertarget{queue_8h_a1b9da5b560704e6021d4d281b5b83461}\label{queue_8h_a1b9da5b560704e6021d4d281b5b83461}} 
+\index{queue.\+h@{queue.\+h}!mutex\+\_\+lock@{mutex\+\_\+lock}}
+\index{mutex\+\_\+lock@{mutex\+\_\+lock}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{mutex\+\_\+lock}{mutex\_lock}}
+{\footnotesize\ttfamily \#define mutex\+\_\+lock~pthread\+\_\+mutex\+\_\+lock}
+
+Lock a mutex \mbox{\Hypertarget{queue_8h_a1d5fd784685227c3291dc67cbf5a88ef}\label{queue_8h_a1d5fd784685227c3291dc67cbf5a88ef}} 
+\index{queue.\+h@{queue.\+h}!mutex\+\_\+unlock@{mutex\+\_\+unlock}}
+\index{mutex\+\_\+unlock@{mutex\+\_\+unlock}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{mutex\+\_\+unlock}{mutex\_unlock}}
+{\footnotesize\ttfamily \#define mutex\+\_\+unlock~pthread\+\_\+mutex\+\_\+unlock}
+
+Unlock a mutex \mbox{\Hypertarget{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}\label{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}} 
+\index{queue.\+h@{queue.\+h}!thread@{thread}}
+\index{thread@{thread}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{thread}{thread}}
+{\footnotesize\ttfamily \#define thread~pthread\+\_\+t}
+
+A thread, the OS specific representation of a thread \mbox{\Hypertarget{queue_8h_ac5ab272260fc5c97a64100a65f5544a0}\label{queue_8h_ac5ab272260fc5c97a64100a65f5544a0}} 
+\index{queue.\+h@{queue.\+h}!thread\+Ret@{thread\+Ret}}
+\index{thread\+Ret@{thread\+Ret}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{thread\+Ret}{threadRet}}
+{\footnotesize\ttfamily \#define thread\+Ret~void$\ast$}
+
+A thread return type, the OS specific return type expected by a thread 
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{queue_8h_ae334156b4cde2f884517a660d81450cd}\label{queue_8h_ae334156b4cde2f884517a660d81450cd}} 
+\index{queue.\+h@{queue.\+h}!queue@{queue}}
+\index{queue@{queue}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{queue}{queue}}
+{\footnotesize\ttfamily typedef struct \hyperlink{struct__queue}{\+\_\+queue}  \hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue}}
+
+
+
+A mostly lock free queue. 
+
+A queue where the producer side shares a lock and the consumer side shares a lock. This means that as long as you only have one producer or one consumer you should not have any lock contention issues. The locks are also used in order to signal the consumer on new data rather than doing a busy wait.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{struct__queue__node}{\+\_\+queue\+\_\+node} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{queue_8h_ae1857eedcea35e26ec2c78b7b122b095}\label{queue_8h_ae1857eedcea35e26ec2c78b7b122b095}} 
+\index{queue.\+h@{queue.\+h}!queue\+Node@{queue\+Node}}
+\index{queue\+Node@{queue\+Node}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{queue\+Node}{queueNode}}
+{\footnotesize\ttfamily typedef struct \hyperlink{struct__queue__node}{\+\_\+queue\+\_\+node}  \hyperlink{queue_8h_ae1857eedcea35e26ec2c78b7b122b095}{queue\+Node}}
+
+
+
+A simple linked list node. 
+
+A strcuture defining the single linked list node for the queue structure.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{struct__queue}{\+\_\+queue} 
+\end{DoxySeeAlso}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{queue_8h_aa4727b72ed89cd406d2809482181b959}\label{queue_8h_aa4727b72ed89cd406d2809482181b959}} 
+\index{queue.\+h@{queue.\+h}!free\+Queue@{free\+Queue}}
+\index{free\+Queue@{free\+Queue}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{free\+Queue()}{freeQueue()}}
+{\footnotesize\ttfamily void free\+Queue (\begin{DoxyParamCaption}\item[{\hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue} $\ast$}]{q }\end{DoxyParamCaption})}
+
+
+
+Free the queue and any remaining elements. 
+
+Free the queue and any remaining nodes on the queue.
+
+
+\begin{DoxyParams}{Parameters}
+{\em q} & The queue to free. \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{queue_8h_abc1f84950399a22528dfb5cbd1d46e0d}{new\+Queue} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{queue_8h_abc1f84950399a22528dfb5cbd1d46e0d}\label{queue_8h_abc1f84950399a22528dfb5cbd1d46e0d}} 
+\index{queue.\+h@{queue.\+h}!new\+Queue@{new\+Queue}}
+\index{new\+Queue@{new\+Queue}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{new\+Queue()}{newQueue()}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue}$\ast$ new\+Queue (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Create a new queue. 
+
+Create a new queue ready to be pushed and popped from.
+
+\begin{DoxyReturn}{Returns}
+A new queue data structure. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{queue_8h_aa4727b72ed89cd406d2809482181b959}{free\+Queue} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{queue_8h_aa590441e100509d0b45b65b3bc8422ac}\label{queue_8h_aa590441e100509d0b45b65b3bc8422ac}} 
+\index{queue.\+h@{queue.\+h}!queue\+Pop@{queue\+Pop}}
+\index{queue\+Pop@{queue\+Pop}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{queue\+Pop()}{queuePop()}}
+{\footnotesize\ttfamily unsigned int queue\+Pop (\begin{DoxyParamCaption}\item[{\hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue} $\ast$}]{q,  }\item[{void $\ast$$\ast$}]{value }\end{DoxyParamCaption})}
+
+
+
+Remove an element from the queue. 
+
+Wait for an element to be available and then remove it from the queue.
+
+
+\begin{DoxyParams}{Parameters}
+{\em q} & The queue to remove from. \\
+\hline
+{\em value} & A pointer to the value obtained \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, non-\/zero on failure 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{queue_8h_a0c3b75138978ca512bfcaa9966d426bf}{queue\+Push} 
+
+\hyperlink{queue_8h_a7241172368cd17733584b72bac30b7bf}{queue\+Pop\+No\+Wait} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{queue_8h_a7241172368cd17733584b72bac30b7bf}\label{queue_8h_a7241172368cd17733584b72bac30b7bf}} 
+\index{queue.\+h@{queue.\+h}!queue\+Pop\+No\+Wait@{queue\+Pop\+No\+Wait}}
+\index{queue\+Pop\+No\+Wait@{queue\+Pop\+No\+Wait}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{queue\+Pop\+No\+Wait()}{queuePopNoWait()}}
+{\footnotesize\ttfamily unsigned int queue\+Pop\+No\+Wait (\begin{DoxyParamCaption}\item[{\hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue} $\ast$}]{q,  }\item[{void $\ast$$\ast$}]{value }\end{DoxyParamCaption})}
+
+
+
+Remove an element from the queue. 
+
+Remove an element from the queue or fail instantly if no element is present.
+
+
+\begin{DoxyParams}{Parameters}
+{\em q} & The queue to remove from. \\
+\hline
+{\em value} & A pointer to the value obtained \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, non-\/zero on failure or no element present 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{queue_8h_a0c3b75138978ca512bfcaa9966d426bf}{queue\+Push} 
+
+\hyperlink{queue_8h_aa590441e100509d0b45b65b3bc8422ac}{queue\+Pop} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{queue_8h_a0c3b75138978ca512bfcaa9966d426bf}\label{queue_8h_a0c3b75138978ca512bfcaa9966d426bf}} 
+\index{queue.\+h@{queue.\+h}!queue\+Push@{queue\+Push}}
+\index{queue\+Push@{queue\+Push}!queue.\+h@{queue.\+h}}
+\subsubsection{\texorpdfstring{queue\+Push()}{queuePush()}}
+{\footnotesize\ttfamily unsigned int queue\+Push (\begin{DoxyParamCaption}\item[{\hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue} $\ast$}]{q,  }\item[{void $\ast$}]{value }\end{DoxyParamCaption})}
+
+
+
+Add an element to the end of the queue. 
+
+Add an element to the end of the queue.
+
+
+\begin{DoxyParams}{Parameters}
+{\em q} & The queue to add to. \\
+\hline
+{\em value} & The value to add \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, non-\/zero on failure 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{queue_8h_aa590441e100509d0b45b65b3bc8422ac}{queue\+Pop} 
+
+\hyperlink{queue_8h_a7241172368cd17733584b72bac30b7bf}{queue\+Pop\+No\+Wait} 
+\end{DoxySeeAlso}

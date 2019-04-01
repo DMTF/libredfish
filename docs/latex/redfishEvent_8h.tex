@@ -1,0 +1,47 @@
+\hypertarget{redfishEvent_8h}{}\section{include/redfish\+Event.h File Reference}
+\label{redfishEvent_8h}\index{include/redfish\+Event.\+h@{include/redfish\+Event.\+h}}
+
+
+File containing the shared data for event producers and consumers.  
+
+
+{\ttfamily \#include $<$czmq.\+h$>$}\newline
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{redfishEvent_8h_abe81e310c2fe39facd0412c0981d751e}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+S\+O\+C\+K\+ET}~\char`\"{}ipc\+:///var/run/libredfish/event\+Pipe\char`\"{}
+\item 
+\#define \hyperlink{redfishEvent_8h_a997d6f7c0a531addf695841a1514c813}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+L\+I\+B\+R\+A\+R\+Y\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK}~zsock\+\_\+new\+\_\+pull(\char`\"{}@\char`\"{} \hyperlink{redfishEvent_8h_abe81e310c2fe39facd0412c0981d751e}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+S\+O\+C\+K\+ET})
+\item 
+\#define \hyperlink{redfishEvent_8h_afa87b295342df3ed18fa5f5d7ff580e6}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+H\+E\+L\+P\+E\+R\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK}~zsock\+\_\+new\+\_\+push(\char`\"{}$>$\char`\"{} \hyperlink{redfishEvent_8h_abe81e310c2fe39facd0412c0981d751e}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+S\+O\+C\+K\+ET})
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File containing the shared data for event producers and consumers. 
+
+\begin{DoxyAuthor}{Author}
+Patrick Boyd This file explains the interface for the event producer and consumer interface 
+\end{DoxyAuthor}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{redfishEvent_8h_afa87b295342df3ed18fa5f5d7ff580e6}\label{redfishEvent_8h_afa87b295342df3ed18fa5f5d7ff580e6}} 
+\index{redfish\+Event.\+h@{redfish\+Event.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+H\+E\+L\+P\+E\+R\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+H\+E\+L\+P\+E\+R\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+H\+E\+L\+P\+E\+R\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+H\+E\+L\+P\+E\+R\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK}!redfish\+Event.\+h@{redfish\+Event.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+H\+E\+L\+P\+E\+R\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK}{REDFISH\_EVENT\_0MQ\_HELPER\_NEW\_SOCK}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+H\+E\+L\+P\+E\+R\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK~zsock\+\_\+new\+\_\+push(\char`\"{}$>$\char`\"{} \hyperlink{redfishEvent_8h_abe81e310c2fe39facd0412c0981d751e}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+S\+O\+C\+K\+ET})}
+
+The Producer side of the socket \mbox{\Hypertarget{redfishEvent_8h_a997d6f7c0a531addf695841a1514c813}\label{redfishEvent_8h_a997d6f7c0a531addf695841a1514c813}} 
+\index{redfish\+Event.\+h@{redfish\+Event.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+L\+I\+B\+R\+A\+R\+Y\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+L\+I\+B\+R\+A\+R\+Y\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+L\+I\+B\+R\+A\+R\+Y\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+L\+I\+B\+R\+A\+R\+Y\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK}!redfish\+Event.\+h@{redfish\+Event.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+L\+I\+B\+R\+A\+R\+Y\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK}{REDFISH\_EVENT\_0MQ\_LIBRARY\_NEW\_SOCK}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+L\+I\+B\+R\+A\+R\+Y\+\_\+\+N\+E\+W\+\_\+\+S\+O\+CK~zsock\+\_\+new\+\_\+pull(\char`\"{}@\char`\"{} \hyperlink{redfishEvent_8h_abe81e310c2fe39facd0412c0981d751e}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+S\+O\+C\+K\+ET})}
+
+The Consumer side of the socket \mbox{\Hypertarget{redfishEvent_8h_abe81e310c2fe39facd0412c0981d751e}\label{redfishEvent_8h_abe81e310c2fe39facd0412c0981d751e}} 
+\index{redfish\+Event.\+h@{redfish\+Event.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+S\+O\+C\+K\+ET@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+S\+O\+C\+K\+ET}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+S\+O\+C\+K\+ET@{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+S\+O\+C\+K\+ET}!redfish\+Event.\+h@{redfish\+Event.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+S\+O\+C\+K\+ET}{REDFISH\_EVENT\_0MQ\_SOCKET}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+V\+E\+N\+T\+\_\+0\+M\+Q\+\_\+\+S\+O\+C\+K\+ET~\char`\"{}ipc\+:///var/run/libredfish/event\+Pipe\char`\"{}}
+
+The Zero\+MQ socket to use between the producer and consumer 

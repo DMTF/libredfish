@@ -1,0 +1,39 @@
+\hypertarget{structEventActorState}{}\section{Event\+Actor\+State Struct Reference}
+\label{structEventActorState}\index{Event\+Actor\+State@{Event\+Actor\+State}}
+
+
+A representation of event actor state.  
+
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{structEventActorState_a67caad153d6fcae5d611eb53a3bcd0c1}{terminate}
+\item 
+\hyperlink{queue_8h_ae1857eedcea35e26ec2c78b7b122b095}{queue\+Node} $\ast$ \hyperlink{structEventActorState_af6212af5126999825b7a04b6cf347164}{registrations}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A representation of event actor state. 
+
+A structure representing state of the event actor 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structEventActorState_af6212af5126999825b7a04b6cf347164}\label{structEventActorState_af6212af5126999825b7a04b6cf347164}} 
+\index{Event\+Actor\+State@{Event\+Actor\+State}!registrations@{registrations}}
+\index{registrations@{registrations}!Event\+Actor\+State@{Event\+Actor\+State}}
+\subsubsection{\texorpdfstring{registrations}{registrations}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_ae1857eedcea35e26ec2c78b7b122b095}{queue\+Node}$\ast$ Event\+Actor\+State\+::registrations}
+
+A linked list of struct \hyperlink{structEventCallbackRegister}{Event\+Callback\+Register} for each registration \mbox{\Hypertarget{structEventActorState_a67caad153d6fcae5d611eb53a3bcd0c1}\label{structEventActorState_a67caad153d6fcae5d611eb53a3bcd0c1}} 
+\index{Event\+Actor\+State@{Event\+Actor\+State}!terminate@{terminate}}
+\index{terminate@{terminate}!Event\+Actor\+State@{Event\+Actor\+State}}
+\subsubsection{\texorpdfstring{terminate}{terminate}}
+{\footnotesize\ttfamily bool Event\+Actor\+State\+::terminate}
+
+If true, terminate the thread 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/service.\+c\end{DoxyCompactItemize}

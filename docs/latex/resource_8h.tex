@@ -1,0 +1,241 @@
+\hypertarget{resource_8h}{}\section{include/entities/resource.h File Reference}
+\label{resource_8h}\index{include/entities/resource.\+h@{include/entities/resource.\+h}}
+
+
+File containing the interface for interacting with generic Redfish resources.  
+
+
+{\ttfamily \#include \char`\"{}redfish\+Payload.\+h\char`\"{}}\newline
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900}{redfish\+Health} \{ \newline
+\hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a9e6cc2eedae7246bbff6c36c13dd58bf}{Redfish\+Health\+Error} = -\/1, 
+\hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a8c61b2fc07224547eb6fd0da70a1494b}{Redfish\+Health\+Unknown} = 0, 
+\hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a232dc6a8384e6db2d01fdb9ac9a6d568}{Redfish\+Health\+OK} = 1, 
+\hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a17f3c11ed7e668455f6adbf75a19e1f1}{Redfish\+Health\+Warning} = 2, 
+\newline
+\hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a71eb0c5e1020a57f1a83d5e1c66e6df9}{Redfish\+Health\+Critical} = 3
+ \}
+\item 
+enum \hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65}{redfish\+State} \{ \newline
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65ad183adad83c82b34dade46749a0189e7}{Redfish\+State\+Error} = -\/1, 
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65afdb3be237e261baf7e6c0e9a1fdbb272}{Redfish\+State\+Unknown} = 0, 
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65ae4407734ac7ac32e900f201dad6286fa}{Redfish\+State\+Enabled} = 1, 
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65adc4f6e146d222fb59522f120a00de846}{Redfish\+State\+Disabled} = 2, 
+\newline
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65ade95330d03b8b741b737bc1590c40f54}{Redfish\+State\+Standby\+Offline} = 3, 
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a0d66ea6186507d0353105fde5e0ea2c4}{Redfish\+State\+Standby\+Spare} = 4, 
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65ad10f7ee207f992be42946dbb0b6525bb}{Redfish\+State\+In\+Test} = 5, 
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65afa65c9b2575b81cf1e26365506cc87bc}{Redfish\+State\+Starting} = 6, 
+\newline
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a70ead6e7933495e968dcb38b59b8e486}{Redfish\+State\+Absent} = 7, 
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a73693883a9cd84a05639fabc30d4d44e}{Redfish\+State\+Unavailable\+Offline} = 8, 
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a557ba6bce3f3fee62a83a008f9145128}{Redfish\+State\+Deferring} = 9, 
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a9165edeb2eba359a59a8be49fdcb3d9c}{Redfish\+State\+Quiesced} = 10, 
+\newline
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a48ffe5353026845b7d6b9e19aed2e42f}{Redfish\+State\+Updating} = 11
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900}{redfish\+Health} \hyperlink{resource_8h_a76cc45a20766e875f8d1682a20685ff5}{get\+Resource\+Health} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Get the redfish\+Health of the payload. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900}{redfish\+Health} \hyperlink{resource_8h_aae514fd3576d9dde6c19efaca22e8e11}{get\+Resource\+Rollup\+Health} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Get the rollup redfish\+Health of the payload. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65}{redfish\+State} \hyperlink{resource_8h_aecb6b35579d598ad95f2e8099c509823}{get\+Resource\+State} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Get the redfish\+State of the payload. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} char $\ast$ \hyperlink{resource_8h_a53a28174115a35a425a8279b1c8c820b}{get\+Resource\+Name} (\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$payload)
+\begin{DoxyCompactList}\small\item\em Get the Name of the payload. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File containing the interface for interacting with generic Redfish resources. 
+
+\begin{DoxyAuthor}{Author}
+Patrick Boyd This file explains the interface for the interacting with payloads representing a Resource.\+Resource entity type or any type decended from that type 
+\end{DoxyAuthor}
+
+
+\subsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{resource_8h_ac01d405f3beaed790e22fa5cd7af9900}\label{resource_8h_ac01d405f3beaed790e22fa5cd7af9900}} 
+\index{resource.\+h@{resource.\+h}!redfish\+Health@{redfish\+Health}}
+\index{redfish\+Health@{redfish\+Health}!resource.\+h@{resource.\+h}}
+\subsubsection{\texorpdfstring{redfish\+Health}{redfishHealth}}
+{\footnotesize\ttfamily enum \hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900}{redfish\+Health}}
+
+Redfish health enum. Corresponds to Resource.\+Health in C\+S\+DL \begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+Health\+Error@{Redfish\+Health\+Error}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+Health\+Error@{Redfish\+Health\+Error}}}\mbox{\Hypertarget{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a9e6cc2eedae7246bbff6c36c13dd58bf}\label{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a9e6cc2eedae7246bbff6c36c13dd58bf}} 
+Redfish\+Health\+Error&There was an error obtaining health \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+Health\+Unknown@{Redfish\+Health\+Unknown}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+Health\+Unknown@{Redfish\+Health\+Unknown}}}\mbox{\Hypertarget{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a8c61b2fc07224547eb6fd0da70a1494b}\label{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a8c61b2fc07224547eb6fd0da70a1494b}} 
+Redfish\+Health\+Unknown&The health is unknown \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+Health\+OK@{Redfish\+Health\+OK}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+Health\+OK@{Redfish\+Health\+OK}}}\mbox{\Hypertarget{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a232dc6a8384e6db2d01fdb9ac9a6d568}\label{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a232dc6a8384e6db2d01fdb9ac9a6d568}} 
+Redfish\+Health\+OK&Normal. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+Health\+Warning@{Redfish\+Health\+Warning}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+Health\+Warning@{Redfish\+Health\+Warning}}}\mbox{\Hypertarget{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a17f3c11ed7e668455f6adbf75a19e1f1}\label{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a17f3c11ed7e668455f6adbf75a19e1f1}} 
+Redfish\+Health\+Warning&A condition exists that requires attention. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+Health\+Critical@{Redfish\+Health\+Critical}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+Health\+Critical@{Redfish\+Health\+Critical}}}\mbox{\Hypertarget{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a71eb0c5e1020a57f1a83d5e1c66e6df9}\label{resource_8h_ac01d405f3beaed790e22fa5cd7af9900a71eb0c5e1020a57f1a83d5e1c66e6df9}} 
+Redfish\+Health\+Critical&A critical condition exists that requires immediate attention. \\
+\hline
+
+\end{DoxyEnumFields}
+\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65}} 
+\index{resource.\+h@{resource.\+h}!redfish\+State@{redfish\+State}}
+\index{redfish\+State@{redfish\+State}!resource.\+h@{resource.\+h}}
+\subsubsection{\texorpdfstring{redfish\+State}{redfishState}}
+{\footnotesize\ttfamily enum \hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65}{redfish\+State}}
+
+Redfish health enum. Corresponds to Resource.\+State in C\+S\+DL \begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+Error@{Redfish\+State\+Error}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+Error@{Redfish\+State\+Error}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65ad183adad83c82b34dade46749a0189e7}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65ad183adad83c82b34dade46749a0189e7}} 
+Redfish\+State\+Error&There was an error obtaining state \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+Unknown@{Redfish\+State\+Unknown}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+Unknown@{Redfish\+State\+Unknown}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65afdb3be237e261baf7e6c0e9a1fdbb272}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65afdb3be237e261baf7e6c0e9a1fdbb272}} 
+Redfish\+State\+Unknown&The state is unknown \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+Enabled@{Redfish\+State\+Enabled}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+Enabled@{Redfish\+State\+Enabled}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65ae4407734ac7ac32e900f201dad6286fa}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65ae4407734ac7ac32e900f201dad6286fa}} 
+Redfish\+State\+Enabled&This function or resource has been enabled. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+Disabled@{Redfish\+State\+Disabled}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+Disabled@{Redfish\+State\+Disabled}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65adc4f6e146d222fb59522f120a00de846}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65adc4f6e146d222fb59522f120a00de846}} 
+Redfish\+State\+Disabled&This function or resource has been disabled. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+Standby\+Offline@{Redfish\+State\+Standby\+Offline}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+Standby\+Offline@{Redfish\+State\+Standby\+Offline}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65ade95330d03b8b741b737bc1590c40f54}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65ade95330d03b8b741b737bc1590c40f54}} 
+Redfish\+State\+Standby\+Offline&This function or resource is enabled, but awaiting an external action to activate it. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+Standby\+Spare@{Redfish\+State\+Standby\+Spare}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+Standby\+Spare@{Redfish\+State\+Standby\+Spare}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a0d66ea6186507d0353105fde5e0ea2c4}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a0d66ea6186507d0353105fde5e0ea2c4}} 
+Redfish\+State\+Standby\+Spare&This function or resource is part of a redundancy set and is awaiting a failover or other external action to activate it. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+In\+Test@{Redfish\+State\+In\+Test}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+In\+Test@{Redfish\+State\+In\+Test}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65ad10f7ee207f992be42946dbb0b6525bb}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65ad10f7ee207f992be42946dbb0b6525bb}} 
+Redfish\+State\+In\+Test&This function or resource is undergoing testing. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+Starting@{Redfish\+State\+Starting}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+Starting@{Redfish\+State\+Starting}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65afa65c9b2575b81cf1e26365506cc87bc}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65afa65c9b2575b81cf1e26365506cc87bc}} 
+Redfish\+State\+Starting&This function or resource is starting. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+Absent@{Redfish\+State\+Absent}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+Absent@{Redfish\+State\+Absent}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a70ead6e7933495e968dcb38b59b8e486}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a70ead6e7933495e968dcb38b59b8e486}} 
+Redfish\+State\+Absent&This function or resource is not present or not detected. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+Unavailable\+Offline@{Redfish\+State\+Unavailable\+Offline}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+Unavailable\+Offline@{Redfish\+State\+Unavailable\+Offline}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a73693883a9cd84a05639fabc30d4d44e}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a73693883a9cd84a05639fabc30d4d44e}} 
+Redfish\+State\+Unavailable\+Offline&This function or resource is present but cannot be used. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+Deferring@{Redfish\+State\+Deferring}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+Deferring@{Redfish\+State\+Deferring}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a557ba6bce3f3fee62a83a008f9145128}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a557ba6bce3f3fee62a83a008f9145128}} 
+Redfish\+State\+Deferring&The element will not process any commands but will queue new requests. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+Quiesced@{Redfish\+State\+Quiesced}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+Quiesced@{Redfish\+State\+Quiesced}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a9165edeb2eba359a59a8be49fdcb3d9c}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a9165edeb2eba359a59a8be49fdcb3d9c}} 
+Redfish\+State\+Quiesced&The element is enabled but only processes a restricted set of commands. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Redfish\+State\+Updating@{Redfish\+State\+Updating}!resource.\+h@{resource.\+h}}\index{resource.\+h@{resource.\+h}!Redfish\+State\+Updating@{Redfish\+State\+Updating}}}\mbox{\Hypertarget{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a48ffe5353026845b7d6b9e19aed2e42f}\label{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65a48ffe5353026845b7d6b9e19aed2e42f}} 
+Redfish\+State\+Updating&The element is updating and may be unavailable or degraded. \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{resource_8h_a76cc45a20766e875f8d1682a20685ff5}\label{resource_8h_a76cc45a20766e875f8d1682a20685ff5}} 
+\index{resource.\+h@{resource.\+h}!get\+Resource\+Health@{get\+Resource\+Health}}
+\index{get\+Resource\+Health@{get\+Resource\+Health}!resource.\+h@{resource.\+h}}
+\subsubsection{\texorpdfstring{get\+Resource\+Health()}{getResourceHealth()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900}{redfish\+Health} get\+Resource\+Health (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Get the redfish\+Health of the payload. 
+
+Get the enumeration value corresponding to the reported health of the Redfish Payload
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the health of \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+value of redfish\+Health corresponding to the health or Redfish\+Health\+Error on failure. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900}{redfish\+Health} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{resource_8h_a53a28174115a35a425a8279b1c8c820b}\label{resource_8h_a53a28174115a35a425a8279b1c8c820b}} 
+\index{resource.\+h@{resource.\+h}!get\+Resource\+Name@{get\+Resource\+Name}}
+\index{get\+Resource\+Name@{get\+Resource\+Name}!resource.\+h@{resource.\+h}}
+\subsubsection{\texorpdfstring{get\+Resource\+Name()}{getResourceName()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} char$\ast$ get\+Resource\+Name (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Get the Name of the payload. 
+
+Get the Name string of the Redfish Payload
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the state of \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The Name string or N\+U\+LL on failure. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{resource_8h_aae514fd3576d9dde6c19efaca22e8e11}\label{resource_8h_aae514fd3576d9dde6c19efaca22e8e11}} 
+\index{resource.\+h@{resource.\+h}!get\+Resource\+Rollup\+Health@{get\+Resource\+Rollup\+Health}}
+\index{get\+Resource\+Rollup\+Health@{get\+Resource\+Rollup\+Health}!resource.\+h@{resource.\+h}}
+\subsubsection{\texorpdfstring{get\+Resource\+Rollup\+Health()}{getResourceRollupHealth()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900}{redfish\+Health} get\+Resource\+Rollup\+Health (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Get the rollup redfish\+Health of the payload. 
+
+Get the enumeration value corresponding to the reported rollup health of the Redfish Payload
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the rollup health of \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+value of redfish\+Health corresponding to the rollup health or Redfish\+Health\+Error on failure. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{resource_8h_ac01d405f3beaed790e22fa5cd7af9900}{redfish\+Health} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{resource_8h_aecb6b35579d598ad95f2e8099c509823}\label{resource_8h_aecb6b35579d598ad95f2e8099c509823}} 
+\index{resource.\+h@{resource.\+h}!get\+Resource\+State@{get\+Resource\+State}}
+\index{get\+Resource\+State@{get\+Resource\+State}!resource.\+h@{resource.\+h}}
+\subsubsection{\texorpdfstring{get\+Resource\+State()}{getResourceState()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65}{redfish\+State} get\+Resource\+State (\begin{DoxyParamCaption}\item[{\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$}]{payload }\end{DoxyParamCaption})}
+
+
+
+Get the redfish\+State of the payload. 
+
+Get the enumeration value corresponding to the reported state of the Redfish Payload
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & The payload to get the state of \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+value of redfish\+State corresponding to the state or Redfish\+State\+Error on failure. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{resource_8h_a577a1411db92ef3cec9e1d6b57ecec65}{redfish\+State} 
+\end{DoxySeeAlso}

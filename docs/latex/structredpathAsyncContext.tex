@@ -1,0 +1,49 @@
+\hypertarget{structredpathAsyncContext}{}\section{redpath\+Async\+Context Struct Reference}
+\label{structredpathAsyncContext}\index{redpath\+Async\+Context@{redpath\+Async\+Context}}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} \hyperlink{structredpathAsyncContext_ac792549cfab7c6734c8b0338043d8788}{callback}
+\item 
+void $\ast$ \hyperlink{structredpathAsyncContext_abe2573fe9e61a4dbdba5e9da2df3ccde}{original\+Context}
+\item 
+\hyperlink{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}{red\+Path\+Node} $\ast$ \hyperlink{structredpathAsyncContext_a6891b0c642edde43577b6f130d097d54}{redpath}
+\item 
+\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$ \hyperlink{structredpathAsyncContext_aa9cad0a8f6b371db4ec82c4c3d104edb}{options}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Internal structure used for callbacks involving redpath 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structredpathAsyncContext_ac792549cfab7c6734c8b0338043d8788}\label{structredpathAsyncContext_ac792549cfab7c6734c8b0338043d8788}} 
+\index{redpath\+Async\+Context@{redpath\+Async\+Context}!callback@{callback}}
+\index{callback@{callback}!redpath\+Async\+Context@{redpath\+Async\+Context}}
+\subsubsection{\texorpdfstring{callback}{callback}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} redpath\+Async\+Context\+::callback}
+
+The original callback to be called when the redpath traversal has finished or an error has occurred \mbox{\Hypertarget{structredpathAsyncContext_aa9cad0a8f6b371db4ec82c4c3d104edb}\label{structredpathAsyncContext_aa9cad0a8f6b371db4ec82c4c3d104edb}} 
+\index{redpath\+Async\+Context@{redpath\+Async\+Context}!options@{options}}
+\index{options@{options}!redpath\+Async\+Context@{redpath\+Async\+Context}}
+\subsubsection{\texorpdfstring{options}{options}}
+{\footnotesize\ttfamily \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$ redpath\+Async\+Context\+::options}
+
+The options passed to the original call \mbox{\Hypertarget{structredpathAsyncContext_abe2573fe9e61a4dbdba5e9da2df3ccde}\label{structredpathAsyncContext_abe2573fe9e61a4dbdba5e9da2df3ccde}} 
+\index{redpath\+Async\+Context@{redpath\+Async\+Context}!original\+Context@{original\+Context}}
+\index{original\+Context@{original\+Context}!redpath\+Async\+Context@{redpath\+Async\+Context}}
+\subsubsection{\texorpdfstring{original\+Context}{originalContext}}
+{\footnotesize\ttfamily void $\ast$ redpath\+Async\+Context\+::original\+Context}
+
+The original context for the original callback \mbox{\Hypertarget{structredpathAsyncContext_a6891b0c642edde43577b6f130d097d54}\label{structredpathAsyncContext_a6891b0c642edde43577b6f130d097d54}} 
+\index{redpath\+Async\+Context@{redpath\+Async\+Context}!redpath@{redpath}}
+\index{redpath@{redpath}!redpath\+Async\+Context@{redpath\+Async\+Context}}
+\subsubsection{\texorpdfstring{redpath}{redpath}}
+{\footnotesize\ttfamily \hyperlink{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}{red\+Path\+Node} $\ast$ redpath\+Async\+Context\+::redpath}
+
+The current redpath for this call 
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/payload.\+c\item 
+src/service.\+c\end{DoxyCompactItemize}

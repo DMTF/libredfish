@@ -1,0 +1,84 @@
+\hypertarget{structenumeratorAuthentication}{}\section{enumerator\+Authentication Struct Reference}
+\label{structenumeratorAuthentication}\index{enumerator\+Authentication@{enumerator\+Authentication}}
+
+
+A representation of how to authenticate to the service.  
+
+
+
+
+{\ttfamily \#include $<$redfish\+Service.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+unsigned int \hyperlink{structenumeratorAuthentication_a588159b44ece4dbedc9f5f738c9dd3b5}{auth\+Type}
+\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>struct \{\\
+\>\>char $\ast$ \hyperlink{structenumeratorAuthentication_a9a40303876fa5c0adaa29c1037c60d4c}{username}\\
+\>\>char $\ast$ \hyperlink{structenumeratorAuthentication_a9c7084686434ee9dd6328c299367d9d4}{password}\\
+\>\} \hyperlink{structenumeratorAuthentication_aa203643dc4f82f99f59a42888722e615}{userPass}\\
+\>struct \{\\
+\>\>char $\ast$ \hyperlink{structenumeratorAuthentication_a13d0603779b5edc0bd2ed8dcf4d7a651}{token}\\
+\>\} \hyperlink{structenumeratorAuthentication_a9483024312ed7d30682e7c59f62f8bff}{authToken}\\
+\} \hyperlink{structenumeratorAuthentication_a6fd390d5d377409355f4493cf46698d4}{authCodes}\\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A representation of how to authenticate to the service. 
+
+A structure representing redfish authentication methods 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structenumeratorAuthentication_a6fd390d5d377409355f4493cf46698d4}\label{structenumeratorAuthentication_a6fd390d5d377409355f4493cf46698d4}} 
+\index{enumerator\+Authentication@{enumerator\+Authentication}!auth\+Codes@{auth\+Codes}}
+\index{auth\+Codes@{auth\+Codes}!enumerator\+Authentication@{enumerator\+Authentication}}
+\subsubsection{\texorpdfstring{auth\+Codes}{authCodes}}
+{\footnotesize\ttfamily union \{ ... \}   enumerator\+Authentication\+::auth\+Codes}
+
+The actual authentication codes \mbox{\Hypertarget{structenumeratorAuthentication_a9483024312ed7d30682e7c59f62f8bff}\label{structenumeratorAuthentication_a9483024312ed7d30682e7c59f62f8bff}} 
+\index{enumerator\+Authentication@{enumerator\+Authentication}!auth\+Token@{auth\+Token}}
+\index{auth\+Token@{auth\+Token}!enumerator\+Authentication@{enumerator\+Authentication}}
+\subsubsection{\texorpdfstring{auth\+Token}{authToken}}
+{\footnotesize\ttfamily struct \{ ... \}   enumerator\+Authentication\+::auth\+Token}
+
+The data used for R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+E\+A\+R\+E\+R\+\_\+\+T\+O\+K\+EN \mbox{\Hypertarget{structenumeratorAuthentication_a588159b44ece4dbedc9f5f738c9dd3b5}\label{structenumeratorAuthentication_a588159b44ece4dbedc9f5f738c9dd3b5}} 
+\index{enumerator\+Authentication@{enumerator\+Authentication}!auth\+Type@{auth\+Type}}
+\index{auth\+Type@{auth\+Type}!enumerator\+Authentication@{enumerator\+Authentication}}
+\subsubsection{\texorpdfstring{auth\+Type}{authType}}
+{\footnotesize\ttfamily unsigned int enumerator\+Authentication\+::auth\+Type}
+
+The authentication type to use \mbox{\Hypertarget{structenumeratorAuthentication_a9c7084686434ee9dd6328c299367d9d4}\label{structenumeratorAuthentication_a9c7084686434ee9dd6328c299367d9d4}} 
+\index{enumerator\+Authentication@{enumerator\+Authentication}!password@{password}}
+\index{password@{password}!enumerator\+Authentication@{enumerator\+Authentication}}
+\subsubsection{\texorpdfstring{password}{password}}
+{\footnotesize\ttfamily char$\ast$ enumerator\+Authentication\+::password}
+
+The password to authenticate with \mbox{\Hypertarget{structenumeratorAuthentication_a13d0603779b5edc0bd2ed8dcf4d7a651}\label{structenumeratorAuthentication_a13d0603779b5edc0bd2ed8dcf4d7a651}} 
+\index{enumerator\+Authentication@{enumerator\+Authentication}!token@{token}}
+\index{token@{token}!enumerator\+Authentication@{enumerator\+Authentication}}
+\subsubsection{\texorpdfstring{token}{token}}
+{\footnotesize\ttfamily char$\ast$ enumerator\+Authentication\+::token}
+
+The bearer token to authenticate with \mbox{\Hypertarget{structenumeratorAuthentication_a9a40303876fa5c0adaa29c1037c60d4c}\label{structenumeratorAuthentication_a9a40303876fa5c0adaa29c1037c60d4c}} 
+\index{enumerator\+Authentication@{enumerator\+Authentication}!username@{username}}
+\index{username@{username}!enumerator\+Authentication@{enumerator\+Authentication}}
+\subsubsection{\texorpdfstring{username}{username}}
+{\footnotesize\ttfamily char$\ast$ enumerator\+Authentication\+::username}
+
+The username to authenticate with \mbox{\Hypertarget{structenumeratorAuthentication_aa203643dc4f82f99f59a42888722e615}\label{structenumeratorAuthentication_aa203643dc4f82f99f59a42888722e615}} 
+\index{enumerator\+Authentication@{enumerator\+Authentication}!user\+Pass@{user\+Pass}}
+\index{user\+Pass@{user\+Pass}!enumerator\+Authentication@{enumerator\+Authentication}}
+\subsubsection{\texorpdfstring{user\+Pass}{userPass}}
+{\footnotesize\ttfamily struct \{ ... \}   enumerator\+Authentication\+::user\+Pass}
+
+The data used for R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+B\+A\+S\+IC or R\+E\+D\+F\+I\+S\+H\+\_\+\+A\+U\+T\+H\+\_\+\+S\+E\+S\+S\+I\+ON 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/\hyperlink{redfishService_8h}{redfish\+Service.\+h}\end{DoxyCompactItemize}

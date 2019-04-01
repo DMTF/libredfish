@@ -1,0 +1,45 @@
+\hypertarget{structEventInfo}{}\section{Event\+Info Struct Reference}
+\label{structEventInfo}\index{Event\+Info@{Event\+Info}}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{structEventInfo_a1accd6f1a75475fbff4aafd612c56343}{event}
+\item 
+\hyperlink{structenumeratorAuthentication}{enumerator\+Authentication} $\ast$ \hyperlink{structEventInfo_a6d3cf4fe002a50cab93fc1d85a1a8047}{auth}
+\item 
+unsigned int \hyperlink{structEventInfo_a5b1252707a2300785198051c0d8dd953}{event\+Type}
+\item 
+char $\ast$ \hyperlink{structEventInfo_a2a2491eaacf241bd58419fb7eefc9abe}{context}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structEventInfo_a6d3cf4fe002a50cab93fc1d85a1a8047}\label{structEventInfo_a6d3cf4fe002a50cab93fc1d85a1a8047}} 
+\index{Event\+Info@{Event\+Info}!auth@{auth}}
+\index{auth@{auth}!Event\+Info@{Event\+Info}}
+\subsubsection{\texorpdfstring{auth}{auth}}
+{\footnotesize\ttfamily \hyperlink{structenumeratorAuthentication}{enumerator\+Authentication}$\ast$ Event\+Info\+::auth}
+
+The authentication data provided by the caller or null if none \mbox{\Hypertarget{structEventInfo_a2a2491eaacf241bd58419fb7eefc9abe}\label{structEventInfo_a2a2491eaacf241bd58419fb7eefc9abe}} 
+\index{Event\+Info@{Event\+Info}!context@{context}}
+\index{context@{context}!Event\+Info@{Event\+Info}}
+\subsubsection{\texorpdfstring{context}{context}}
+{\footnotesize\ttfamily char$\ast$ Event\+Info\+::context}
+
+user specified value \mbox{\Hypertarget{structEventInfo_a1accd6f1a75475fbff4aafd612c56343}\label{structEventInfo_a1accd6f1a75475fbff4aafd612c56343}} 
+\index{Event\+Info@{Event\+Info}!event@{event}}
+\index{event@{event}!Event\+Info@{Event\+Info}}
+\subsubsection{\texorpdfstring{event}{event}}
+{\footnotesize\ttfamily \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ Event\+Info\+::event}
+
+The \hyperlink{structredfishPayload}{redfish\+Payload} from the event \mbox{\Hypertarget{structEventInfo_a5b1252707a2300785198051c0d8dd953}\label{structEventInfo_a5b1252707a2300785198051c0d8dd953}} 
+\index{Event\+Info@{Event\+Info}!event\+Type@{event\+Type}}
+\index{event\+Type@{event\+Type}!Event\+Info@{Event\+Info}}
+\subsubsection{\texorpdfstring{event\+Type}{eventType}}
+{\footnotesize\ttfamily unsigned int Event\+Info\+::event\+Type}
+
+The type of event this is 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/async\+Event.\+c\end{DoxyCompactItemize}

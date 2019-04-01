@@ -1,0 +1,63 @@
+\hypertarget{structEventCallbackRegister}{}\section{Event\+Callback\+Register Struct Reference}
+\label{structEventCallbackRegister}\index{Event\+Callback\+Register@{Event\+Callback\+Register}}
+
+
+A representation of event registrations.  
+
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{structEventCallbackRegister_a0daf5de835ad6515d1fb180f1bbaa91e}{unregister}
+\item 
+\hyperlink{redfishService_8h_a758b03d26a0d4f87974b4e16fbd833e8}{redfish\+Event\+Callback} \hyperlink{structEventCallbackRegister_a68129e68a1f8fa73e3c675594a3f1f89}{callback}
+\item 
+unsigned int \hyperlink{structEventCallbackRegister_aae27b426e376de0eba9b424dede08e60}{event\+Types}
+\item 
+char $\ast$ \hyperlink{structEventCallbackRegister_a7e1b05f5578cba8db9ba6335bc9794e6}{context}
+\item 
+\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$ \hyperlink{structEventCallbackRegister_aa6b4bd76f3f3b6370867148e0ba47ec2}{service}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A representation of event registrations. 
+
+A structure representing a redfish event registration 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structEventCallbackRegister_a68129e68a1f8fa73e3c675594a3f1f89}\label{structEventCallbackRegister_a68129e68a1f8fa73e3c675594a3f1f89}} 
+\index{Event\+Callback\+Register@{Event\+Callback\+Register}!callback@{callback}}
+\index{callback@{callback}!Event\+Callback\+Register@{Event\+Callback\+Register}}
+\subsubsection{\texorpdfstring{callback}{callback}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_a758b03d26a0d4f87974b4e16fbd833e8}{redfish\+Event\+Callback} Event\+Callback\+Register\+::callback}
+
+The function to call each time an event meeting the requirements is received \mbox{\Hypertarget{structEventCallbackRegister_a7e1b05f5578cba8db9ba6335bc9794e6}\label{structEventCallbackRegister_a7e1b05f5578cba8db9ba6335bc9794e6}} 
+\index{Event\+Callback\+Register@{Event\+Callback\+Register}!context@{context}}
+\index{context@{context}!Event\+Callback\+Register@{Event\+Callback\+Register}}
+\subsubsection{\texorpdfstring{context}{context}}
+{\footnotesize\ttfamily char$\ast$ Event\+Callback\+Register\+::context}
+
+The context to pass to the callback \mbox{\Hypertarget{structEventCallbackRegister_aae27b426e376de0eba9b424dede08e60}\label{structEventCallbackRegister_aae27b426e376de0eba9b424dede08e60}} 
+\index{Event\+Callback\+Register@{Event\+Callback\+Register}!event\+Types@{event\+Types}}
+\index{event\+Types@{event\+Types}!Event\+Callback\+Register@{Event\+Callback\+Register}}
+\subsubsection{\texorpdfstring{event\+Types}{eventTypes}}
+{\footnotesize\ttfamily unsigned int Event\+Callback\+Register\+::event\+Types}
+
+The event types for this registration \mbox{\Hypertarget{structEventCallbackRegister_aa6b4bd76f3f3b6370867148e0ba47ec2}\label{structEventCallbackRegister_aa6b4bd76f3f3b6370867148e0ba47ec2}} 
+\index{Event\+Callback\+Register@{Event\+Callback\+Register}!service@{service}}
+\index{service@{service}!Event\+Callback\+Register@{Event\+Callback\+Register}}
+\subsubsection{\texorpdfstring{service}{service}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service}$\ast$ Event\+Callback\+Register\+::service}
+
+The service associated with this registration \mbox{\Hypertarget{structEventCallbackRegister_a0daf5de835ad6515d1fb180f1bbaa91e}\label{structEventCallbackRegister_a0daf5de835ad6515d1fb180f1bbaa91e}} 
+\index{Event\+Callback\+Register@{Event\+Callback\+Register}!unregister@{unregister}}
+\index{unregister@{unregister}!Event\+Callback\+Register@{Event\+Callback\+Register}}
+\subsubsection{\texorpdfstring{unregister}{unregister}}
+{\footnotesize\ttfamily bool Event\+Callback\+Register\+::unregister}
+
+If true, the event actor thread will remove this registration the next time it processes 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/async\+Event.\+c\end{DoxyCompactItemize}

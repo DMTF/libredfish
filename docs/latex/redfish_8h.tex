@@ -1,0 +1,54 @@
+\hypertarget{redfish_8h}{}\section{include/redfish.h File Reference}
+\label{redfish_8h}\index{include/redfish.\+h@{include/redfish.\+h}}
+
+
+File containing the interface for the library level interactions.  
+
+
+{\ttfamily \#include $<$redfish\+Service.\+h$>$}\newline
+{\ttfamily \#include $<$redfish\+Payload.\+h$>$}\newline
+{\ttfamily \#include $<$redpath.\+h$>$}\newline
+{\ttfamily \#include $<$entities/resource.\+h$>$}\newline
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef void($\ast$ \hyperlink{redfish_8h_a6773d6c766aabb5d808dc5395dad59a7}{lib\+Redfish\+Debug\+Func}) (int priority, const char $\ast$message,...)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{redfish_8h_a287f496a39c28881cf936f554d08ba73}{libredfish\+Set\+Debug\+Function} (\hyperlink{redfish_8h_a6773d6c766aabb5d808dc5395dad59a7}{lib\+Redfish\+Debug\+Func} debug\+Func)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File containing the interface for the library level interactions. 
+
+\begin{DoxyAuthor}{Author}
+Patrick Boyd This file explains the interface for interacting with the libredfish library and includes all external interfaces. 
+\end{DoxyAuthor}
+
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{redfish_8h_a6773d6c766aabb5d808dc5395dad59a7}\label{redfish_8h_a6773d6c766aabb5d808dc5395dad59a7}} 
+\index{redfish.\+h@{redfish.\+h}!lib\+Redfish\+Debug\+Func@{lib\+Redfish\+Debug\+Func}}
+\index{lib\+Redfish\+Debug\+Func@{lib\+Redfish\+Debug\+Func}!redfish.\+h@{redfish.\+h}}
+\subsubsection{\texorpdfstring{lib\+Redfish\+Debug\+Func}{libRedfishDebugFunc}}
+{\footnotesize\ttfamily typedef void($\ast$ lib\+Redfish\+Debug\+Func) (int priority, const char $\ast$message,...)}
+
+syslog style function used to debug libredfish. 
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{redfish_8h_a287f496a39c28881cf936f554d08ba73}\label{redfish_8h_a287f496a39c28881cf936f554d08ba73}} 
+\index{redfish.\+h@{redfish.\+h}!libredfish\+Set\+Debug\+Function@{libredfish\+Set\+Debug\+Function}}
+\index{libredfish\+Set\+Debug\+Function@{libredfish\+Set\+Debug\+Function}!redfish.\+h@{redfish.\+h}}
+\subsubsection{\texorpdfstring{libredfish\+Set\+Debug\+Function()}{libredfishSetDebugFunction()}}
+{\footnotesize\ttfamily void \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} libredfish\+Set\+Debug\+Function (\begin{DoxyParamCaption}\item[{\hyperlink{redfish_8h_a6773d6c766aabb5d808dc5395dad59a7}{lib\+Redfish\+Debug\+Func}}]{debug\+Func }\end{DoxyParamCaption})}
+
+Set the debug function to be used for libredfish. N\+O\+TE\+: This will do nothing unless the \+\_\+\+D\+E\+B\+UG macro is set during compilation time of the library.
+
+
+\begin{DoxyParams}{Parameters}
+{\em debug\+Func} & The debug function to use, N\+U\+LL disables debug. \\
+\hline
+\end{DoxyParams}

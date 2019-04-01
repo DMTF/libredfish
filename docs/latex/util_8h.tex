@@ -1,0 +1,161 @@
+\hypertarget{util_8h}{}\section{src/util.h File Reference}
+\label{util_8h}\index{src/util.\+h@{src/util.\+h}}
+
+
+File containing the utility functions.  
+
+
+{\ttfamily \#include \char`\"{}queue.\+h\char`\"{}}\newline
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{util_8h_a8dc8083897335125630f1af5dafd5831}\label{util_8h_a8dc8083897335125630f1af5dafd5831}} 
+typedef int {\bfseries S\+O\+C\+K\+ET}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$ \hyperlink{util_8h_a61d68e7dc22be51a51d8d2789bc6619f}{safe\+Strdup} (const char $\ast$str)
+\begin{DoxyCompactList}\small\item\em Duplicate a string. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{util_8h_aa1406c084812f4f891177f953c04f6f6}{get\+String\+Till} (const char $\ast$string, const char $\ast$terminator, char $\ast$$\ast$ret\+End)
+\begin{DoxyCompactList}\small\item\em Return the contents of a string until a specified terminator. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{util_8h_ae7134f74687d965cfdfff25d81975672}{get\+Ipv4\+Address} (const char $\ast$network\+Interface)
+\begin{DoxyCompactList}\small\item\em Get the string version of the I\+Pv4 address for the specified interface. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{util_8h_a6acdd39800077b937f4f6c7d7b1906d1}{get\+Ipv6\+Address} (const char $\ast$network\+Interface)
+\begin{DoxyCompactList}\small\item\em Get the string version of the I\+Pv6 address for the specified interface. \end{DoxyCompactList}\item 
+S\+O\+C\+K\+ET \hyperlink{util_8h_adc5101fe22a0168daacc64dd5539d773}{get\+Socket} (const char $\ast$ip, unsigned int $\ast$port\+Num)
+\begin{DoxyCompactList}\small\item\em Get a socket bound to a random port on the specified ip. \end{DoxyCompactList}\item 
+\hyperlink{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}{thread} \hyperlink{util_8h_aef260ee5bf8ce5ea026d1e33124d5666}{get\+Thread\+Id} ()
+\begin{DoxyCompactList}\small\item\em Get the id of the currently running thread. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File containing the utility functions. 
+
+\begin{DoxyAuthor}{Author}
+Patrick Boyd This file explains the interface for various utility functions 
+\end{DoxyAuthor}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{util_8h_ae7134f74687d965cfdfff25d81975672}\label{util_8h_ae7134f74687d965cfdfff25d81975672}} 
+\index{util.\+h@{util.\+h}!get\+Ipv4\+Address@{get\+Ipv4\+Address}}
+\index{get\+Ipv4\+Address@{get\+Ipv4\+Address}!util.\+h@{util.\+h}}
+\subsubsection{\texorpdfstring{get\+Ipv4\+Address()}{getIpv4Address()}}
+{\footnotesize\ttfamily char$\ast$ get\+Ipv4\+Address (\begin{DoxyParamCaption}\item[{const char $\ast$}]{network\+Interface }\end{DoxyParamCaption})}
+
+
+
+Get the string version of the I\+Pv4 address for the specified interface. 
+
+Get the string version of the I\+Pv4 address for the specified interface.
+
+
+\begin{DoxyParams}{Parameters}
+{\em network\+Interface} & The interface to obtain the I\+Pv4 address of \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The string version of the I\+Pv4 address or N\+U\+LL on error 
+\end{DoxyReturn}
+\mbox{\Hypertarget{util_8h_a6acdd39800077b937f4f6c7d7b1906d1}\label{util_8h_a6acdd39800077b937f4f6c7d7b1906d1}} 
+\index{util.\+h@{util.\+h}!get\+Ipv6\+Address@{get\+Ipv6\+Address}}
+\index{get\+Ipv6\+Address@{get\+Ipv6\+Address}!util.\+h@{util.\+h}}
+\subsubsection{\texorpdfstring{get\+Ipv6\+Address()}{getIpv6Address()}}
+{\footnotesize\ttfamily char$\ast$ get\+Ipv6\+Address (\begin{DoxyParamCaption}\item[{const char $\ast$}]{network\+Interface }\end{DoxyParamCaption})}
+
+
+
+Get the string version of the I\+Pv6 address for the specified interface. 
+
+Get the string version of the I\+Pv6 address for the specified interface.
+
+
+\begin{DoxyParams}{Parameters}
+{\em network\+Interface} & The interface to obtain the I\+Pv6 address of \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The string version of the I\+Pv6 address or N\+U\+LL on error 
+\end{DoxyReturn}
+\mbox{\Hypertarget{util_8h_adc5101fe22a0168daacc64dd5539d773}\label{util_8h_adc5101fe22a0168daacc64dd5539d773}} 
+\index{util.\+h@{util.\+h}!get\+Socket@{get\+Socket}}
+\index{get\+Socket@{get\+Socket}!util.\+h@{util.\+h}}
+\subsubsection{\texorpdfstring{get\+Socket()}{getSocket()}}
+{\footnotesize\ttfamily S\+O\+C\+K\+ET get\+Socket (\begin{DoxyParamCaption}\item[{const char $\ast$}]{ip,  }\item[{unsigned int $\ast$}]{port\+Num }\end{DoxyParamCaption})}
+
+
+
+Get a socket bound to a random port on the specified ip. 
+
+Get a socket bound to a random port on the specified ip.
+
+
+\begin{DoxyParams}{Parameters}
+{\em ip} & The ip to bind to \\
+\hline
+{\em port\+Num} & A pointer to an integer describing the port number. If set to an int other than 0 the function will use that port. 0 will cause a random port to be used. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The socket or -\/1 on error 
+\end{DoxyReturn}
+\mbox{\Hypertarget{util_8h_aa1406c084812f4f891177f953c04f6f6}\label{util_8h_aa1406c084812f4f891177f953c04f6f6}} 
+\index{util.\+h@{util.\+h}!get\+String\+Till@{get\+String\+Till}}
+\index{get\+String\+Till@{get\+String\+Till}!util.\+h@{util.\+h}}
+\subsubsection{\texorpdfstring{get\+String\+Till()}{getStringTill()}}
+{\footnotesize\ttfamily char$\ast$ get\+String\+Till (\begin{DoxyParamCaption}\item[{const char $\ast$}]{string,  }\item[{const char $\ast$}]{terminator,  }\item[{char $\ast$$\ast$}]{ret\+End }\end{DoxyParamCaption})}
+
+
+
+Return the contents of a string until a specified terminator. 
+
+Return the contents of a string until a specified terminator.
+
+
+\begin{DoxyParams}{Parameters}
+{\em string} & The string to search \\
+\hline
+{\em terminator} & The string to search until \\
+\hline
+{\em ret\+End} & \mbox{[}optional\mbox{]} The location of the terminator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A copy of the contents of string until terminator is hit 
+\end{DoxyReturn}
+\mbox{\Hypertarget{util_8h_aef260ee5bf8ce5ea026d1e33124d5666}\label{util_8h_aef260ee5bf8ce5ea026d1e33124d5666}} 
+\index{util.\+h@{util.\+h}!get\+Thread\+Id@{get\+Thread\+Id}}
+\index{get\+Thread\+Id@{get\+Thread\+Id}!util.\+h@{util.\+h}}
+\subsubsection{\texorpdfstring{get\+Thread\+Id()}{getThreadId()}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}{thread} get\+Thread\+Id (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the id of the currently running thread. 
+
+Get the id of the currently running thread.
+
+\begin{DoxyReturn}{Returns}
+The id of the currently running thread 
+\end{DoxyReturn}
+\mbox{\Hypertarget{util_8h_a61d68e7dc22be51a51d8d2789bc6619f}\label{util_8h_a61d68e7dc22be51a51d8d2789bc6619f}} 
+\index{util.\+h@{util.\+h}!safe\+Strdup@{safe\+Strdup}}
+\index{safe\+Strdup@{safe\+Strdup}!util.\+h@{util.\+h}}
+\subsubsection{\texorpdfstring{safe\+Strdup()}{safeStrdup()}}
+{\footnotesize\ttfamily char$\ast$ safe\+Strdup (\begin{DoxyParamCaption}\item[{const char $\ast$}]{str }\end{DoxyParamCaption})}
+
+
+
+Duplicate a string. 
+
+Duplicates a string or returns null if a null pointer is passed in.
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & The string to duplicate \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a new copy of str or N\+U\+LL 
+\end{DoxyReturn}

@@ -1,0 +1,38 @@
+\hypertarget{structSSEThreadData}{}\section{S\+S\+E\+Thread\+Data Struct Reference}
+\label{structSSEThreadData}\index{S\+S\+E\+Thread\+Data@{S\+S\+E\+Thread\+Data}}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structSSEThreadData_a299ff33bd377a09bfe2431a704cdb564}\label{structSSEThreadData_a299ff33bd377a09bfe2431a704cdb564}} 
+\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$ {\bfseries service}
+\item 
+\mbox{\Hypertarget{structSSEThreadData_a369af81bf9f3b1b213a41ba91721e1c6}\label{structSSEThreadData_a369af81bf9f3b1b213a41ba91721e1c6}} 
+char $\ast$ {\bfseries sse\+Uri}
+\item 
+\hyperlink{queue_8h_a8c80af1d72030a9dc70c3a2c3e46ae9a}{mutex} \hyperlink{structSSEThreadData_ae1b47add8bc39707e7687a5c15f6facb}{spin\+Lock}
+\item 
+\hyperlink{queue_8h_a18a0de1af5a8524b75bf94d6b14701b4}{condition} \hyperlink{structSSEThreadData_a2c1ad330fd390938be8ef292fee4df82}{wait\+For\+It}
+\item 
+\mbox{\Hypertarget{structSSEThreadData_a0ecd819cdec9284f732976a863cb975a}\label{structSSEThreadData_a0ecd819cdec9284f732976a863cb975a}} 
+int {\bfseries thread\+Status}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structSSEThreadData_ae1b47add8bc39707e7687a5c15f6facb}\label{structSSEThreadData_ae1b47add8bc39707e7687a5c15f6facb}} 
+\index{S\+S\+E\+Thread\+Data@{S\+S\+E\+Thread\+Data}!spin\+Lock@{spin\+Lock}}
+\index{spin\+Lock@{spin\+Lock}!S\+S\+E\+Thread\+Data@{S\+S\+E\+Thread\+Data}}
+\subsubsection{\texorpdfstring{spin\+Lock}{spinLock}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_a8c80af1d72030a9dc70c3a2c3e46ae9a}{mutex} S\+S\+E\+Thread\+Data\+::spin\+Lock}
+
+A lock to control access to the condition variable \mbox{\Hypertarget{structSSEThreadData_a2c1ad330fd390938be8ef292fee4df82}\label{structSSEThreadData_a2c1ad330fd390938be8ef292fee4df82}} 
+\index{S\+S\+E\+Thread\+Data@{S\+S\+E\+Thread\+Data}!wait\+For\+It@{wait\+For\+It}}
+\index{wait\+For\+It@{wait\+For\+It}!S\+S\+E\+Thread\+Data@{S\+S\+E\+Thread\+Data}}
+\subsubsection{\texorpdfstring{wait\+For\+It}{waitForIt}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_a18a0de1af5a8524b75bf94d6b14701b4}{condition} S\+S\+E\+Thread\+Data\+::wait\+For\+It}
+
+The condition variable to be signalled on the async call completion 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/async\+Event.\+c\end{DoxyCompactItemize}

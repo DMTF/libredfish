@@ -1,0 +1,55 @@
+\hypertarget{structasyncWorkItem}{}\section{async\+Work\+Item Struct Reference}
+\label{structasyncWorkItem}\index{async\+Work\+Item@{async\+Work\+Item}}
+
+
+A work item for the async queue.  
+
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{structasyncWorkItem_a3acc23abec3617d1cbdd4b3a2f577612}{term}
+\item 
+\hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request} $\ast$ \hyperlink{structasyncWorkItem_a80945057b42102b7ef5eb7a4b88f90ed}{request}
+\item 
+\hyperlink{redfishRawAsync_8h_a0fe5b4a806033e1fcf0cbc4b2b53953f}{async\+Raw\+Callback} \hyperlink{structasyncWorkItem_ade1bb27c87ca58f9d8cebd7f5a377f28}{callback}
+\item 
+void $\ast$ \hyperlink{structasyncWorkItem_a06379c9a4a8594373d5ffd9c0ab1af44}{context}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A work item for the async queue. 
+
+An item representing work for the async queue. This is usually a async H\+T\+TP request, but could also be a command for the thread. 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structasyncWorkItem_ade1bb27c87ca58f9d8cebd7f5a377f28}\label{structasyncWorkItem_ade1bb27c87ca58f9d8cebd7f5a377f28}} 
+\index{async\+Work\+Item@{async\+Work\+Item}!callback@{callback}}
+\index{callback@{callback}!async\+Work\+Item@{async\+Work\+Item}}
+\subsubsection{\texorpdfstring{callback}{callback}}
+{\footnotesize\ttfamily \hyperlink{redfishRawAsync_8h_a0fe5b4a806033e1fcf0cbc4b2b53953f}{async\+Raw\+Callback} async\+Work\+Item\+::callback}
+
+The callback for the request \mbox{\Hypertarget{structasyncWorkItem_a06379c9a4a8594373d5ffd9c0ab1af44}\label{structasyncWorkItem_a06379c9a4a8594373d5ffd9c0ab1af44}} 
+\index{async\+Work\+Item@{async\+Work\+Item}!context@{context}}
+\index{context@{context}!async\+Work\+Item@{async\+Work\+Item}}
+\subsubsection{\texorpdfstring{context}{context}}
+{\footnotesize\ttfamily void$\ast$ async\+Work\+Item\+::context}
+
+The context for the request \mbox{\Hypertarget{structasyncWorkItem_a80945057b42102b7ef5eb7a4b88f90ed}\label{structasyncWorkItem_a80945057b42102b7ef5eb7a4b88f90ed}} 
+\index{async\+Work\+Item@{async\+Work\+Item}!request@{request}}
+\index{request@{request}!async\+Work\+Item@{async\+Work\+Item}}
+\subsubsection{\texorpdfstring{request}{request}}
+{\footnotesize\ttfamily \hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request}$\ast$ async\+Work\+Item\+::request}
+
+This is the request to process if term is false \mbox{\Hypertarget{structasyncWorkItem_a3acc23abec3617d1cbdd4b3a2f577612}\label{structasyncWorkItem_a3acc23abec3617d1cbdd4b3a2f577612}} 
+\index{async\+Work\+Item@{async\+Work\+Item}!term@{term}}
+\index{term@{term}!async\+Work\+Item@{async\+Work\+Item}}
+\subsubsection{\texorpdfstring{term}{term}}
+{\footnotesize\ttfamily bool async\+Work\+Item\+::term}
+
+This work item instructs the thread to terminate 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/async\+Raw.\+c\end{DoxyCompactItemize}

@@ -1,0 +1,40 @@
+\hypertarget{asyncEvent_8h}{}\section{src/async\+Event.h File Reference}
+\label{asyncEvent_8h}\index{src/async\+Event.\+h@{src/async\+Event.\+h}}
+
+
+File containing the interface for the async events.  
+
+
+{\ttfamily \#include $<$redfish\+Service.\+h$>$}\newline
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{asyncEvent_8h_a3cb5750633622fc56c135427cdd8d990}\label{asyncEvent_8h_a3cb5750633622fc56c135427cdd8d990}} 
+bool {\bfseries register\+Callback} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, \hyperlink{redfishService_8h_a758b03d26a0d4f87974b4e16fbd833e8}{redfish\+Event\+Callback} callback, unsigned int event\+Types, const char $\ast$context)
+\item 
+\mbox{\Hypertarget{asyncEvent_8h_a2b40ba6b91ea8bf69da3a83f85f8bfae}\label{asyncEvent_8h_a2b40ba6b91ea8bf69da3a83f85f8bfae}} 
+bool {\bfseries unregister\+Callback} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, \hyperlink{redfishService_8h_a758b03d26a0d4f87974b4e16fbd833e8}{redfish\+Event\+Callback} callback, unsigned int event\+Types, const char $\ast$context)
+\item 
+\mbox{\Hypertarget{asyncEvent_8h_ab88855358b9d39e463dd115424342cd6}\label{asyncEvent_8h_ab88855358b9d39e463dd115424342cd6}} 
+void {\bfseries start\+Event\+Thread} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service)
+\item 
+\mbox{\Hypertarget{asyncEvent_8h_a9d3275e5194c4bf86a966fa8939870ea}\label{asyncEvent_8h_a9d3275e5194c4bf86a966fa8939870ea}} 
+void {\bfseries terminate\+Async\+Event\+Thread} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service)
+\item 
+\mbox{\Hypertarget{asyncEvent_8h_a8f2aa2606f181297832eaf3ce0d6d186}\label{asyncEvent_8h_a8f2aa2606f181297832eaf3ce0d6d186}} 
+bool {\bfseries start\+S\+S\+E\+Listener} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, const char $\ast$sse\+Uri)
+\item 
+\mbox{\Hypertarget{asyncEvent_8h_a4fac82c4b754c4845f5d300d92f5714a}\label{asyncEvent_8h_a4fac82c4b754c4845f5d300d92f5714a}} 
+bool {\bfseries start\+T\+C\+P\+Listener} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, S\+O\+C\+K\+ET socket)
+\item 
+\mbox{\Hypertarget{asyncEvent_8h_a248d0dfb7b456d36e96d245533c82a8a}\label{asyncEvent_8h_a248d0dfb7b456d36e96d245533c82a8a}} 
+bool {\bfseries start\+Zero\+M\+Q\+Listener} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File containing the interface for the async events. 
+
+\begin{DoxyAuthor}{Author}
+Patrick Boyd This file explains the interface for the internal async event system 
+\end{DoxyAuthor}

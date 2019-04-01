@@ -1,0 +1,104 @@
+\hypertarget{structredpathAsyncOpContext}{}\section{redpath\+Async\+Op\+Context Struct Reference}
+\label{structredpathAsyncOpContext}\index{redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} \hyperlink{structredpathAsyncOpContext_ac50c870aa8b7ee2529552a484fa6b471}{callback}
+\item 
+void $\ast$ \hyperlink{structredpathAsyncOpContext_aa523a807beefa636407b899608c8268c}{original\+Context}
+\item 
+\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$ \hyperlink{structredpathAsyncOpContext_a0c767a962ec9d8e342030e1b0331a45f}{options}
+\item 
+\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{structredpathAsyncOpContext_afe71852bb8ff58bc37b6c8eecd2cdd0d}{payload}
+\item 
+char $\ast$ \hyperlink{structredpathAsyncOpContext_a9a46d450cf13ff95148457623f7c9d87}{prop\+Name}
+\item 
+Red\+Path\+Op \hyperlink{structredpathAsyncOpContext_aa5e48919de95e9c486ddc470c80a51b1}{op}
+\item 
+char $\ast$ \hyperlink{structredpathAsyncOpContext_a99896f99b5911f8d699c4212bdd651aa}{value}
+\item 
+size\+\_\+t \hyperlink{structredpathAsyncOpContext_abc510ebbe2744f327cd0006b6dfaba23}{count}
+\item 
+size\+\_\+t \hyperlink{structredpathAsyncOpContext_ac1dd09aaa41b7d1fb7b912e026b7b994}{left}
+\item 
+size\+\_\+t \hyperlink{structredpathAsyncOpContext_a823ad5ca475b0f36527b6502e5b1f1a9}{valid\+Count}
+\item 
+\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$$\ast$ \hyperlink{structredpathAsyncOpContext_a261f287b72dcdf3a75f80b98eda9050e}{payloads}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Internal structure used for callbacks involving redpath operations 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structredpathAsyncOpContext_ac50c870aa8b7ee2529552a484fa6b471}\label{structredpathAsyncOpContext_ac50c870aa8b7ee2529552a484fa6b471}} 
+\index{redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}!callback@{callback}}
+\index{callback@{callback}!redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}}
+\subsubsection{\texorpdfstring{callback}{callback}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} redpath\+Async\+Op\+Context\+::callback}
+
+The original callback to be called when the redpath traversal has finished or an error has occurred \mbox{\Hypertarget{structredpathAsyncOpContext_abc510ebbe2744f327cd0006b6dfaba23}\label{structredpathAsyncOpContext_abc510ebbe2744f327cd0006b6dfaba23}} 
+\index{redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}!count@{count}}
+\index{count@{count}!redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}}
+\subsubsection{\texorpdfstring{count}{count}}
+{\footnotesize\ttfamily size\+\_\+t redpath\+Async\+Op\+Context\+::count}
+
+The number of operations to perform (i.\+e. a collection or array has to perform the operation on each element) \mbox{\Hypertarget{structredpathAsyncOpContext_ac1dd09aaa41b7d1fb7b912e026b7b994}\label{structredpathAsyncOpContext_ac1dd09aaa41b7d1fb7b912e026b7b994}} 
+\index{redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}!left@{left}}
+\index{left@{left}!redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}}
+\subsubsection{\texorpdfstring{left}{left}}
+{\footnotesize\ttfamily size\+\_\+t redpath\+Async\+Op\+Context\+::left}
+
+The number of operations left \mbox{\Hypertarget{structredpathAsyncOpContext_aa5e48919de95e9c486ddc470c80a51b1}\label{structredpathAsyncOpContext_aa5e48919de95e9c486ddc470c80a51b1}} 
+\index{redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}!op@{op}}
+\index{op@{op}!redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}}
+\subsubsection{\texorpdfstring{op}{op}}
+{\footnotesize\ttfamily Red\+Path\+Op redpath\+Async\+Op\+Context\+::op}
+
+The operation to perform on the property \mbox{\Hypertarget{structredpathAsyncOpContext_a0c767a962ec9d8e342030e1b0331a45f}\label{structredpathAsyncOpContext_a0c767a962ec9d8e342030e1b0331a45f}} 
+\index{redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}!options@{options}}
+\index{options@{options}!redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}}
+\subsubsection{\texorpdfstring{options}{options}}
+{\footnotesize\ttfamily \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options}$\ast$ redpath\+Async\+Op\+Context\+::options}
+
+The options passed to the original call \mbox{\Hypertarget{structredpathAsyncOpContext_aa523a807beefa636407b899608c8268c}\label{structredpathAsyncOpContext_aa523a807beefa636407b899608c8268c}} 
+\index{redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}!original\+Context@{original\+Context}}
+\index{original\+Context@{original\+Context}!redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}}
+\subsubsection{\texorpdfstring{original\+Context}{originalContext}}
+{\footnotesize\ttfamily void$\ast$ redpath\+Async\+Op\+Context\+::original\+Context}
+
+The original context for the original callback \mbox{\Hypertarget{structredpathAsyncOpContext_afe71852bb8ff58bc37b6c8eecd2cdd0d}\label{structredpathAsyncOpContext_afe71852bb8ff58bc37b6c8eecd2cdd0d}} 
+\index{redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}!payload@{payload}}
+\index{payload@{payload}!redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}}
+\subsubsection{\texorpdfstring{payload}{payload}}
+{\footnotesize\ttfamily \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ redpath\+Async\+Op\+Context\+::payload}
+
+The payload the operation was called on \mbox{\Hypertarget{structredpathAsyncOpContext_a261f287b72dcdf3a75f80b98eda9050e}\label{structredpathAsyncOpContext_a261f287b72dcdf3a75f80b98eda9050e}} 
+\index{redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}!payloads@{payloads}}
+\index{payloads@{payloads}!redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}}
+\subsubsection{\texorpdfstring{payloads}{payloads}}
+{\footnotesize\ttfamily \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$$\ast$ redpath\+Async\+Op\+Context\+::payloads}
+
+A set of payloads for the collection \mbox{\Hypertarget{structredpathAsyncOpContext_a9a46d450cf13ff95148457623f7c9d87}\label{structredpathAsyncOpContext_a9a46d450cf13ff95148457623f7c9d87}} 
+\index{redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}!prop\+Name@{prop\+Name}}
+\index{prop\+Name@{prop\+Name}!redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}}
+\subsubsection{\texorpdfstring{prop\+Name}{propName}}
+{\footnotesize\ttfamily char$\ast$ redpath\+Async\+Op\+Context\+::prop\+Name}
+
+The property name to retrieve \mbox{\Hypertarget{structredpathAsyncOpContext_a823ad5ca475b0f36527b6502e5b1f1a9}\label{structredpathAsyncOpContext_a823ad5ca475b0f36527b6502e5b1f1a9}} 
+\index{redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}!valid\+Count@{valid\+Count}}
+\index{valid\+Count@{valid\+Count}!redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}}
+\subsubsection{\texorpdfstring{valid\+Count}{validCount}}
+{\footnotesize\ttfamily size\+\_\+t redpath\+Async\+Op\+Context\+::valid\+Count}
+
+The number of operations that returned valid for the operation \mbox{\Hypertarget{structredpathAsyncOpContext_a99896f99b5911f8d699c4212bdd651aa}\label{structredpathAsyncOpContext_a99896f99b5911f8d699c4212bdd651aa}} 
+\index{redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}!value@{value}}
+\index{value@{value}!redpath\+Async\+Op\+Context@{redpath\+Async\+Op\+Context}}
+\subsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily char$\ast$ redpath\+Async\+Op\+Context\+::value}
+
+The value for the operation 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/payload.\+c\end{DoxyCompactItemize}

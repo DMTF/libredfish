@@ -1,0 +1,229 @@
+\hypertarget{struct__redfishService}{}\section{\+\_\+redfish\+Service Struct Reference}
+\label{struct__redfishService}\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+
+
+A redfish service.  
+
+
+
+
+{\ttfamily \#include $<$internal\+\_\+service.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$ \hyperlink{struct__redfishService_a26ffe2775b68358d2ebc4eb4880fc141}{host}
+\item 
+\hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue} $\ast$ \hyperlink{struct__redfishService_a856c7f92721b1ae76efbb2bbfeae58bf}{queue}
+\item 
+\hyperlink{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}{thread} \hyperlink{struct__redfishService_a9667f250bdf1205a6947d7ee63ee25ec}{async\+Thread}
+\item 
+C\+U\+RL $\ast$ \hyperlink{struct__redfishService_a73f37e9e9573d97909ae1b009fa00379}{curl}
+\item 
+json\+\_\+t $\ast$ \hyperlink{struct__redfishService_a380d0b9d53d04b26fe44f6abc703eb85}{versions}
+\item 
+unsigned int \hyperlink{struct__redfishService_a3e8935c6a0becddf4da72eef478fbd23}{flags}
+\item 
+char $\ast$ \hyperlink{struct__redfishService_ac8aa0c23ac4b611dc593c86be30633bc}{session\+Token}
+\item 
+char $\ast$ \hyperlink{struct__redfishService_a3959db858c9b279bcf379fc0a5eb7419}{bearer\+Token}
+\item 
+char $\ast$ \hyperlink{struct__redfishService_ac609c13e425bcdfbaaccd756c710a069}{other\+Auth}
+\item 
+pthread\+\_\+mutex\+\_\+t \hyperlink{struct__redfishService_abe36849d9372eafbabbc969b42d9b7d9}{mutex}
+\item 
+size\+\_\+t \hyperlink{struct__redfishService_a0fa4d4e758be848e53743461567c23c1}{ref\+Count}
+\item 
+bool \hyperlink{struct__redfishService_a84e8b26ce280c1e1a42c1a6b52ff56a1}{self\+Term}
+\item 
+\hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue} $\ast$ \hyperlink{struct__redfishService_a0ac7a354af33e114971bf0cf60fc1b26}{event\+Thread\+Queue}
+\item 
+\hyperlink{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}{thread} \hyperlink{struct__redfishService_a8a8b4fd7844bb2a716d07442fc817810}{event\+Thread}
+\item 
+\hyperlink{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}{thread} \hyperlink{struct__redfishService_a5cfc99e21117bbb500b618c4c29fdff0}{sse\+Thread}
+\item 
+\hyperlink{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}{thread} \hyperlink{struct__redfishService_a996d74c5be8aec0056150bf04a67ad19}{tcp\+Thread}
+\item 
+S\+O\+C\+K\+ET \hyperlink{struct__redfishService_a352a6086f7d45aa2263fdf867dd97a2a}{tcp\+Socket}
+\item 
+bool \hyperlink{struct__redfishService_aa243f8de47227d24d0cd8482f270048a}{event\+Term}
+\item 
+char $\ast$ \hyperlink{struct__redfishService_a875599351c18230fe9342253ed5a4941}{event\+Registration\+Uri}
+\item 
+zactor\+\_\+t $\ast$ \hyperlink{struct__redfishService_a63dfd6f2784aad814ba5c34c1a2dac01}{zero\+M\+Q\+Listener}
+\item 
+char $\ast$ \hyperlink{struct__redfishService_ae4d4e7c7b6ad947f2ea0cf06c9980557}{session\+Uri}
+\item 
+bool \hyperlink{struct__redfishService_a896102e06db049b99f32541bb9a4cb1e}{freeing}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A redfish service. 
+
+A strcuture defining redfish service data. 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{struct__redfishService_a9667f250bdf1205a6947d7ee63ee25ec}\label{struct__redfishService_a9667f250bdf1205a6947d7ee63ee25ec}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!async\+Thread@{async\+Thread}}
+\index{async\+Thread@{async\+Thread}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{async\+Thread}{asyncThread}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}{thread} \+\_\+redfish\+Service\+::async\+Thread}
+
+The thread running asynchronous H\+T\+T\+P(s) requests \mbox{\Hypertarget{struct__redfishService_a3959db858c9b279bcf379fc0a5eb7419}\label{struct__redfishService_a3959db858c9b279bcf379fc0a5eb7419}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!bearer\+Token@{bearer\+Token}}
+\index{bearer\+Token@{bearer\+Token}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{bearer\+Token}{bearerToken}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+redfish\+Service\+::bearer\+Token}
+
+A bearer token. If set and session\+Token is not this will be used for authentication.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{struct__redfishService_ac8aa0c23ac4b611dc593c86be30633bc}{session\+Token} 
+
+\hyperlink{struct__redfishService_ac609c13e425bcdfbaaccd756c710a069}{other\+Auth} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{struct__redfishService_a73f37e9e9573d97909ae1b009fa00379}\label{struct__redfishService_a73f37e9e9573d97909ae1b009fa00379}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!curl@{curl}}
+\index{curl@{curl}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{curl}{curl}}
+{\footnotesize\ttfamily C\+U\+RL$\ast$ \+\_\+redfish\+Service\+::curl}
+
+The non-\/async C\+U\+RL implementation \mbox{\Hypertarget{struct__redfishService_a875599351c18230fe9342253ed5a4941}\label{struct__redfishService_a875599351c18230fe9342253ed5a4941}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!event\+Registration\+Uri@{event\+Registration\+Uri}}
+\index{event\+Registration\+Uri@{event\+Registration\+Uri}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{event\+Registration\+Uri}{eventRegistrationUri}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+redfish\+Service\+::event\+Registration\+Uri}
+
+The uri the event registration is stored at \mbox{\Hypertarget{struct__redfishService_aa243f8de47227d24d0cd8482f270048a}\label{struct__redfishService_aa243f8de47227d24d0cd8482f270048a}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!event\+Term@{event\+Term}}
+\index{event\+Term@{event\+Term}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{event\+Term}{eventTerm}}
+{\footnotesize\ttfamily bool \+\_\+redfish\+Service\+::event\+Term}
+
+An indicator to the event thread to terminate itself \mbox{\Hypertarget{struct__redfishService_a8a8b4fd7844bb2a716d07442fc817810}\label{struct__redfishService_a8a8b4fd7844bb2a716d07442fc817810}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!event\+Thread@{event\+Thread}}
+\index{event\+Thread@{event\+Thread}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{event\+Thread}{eventThread}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}{thread} \+\_\+redfish\+Service\+::event\+Thread}
+
+The thread listening for events \mbox{\Hypertarget{struct__redfishService_a0ac7a354af33e114971bf0cf60fc1b26}\label{struct__redfishService_a0ac7a354af33e114971bf0cf60fc1b26}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!event\+Thread\+Queue@{event\+Thread\+Queue}}
+\index{event\+Thread\+Queue@{event\+Thread\+Queue}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{event\+Thread\+Queue}{eventThreadQueue}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue}$\ast$ \+\_\+redfish\+Service\+::event\+Thread\+Queue}
+
+The queue of events to process \mbox{\Hypertarget{struct__redfishService_a3e8935c6a0becddf4da72eef478fbd23}\label{struct__redfishService_a3e8935c6a0becddf4da72eef478fbd23}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!flags@{flags}}
+\index{flags@{flags}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{flags}{flags}}
+{\footnotesize\ttfamily unsigned int \+\_\+redfish\+Service\+::flags}
+
+Flags about this service
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishService_8h_a5173159a2d4de1ab946f0e088aa199ea}{R\+E\+D\+F\+I\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+N\+O\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+D\+OC} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{struct__redfishService_a896102e06db049b99f32541bb9a4cb1e}\label{struct__redfishService_a896102e06db049b99f32541bb9a4cb1e}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!freeing@{freeing}}
+\index{freeing@{freeing}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{freeing}{freeing}}
+{\footnotesize\ttfamily bool \+\_\+redfish\+Service\+::freeing}
+
+The service is being free\textquotesingle{}d \mbox{\Hypertarget{struct__redfishService_a26ffe2775b68358d2ebc4eb4880fc141}\label{struct__redfishService_a26ffe2775b68358d2ebc4eb4880fc141}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!host@{host}}
+\index{host@{host}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{host}{host}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+redfish\+Service\+::host}
+
+The host, including protocol schema \mbox{\Hypertarget{struct__redfishService_abe36849d9372eafbabbc969b42d9b7d9}\label{struct__redfishService_abe36849d9372eafbabbc969b42d9b7d9}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!mutex@{mutex}}
+\index{mutex@{mutex}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{mutex}{mutex}}
+{\footnotesize\ttfamily pthread\+\_\+mutex\+\_\+t \+\_\+redfish\+Service\+::mutex}
+
+A lock to regulate access to this struct \mbox{\Hypertarget{struct__redfishService_ac609c13e425bcdfbaaccd756c710a069}\label{struct__redfishService_ac609c13e425bcdfbaaccd756c710a069}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!other\+Auth@{other\+Auth}}
+\index{other\+Auth@{other\+Auth}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{other\+Auth}{otherAuth}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+redfish\+Service\+::other\+Auth}
+
+Raw authorization field (usually basic auth). This is the last resort.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{struct__redfishService_ac8aa0c23ac4b611dc593c86be30633bc}{session\+Token} 
+
+\hyperlink{struct__redfishService_a3959db858c9b279bcf379fc0a5eb7419}{bearer\+Token} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{struct__redfishService_a856c7f92721b1ae76efbb2bbfeae58bf}\label{struct__redfishService_a856c7f92721b1ae76efbb2bbfeae58bf}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!queue@{queue}}
+\index{queue@{queue}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{queue}{queue}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_ae334156b4cde2f884517a660d81450cd}{queue}$\ast$ \+\_\+redfish\+Service\+::queue}
+
+The queue of asynchronous H\+T\+T\+P(s) requests \mbox{\Hypertarget{struct__redfishService_a0fa4d4e758be848e53743461567c23c1}\label{struct__redfishService_a0fa4d4e758be848e53743461567c23c1}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!ref\+Count@{ref\+Count}}
+\index{ref\+Count@{ref\+Count}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{ref\+Count}{refCount}}
+{\footnotesize\ttfamily size\+\_\+t \+\_\+redfish\+Service\+::ref\+Count}
+
+A reference count for this structure. Once this reaches 0 it will be freed \mbox{\Hypertarget{struct__redfishService_a84e8b26ce280c1e1a42c1a6b52ff56a1}\label{struct__redfishService_a84e8b26ce280c1e1a42c1a6b52ff56a1}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!self\+Term@{self\+Term}}
+\index{self\+Term@{self\+Term}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{self\+Term}{selfTerm}}
+{\footnotesize\ttfamily bool \+\_\+redfish\+Service\+::self\+Term}
+
+An indicator to the async thread to terminate itself \mbox{\Hypertarget{struct__redfishService_ac8aa0c23ac4b611dc593c86be30633bc}\label{struct__redfishService_ac8aa0c23ac4b611dc593c86be30633bc}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!session\+Token@{session\+Token}}
+\index{session\+Token@{session\+Token}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{session\+Token}{sessionToken}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+redfish\+Service\+::session\+Token}
+
+A redfish session token. If set this will be used for authentication
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{struct__redfishService_a3959db858c9b279bcf379fc0a5eb7419}{bearer\+Token} 
+
+\hyperlink{struct__redfishService_ac609c13e425bcdfbaaccd756c710a069}{other\+Auth} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{struct__redfishService_ae4d4e7c7b6ad947f2ea0cf06c9980557}\label{struct__redfishService_ae4d4e7c7b6ad947f2ea0cf06c9980557}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!session\+Uri@{session\+Uri}}
+\index{session\+Uri@{session\+Uri}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{session\+Uri}{sessionUri}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+redfish\+Service\+::session\+Uri}
+
+The uri the session is stored at \mbox{\Hypertarget{struct__redfishService_a5cfc99e21117bbb500b618c4c29fdff0}\label{struct__redfishService_a5cfc99e21117bbb500b618c4c29fdff0}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!sse\+Thread@{sse\+Thread}}
+\index{sse\+Thread@{sse\+Thread}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{sse\+Thread}{sseThread}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}{thread} \+\_\+redfish\+Service\+::sse\+Thread}
+
+The thread listening for sse events \mbox{\Hypertarget{struct__redfishService_a352a6086f7d45aa2263fdf867dd97a2a}\label{struct__redfishService_a352a6086f7d45aa2263fdf867dd97a2a}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!tcp\+Socket@{tcp\+Socket}}
+\index{tcp\+Socket@{tcp\+Socket}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{tcp\+Socket}{tcpSocket}}
+{\footnotesize\ttfamily S\+O\+C\+K\+ET \+\_\+redfish\+Service\+::tcp\+Socket}
+
+The socket listening for tcp events \mbox{\Hypertarget{struct__redfishService_a996d74c5be8aec0056150bf04a67ad19}\label{struct__redfishService_a996d74c5be8aec0056150bf04a67ad19}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!tcp\+Thread@{tcp\+Thread}}
+\index{tcp\+Thread@{tcp\+Thread}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{tcp\+Thread}{tcpThread}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_a1ab4f928aeccce6e6996ee96a4059c8a}{thread} \+\_\+redfish\+Service\+::tcp\+Thread}
+
+The thread listening for tcp events \mbox{\Hypertarget{struct__redfishService_a380d0b9d53d04b26fe44f6abc703eb85}\label{struct__redfishService_a380d0b9d53d04b26fe44f6abc703eb85}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!versions@{versions}}
+\index{versions@{versions}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{versions}{versions}}
+{\footnotesize\ttfamily json\+\_\+t$\ast$ \+\_\+redfish\+Service\+::versions}
+
+A json object containing all Redfish versions supported by this service \mbox{\Hypertarget{struct__redfishService_a63dfd6f2784aad814ba5c34c1a2dac01}\label{struct__redfishService_a63dfd6f2784aad814ba5c34c1a2dac01}} 
+\index{\+\_\+redfish\+Service@{\+\_\+redfish\+Service}!zero\+M\+Q\+Listener@{zero\+M\+Q\+Listener}}
+\index{zero\+M\+Q\+Listener@{zero\+M\+Q\+Listener}!\+\_\+redfish\+Service@{\+\_\+redfish\+Service}}
+\subsubsection{\texorpdfstring{zero\+M\+Q\+Listener}{zeroMQListener}}
+{\footnotesize\ttfamily zactor\+\_\+t$\ast$ \+\_\+redfish\+Service\+::zero\+M\+Q\+Listener}
+
+Ths listener for Zero MQ async events 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\hyperlink{internal__service_8h}{internal\+\_\+service.\+h}\end{DoxyCompactItemize}

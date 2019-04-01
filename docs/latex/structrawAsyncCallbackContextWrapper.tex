@@ -1,0 +1,55 @@
+\hypertarget{structrawAsyncCallbackContextWrapper}{}\section{raw\+Async\+Callback\+Context\+Wrapper Struct Reference}
+\label{structrawAsyncCallbackContextWrapper}\index{raw\+Async\+Callback\+Context\+Wrapper@{raw\+Async\+Callback\+Context\+Wrapper}}
+
+
+An internal structure used to convert Redfish calls to raw async H\+T\+T\+P(s) calls.  
+
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} \hyperlink{structrawAsyncCallbackContextWrapper_ac3d8c4b4d27c42d1f57d8ac703a72d6e}{callback}
+\item 
+void $\ast$ \hyperlink{structrawAsyncCallbackContextWrapper_a42e81ff47b8707ccba35e3c7860b0311}{original\+Context}
+\item 
+\hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options} $\ast$ \hyperlink{structrawAsyncCallbackContextWrapper_a696d24a53bf1d16a69a9163ce9db6cbc}{original\+Options}
+\item 
+\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$ \hyperlink{structrawAsyncCallbackContextWrapper_a6a17937ff77e2b5efca6938279e31eaa}{service}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+An internal structure used to convert Redfish calls to raw async H\+T\+T\+P(s) calls. 
+
+An internal structure used to convert a call from the Redfish call interface to the raw H\+T\+T\+P(s) interface 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structrawAsyncCallbackContextWrapper_ac3d8c4b4d27c42d1f57d8ac703a72d6e}\label{structrawAsyncCallbackContextWrapper_ac3d8c4b4d27c42d1f57d8ac703a72d6e}} 
+\index{raw\+Async\+Callback\+Context\+Wrapper@{raw\+Async\+Callback\+Context\+Wrapper}!callback@{callback}}
+\index{callback@{callback}!raw\+Async\+Callback\+Context\+Wrapper@{raw\+Async\+Callback\+Context\+Wrapper}}
+\subsubsection{\texorpdfstring{callback}{callback}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_a13c86956ea56ba1940a2b662e317264e}{redfish\+Async\+Callback} raw\+Async\+Callback\+Context\+Wrapper\+::callback}
+
+The redfish style callback to call when the async H\+T\+T\+P(s) call is complete \mbox{\Hypertarget{structrawAsyncCallbackContextWrapper_a42e81ff47b8707ccba35e3c7860b0311}\label{structrawAsyncCallbackContextWrapper_a42e81ff47b8707ccba35e3c7860b0311}} 
+\index{raw\+Async\+Callback\+Context\+Wrapper@{raw\+Async\+Callback\+Context\+Wrapper}!original\+Context@{original\+Context}}
+\index{original\+Context@{original\+Context}!raw\+Async\+Callback\+Context\+Wrapper@{raw\+Async\+Callback\+Context\+Wrapper}}
+\subsubsection{\texorpdfstring{original\+Context}{originalContext}}
+{\footnotesize\ttfamily void$\ast$ raw\+Async\+Callback\+Context\+Wrapper\+::original\+Context}
+
+The original caller provided context to pass to the callback \mbox{\Hypertarget{structrawAsyncCallbackContextWrapper_a696d24a53bf1d16a69a9163ce9db6cbc}\label{structrawAsyncCallbackContextWrapper_a696d24a53bf1d16a69a9163ce9db6cbc}} 
+\index{raw\+Async\+Callback\+Context\+Wrapper@{raw\+Async\+Callback\+Context\+Wrapper}!original\+Options@{original\+Options}}
+\index{original\+Options@{original\+Options}!raw\+Async\+Callback\+Context\+Wrapper@{raw\+Async\+Callback\+Context\+Wrapper}}
+\subsubsection{\texorpdfstring{original\+Options}{originalOptions}}
+{\footnotesize\ttfamily \hyperlink{structredfishAsyncOptions}{redfish\+Async\+Options}$\ast$ raw\+Async\+Callback\+Context\+Wrapper\+::original\+Options}
+
+The original options passed to the call so that child calls can use the same options \mbox{\Hypertarget{structrawAsyncCallbackContextWrapper_a6a17937ff77e2b5efca6938279e31eaa}\label{structrawAsyncCallbackContextWrapper_a6a17937ff77e2b5efca6938279e31eaa}} 
+\index{raw\+Async\+Callback\+Context\+Wrapper@{raw\+Async\+Callback\+Context\+Wrapper}!service@{service}}
+\index{service@{service}!raw\+Async\+Callback\+Context\+Wrapper@{raw\+Async\+Callback\+Context\+Wrapper}}
+\subsubsection{\texorpdfstring{service}{service}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service}$\ast$ raw\+Async\+Callback\+Context\+Wrapper\+::service}
+
+The redfish service the call was made on 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/service.\+c\end{DoxyCompactItemize}

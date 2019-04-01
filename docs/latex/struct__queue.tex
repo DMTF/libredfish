@@ -1,0 +1,104 @@
+\hypertarget{struct__queue}{}\section{\+\_\+queue Struct Reference}
+\label{struct__queue}\index{\+\_\+queue@{\+\_\+queue}}
+
+
+A mostly lock free queue.  
+
+
+
+
+{\ttfamily \#include $<$queue.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{queue_8h_ae1857eedcea35e26ec2c78b7b122b095}{queue\+Node} $\ast$ \hyperlink{struct__queue_a3720f64e698aa40d96ee20e8751c41fb}{first}
+\begin{DoxyCompactList}\small\item\em The first element in the queue. \end{DoxyCompactList}\item 
+\hyperlink{queue_8h_ae1857eedcea35e26ec2c78b7b122b095}{queue\+Node} $\ast$ \hyperlink{struct__queue_a4def97dd0c360cb833228b57dada20dc}{divider}
+\begin{DoxyCompactList}\small\item\em The division between the producer and consumer side of the queue. \end{DoxyCompactList}\item 
+\hyperlink{queue_8h_ae1857eedcea35e26ec2c78b7b122b095}{queue\+Node} $\ast$ \hyperlink{struct__queue_a29b95a909fa3663c0ac1d3d5d60f46cc}{last}
+\begin{DoxyCompactList}\small\item\em The last element in the queue. \end{DoxyCompactList}\item 
+\hyperlink{queue_8h_a8c80af1d72030a9dc70c3a2c3e46ae9a}{mutex} \hyperlink{struct__queue_ae3358baa9df4a511359bbd0c318177e0}{push\+Lock}
+\begin{DoxyCompactList}\small\item\em The producer lock. \end{DoxyCompactList}\item 
+\hyperlink{queue_8h_a8c80af1d72030a9dc70c3a2c3e46ae9a}{mutex} \hyperlink{struct__queue_ad365cfb038935edc4496f6e5df7f8ee8}{pop\+Lock}
+\begin{DoxyCompactList}\small\item\em The consumer lock. \end{DoxyCompactList}\item 
+\hyperlink{queue_8h_a18a0de1af5a8524b75bf94d6b14701b4}{condition} \hyperlink{struct__queue_a1b938cb0b6d5e37e6b8e3715d5bd5c4a}{pushed}
+\begin{DoxyCompactList}\small\item\em The pushed condition variable. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A mostly lock free queue. 
+
+A queue where the producer side shares a lock and the consumer side shares a lock. This means that as long as you only have one producer or one consumer you should not have any lock contention issues. The locks are also used in order to signal the consumer on new data rather than doing a busy wait.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{struct__queue__node}{\+\_\+queue\+\_\+node} 
+\end{DoxySeeAlso}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{struct__queue_a4def97dd0c360cb833228b57dada20dc}\label{struct__queue_a4def97dd0c360cb833228b57dada20dc}} 
+\index{\+\_\+queue@{\+\_\+queue}!divider@{divider}}
+\index{divider@{divider}!\+\_\+queue@{\+\_\+queue}}
+\subsubsection{\texorpdfstring{divider}{divider}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_ae1857eedcea35e26ec2c78b7b122b095}{queue\+Node}$\ast$ \+\_\+queue\+::divider}
+
+
+
+The division between the producer and consumer side of the queue. 
+
+This points to a fake element in the list. Everything on the left side of the element has been read by the consumer and is ready to be freed. Everything on the right side of the queue is ready to be read. Bascially, this element ensures that nothing is being free\textquotesingle{}d while it\textquotesingle{}s being read and is the \char`\"{}magic\char`\"{} that lets the producer and consumer sides not share a lock. \mbox{\Hypertarget{struct__queue_a3720f64e698aa40d96ee20e8751c41fb}\label{struct__queue_a3720f64e698aa40d96ee20e8751c41fb}} 
+\index{\+\_\+queue@{\+\_\+queue}!first@{first}}
+\index{first@{first}!\+\_\+queue@{\+\_\+queue}}
+\subsubsection{\texorpdfstring{first}{first}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_ae1857eedcea35e26ec2c78b7b122b095}{queue\+Node}$\ast$ \+\_\+queue\+::first}
+
+
+
+The first element in the queue. 
+
+The first element in the queue or the same as divider and last if the queue is empty. \mbox{\Hypertarget{struct__queue_a29b95a909fa3663c0ac1d3d5d60f46cc}\label{struct__queue_a29b95a909fa3663c0ac1d3d5d60f46cc}} 
+\index{\+\_\+queue@{\+\_\+queue}!last@{last}}
+\index{last@{last}!\+\_\+queue@{\+\_\+queue}}
+\subsubsection{\texorpdfstring{last}{last}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_ae1857eedcea35e26ec2c78b7b122b095}{queue\+Node}$\ast$ \+\_\+queue\+::last}
+
+
+
+The last element in the queue. 
+
+The last element in the queue or the same as divider and first if the queue is empty. \mbox{\Hypertarget{struct__queue_ad365cfb038935edc4496f6e5df7f8ee8}\label{struct__queue_ad365cfb038935edc4496f6e5df7f8ee8}} 
+\index{\+\_\+queue@{\+\_\+queue}!pop\+Lock@{pop\+Lock}}
+\index{pop\+Lock@{pop\+Lock}!\+\_\+queue@{\+\_\+queue}}
+\subsubsection{\texorpdfstring{pop\+Lock}{popLock}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_a8c80af1d72030a9dc70c3a2c3e46ae9a}{mutex} \+\_\+queue\+::pop\+Lock}
+
+
+
+The consumer lock. 
+
+The lock aquired whenever an element is popped off the queue. This is normally only obtained by the consumer except both this lock and push\+Lock are obtained by any call to \hyperlink{queue_8h_aa4727b72ed89cd406d2809482181b959}{free\+Queue()}. \mbox{\Hypertarget{struct__queue_a1b938cb0b6d5e37e6b8e3715d5bd5c4a}\label{struct__queue_a1b938cb0b6d5e37e6b8e3715d5bd5c4a}} 
+\index{\+\_\+queue@{\+\_\+queue}!pushed@{pushed}}
+\index{pushed@{pushed}!\+\_\+queue@{\+\_\+queue}}
+\subsubsection{\texorpdfstring{pushed}{pushed}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_a18a0de1af5a8524b75bf94d6b14701b4}{condition} \+\_\+queue\+::pushed}
+
+
+
+The pushed condition variable. 
+
+The condition that is signalled anytime anything is pushed onto the queue. \mbox{\Hypertarget{struct__queue_ae3358baa9df4a511359bbd0c318177e0}\label{struct__queue_ae3358baa9df4a511359bbd0c318177e0}} 
+\index{\+\_\+queue@{\+\_\+queue}!push\+Lock@{push\+Lock}}
+\index{push\+Lock@{push\+Lock}!\+\_\+queue@{\+\_\+queue}}
+\subsubsection{\texorpdfstring{push\+Lock}{pushLock}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_a8c80af1d72030a9dc70c3a2c3e46ae9a}{mutex} \+\_\+queue\+::push\+Lock}
+
+
+
+The producer lock. 
+
+The lock aquired whenever an element is pushed onto the queue. This is normally only obtained by the producer except both this lock and pop\+Lock are obtained by any call to \hyperlink{queue_8h_aa4727b72ed89cd406d2809482181b959}{free\+Queue()}. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\hyperlink{queue_8h}{queue.\+h}\end{DoxyCompactItemize}

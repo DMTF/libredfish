@@ -1,0 +1,315 @@
+\hypertarget{redfishRawAsync_8h}{}\section{include/redfish\+Raw\+Async.h File Reference}
+\label{redfishRawAsync_8h}\index{include/redfish\+Raw\+Async.\+h@{include/redfish\+Raw\+Async.\+h}}
+
+
+File containing the interface for the asynchronous H\+T\+TP function.  
+
+
+{\ttfamily \#include $<$redfish\+Service.\+h$>$}\newline
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct__httpHeader}{\+\_\+http\+Header}
+\begin{DoxyCompactList}\small\item\em A representation of an H\+T\+TP header. \end{DoxyCompactList}\item 
+struct \hyperlink{struct__asyncHttpRequest}{\+\_\+async\+Http\+Request}
+\begin{DoxyCompactList}\small\item\em An asynchronous H\+T\+T\+P(s) request. \end{DoxyCompactList}\item 
+struct \hyperlink{struct__asyncHttpResponse}{\+\_\+async\+Http\+Response}
+\begin{DoxyCompactList}\small\item\em An asynchronous H\+T\+T\+P(s) response. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \hyperlink{struct__httpHeader}{\+\_\+http\+Header} \hyperlink{redfishRawAsync_8h_a3ee36950587f4749a62b080e3e157280}{http\+Header}
+\begin{DoxyCompactList}\small\item\em A representation of an H\+T\+TP header. \end{DoxyCompactList}\item 
+typedef enum \hyperlink{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2df}{\+\_\+http\+Method} \hyperlink{redfishRawAsync_8h_a15f26ab1ae1b376c50b78e58ded397be}{http\+Method}
+\begin{DoxyCompactList}\small\item\em An H\+T\+TP method. \end{DoxyCompactList}\item 
+typedef struct \hyperlink{struct__asyncHttpRequest}{\+\_\+async\+Http\+Request} \hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request}
+\begin{DoxyCompactList}\small\item\em An asynchronous H\+T\+T\+P(s) request. \end{DoxyCompactList}\item 
+typedef struct \hyperlink{struct__asyncHttpResponse}{\+\_\+async\+Http\+Response} \hyperlink{redfishRawAsync_8h_abce1bfc384186dfa5507dd7a3dc7bcc7}{async\+Http\+Response}
+\begin{DoxyCompactList}\small\item\em An asynchronous H\+T\+T\+P(s) response. \end{DoxyCompactList}\item 
+typedef void($\ast$ \hyperlink{redfishRawAsync_8h_a0fe5b4a806033e1fcf0cbc4b2b53953f}{async\+Raw\+Callback}) (\hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request} $\ast$request, \hyperlink{redfishRawAsync_8h_abce1bfc384186dfa5507dd7a3dc7bcc7}{async\+Http\+Response} $\ast$response, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em A callback when the request is finished. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2df}{\+\_\+http\+Method} \{ \newline
+\hyperlink{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfa4ad23c3d2f21f7502ba058ef89518166}{H\+T\+T\+P\+\_\+\+G\+ET}, 
+\hyperlink{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfab547cb50f6792b41c3e7d52ee0f8e442}{H\+T\+T\+P\+\_\+\+H\+E\+AD}, 
+\hyperlink{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfaa763023b51da2b3618f24cbf994b34bf}{H\+T\+T\+P\+\_\+\+P\+O\+ST}, 
+\hyperlink{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfa2415577115dd0cd5d5a5aa62d52e1512}{H\+T\+T\+P\+\_\+\+P\+UT}, 
+\newline
+\hyperlink{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfa427575ab776ed70f0aa76667affc3942}{H\+T\+T\+P\+\_\+\+D\+E\+L\+E\+TE}, 
+\hyperlink{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfa86aa5540a666a38528d28bd7591cb251}{H\+T\+T\+P\+\_\+\+O\+P\+T\+I\+O\+NS}, 
+\hyperlink{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfae1345469c9ff83a10676dd96e7acf0dc}{H\+T\+T\+P\+\_\+\+P\+A\+T\+CH}
+ \}\begin{DoxyCompactList}\small\item\em An H\+T\+TP method. \end{DoxyCompactList}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request} $\ast$ \hyperlink{redfishRawAsync_8h_af40c562befe39efae32e0928fe3b267c}{create\+Request} (const char $\ast$url, \hyperlink{redfishRawAsync_8h_a15f26ab1ae1b376c50b78e58ded397be}{http\+Method} method, size\+\_\+t bodysize, char $\ast$body)
+\begin{DoxyCompactList}\small\item\em Create an async\+Http\+Request struct. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void \hyperlink{redfishRawAsync_8h_ade74b3fb58a184187938876342ed2048}{add\+Request\+Header} (\hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request} $\ast$request, const char $\ast$name, const char $\ast$value)
+\begin{DoxyCompactList}\small\item\em Add a new header to an existing request. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{redfishRawAsync_8h_a3ee36950587f4749a62b080e3e157280}{http\+Header} $\ast$ \hyperlink{redfishRawAsync_8h_a55dd16ba17a96dbfbe1482978b2a7431}{response\+Get\+Header} (\hyperlink{redfishRawAsync_8h_abce1bfc384186dfa5507dd7a3dc7bcc7}{async\+Http\+Response} $\ast$response, const char $\ast$name)
+\begin{DoxyCompactList}\small\item\em Finds a header in the response. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool \hyperlink{redfishRawAsync_8h_a947644e2eefe151746a2966e7f06feca}{start\+Raw\+Async\+Request} (\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$service, \hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request} $\ast$request, \hyperlink{redfishRawAsync_8h_a0fe5b4a806033e1fcf0cbc4b2b53953f}{async\+Raw\+Callback} callback, void $\ast$context)
+\begin{DoxyCompactList}\small\item\em Start an async request. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void \hyperlink{redfishRawAsync_8h_a9b3d455cd04b463cd96e82b054fdee76}{free\+Async\+Request} (\hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request} $\ast$request)
+\begin{DoxyCompactList}\small\item\em Free an async\+Http\+Request struct. \end{DoxyCompactList}\item 
+\hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void \hyperlink{redfishRawAsync_8h_addc6f1820205fd4b408ebb8cae10521b}{free\+Async\+Response} (\hyperlink{redfishRawAsync_8h_abce1bfc384186dfa5507dd7a3dc7bcc7}{async\+Http\+Response} $\ast$response)
+\begin{DoxyCompactList}\small\item\em Free an async\+Http\+Response struct. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File containing the interface for the asynchronous H\+T\+TP function. 
+
+\begin{DoxyAuthor}{Author}
+Patrick Boyd This file explains the interface for the asynchronous raw H\+T\+T\+P(s) calls. These function do no do any extra processing for redfish including adding authentication information. Therefore, these should only be used if the normal redfish calls cannot function. 
+\end{DoxyAuthor}
+
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}\label{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}} 
+\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!async\+Http\+Request@{async\+Http\+Request}}
+\index{async\+Http\+Request@{async\+Http\+Request}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}
+\subsubsection{\texorpdfstring{async\+Http\+Request}{asyncHttpRequest}}
+{\footnotesize\ttfamily typedef struct \hyperlink{struct__asyncHttpRequest}{\+\_\+async\+Http\+Request}  \hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request}}
+
+
+
+An asynchronous H\+T\+T\+P(s) request. 
+
+A structure with all the information needed to start an H\+T\+T\+P(s) request. \mbox{\Hypertarget{redfishRawAsync_8h_abce1bfc384186dfa5507dd7a3dc7bcc7}\label{redfishRawAsync_8h_abce1bfc384186dfa5507dd7a3dc7bcc7}} 
+\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!async\+Http\+Response@{async\+Http\+Response}}
+\index{async\+Http\+Response@{async\+Http\+Response}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}
+\subsubsection{\texorpdfstring{async\+Http\+Response}{asyncHttpResponse}}
+{\footnotesize\ttfamily typedef struct \hyperlink{struct__asyncHttpResponse}{\+\_\+async\+Http\+Response}  \hyperlink{redfishRawAsync_8h_abce1bfc384186dfa5507dd7a3dc7bcc7}{async\+Http\+Response}}
+
+
+
+An asynchronous H\+T\+T\+P(s) response. 
+
+A structure with all the information returned by the server. \mbox{\Hypertarget{redfishRawAsync_8h_a0fe5b4a806033e1fcf0cbc4b2b53953f}\label{redfishRawAsync_8h_a0fe5b4a806033e1fcf0cbc4b2b53953f}} 
+\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!async\+Raw\+Callback@{async\+Raw\+Callback}}
+\index{async\+Raw\+Callback@{async\+Raw\+Callback}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}
+\subsubsection{\texorpdfstring{async\+Raw\+Callback}{asyncRawCallback}}
+{\footnotesize\ttfamily typedef void($\ast$ async\+Raw\+Callback) (\hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request} $\ast$request, \hyperlink{redfishRawAsync_8h_abce1bfc384186dfa5507dd7a3dc7bcc7}{async\+Http\+Response} $\ast$response, void $\ast$context)}
+
+
+
+A callback when the request is finished. 
+
+A function callback called when the request has finished.
+
+
+\begin{DoxyParams}{Parameters}
+{\em request} & The request that was sent. The function should free this. \\
+\hline
+{\em response} & The response that was received. The function should free this. \\
+\hline
+{\em context} & The context that was passed to start\+Raw\+Async\+Request. It is up to the consumer to determine if this should be freed or not \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishRawAsync_8h_a947644e2eefe151746a2966e7f06feca}{start\+Raw\+Async\+Request} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishRawAsync_8h_a3ee36950587f4749a62b080e3e157280}\label{redfishRawAsync_8h_a3ee36950587f4749a62b080e3e157280}} 
+\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!http\+Header@{http\+Header}}
+\index{http\+Header@{http\+Header}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}
+\subsubsection{\texorpdfstring{http\+Header}{httpHeader}}
+{\footnotesize\ttfamily typedef struct \hyperlink{struct__httpHeader}{\+\_\+http\+Header}  \hyperlink{redfishRawAsync_8h_a3ee36950587f4749a62b080e3e157280}{http\+Header}}
+
+
+
+A representation of an H\+T\+TP header. 
+
+An H\+T\+TP header structure list. \mbox{\Hypertarget{redfishRawAsync_8h_a15f26ab1ae1b376c50b78e58ded397be}\label{redfishRawAsync_8h_a15f26ab1ae1b376c50b78e58ded397be}} 
+\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!http\+Method@{http\+Method}}
+\index{http\+Method@{http\+Method}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}
+\subsubsection{\texorpdfstring{http\+Method}{httpMethod}}
+{\footnotesize\ttfamily typedef enum \hyperlink{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2df}{\+\_\+http\+Method}  \hyperlink{redfishRawAsync_8h_a15f26ab1ae1b376c50b78e58ded397be}{http\+Method}}
+
+
+
+An H\+T\+TP method. 
+
+A representation of an H\+T\+TP method. 
+
+\subsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2df}\label{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2df}} 
+\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!\+\_\+http\+Method@{\+\_\+http\+Method}}
+\index{\+\_\+http\+Method@{\+\_\+http\+Method}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}
+\subsubsection{\texorpdfstring{\+\_\+http\+Method}{\_httpMethod}}
+{\footnotesize\ttfamily enum \hyperlink{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2df}{\+\_\+http\+Method}}
+
+
+
+An H\+T\+TP method. 
+
+A representation of an H\+T\+TP method. \begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+G\+ET@{H\+T\+T\+P\+\_\+\+G\+ET}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!H\+T\+T\+P\+\_\+\+G\+ET@{H\+T\+T\+P\+\_\+\+G\+ET}}}\mbox{\Hypertarget{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfa4ad23c3d2f21f7502ba058ef89518166}\label{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfa4ad23c3d2f21f7502ba058ef89518166}} 
+H\+T\+T\+P\+\_\+\+G\+ET&Get an H\+T\+TP resource \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+H\+E\+AD@{H\+T\+T\+P\+\_\+\+H\+E\+AD}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!H\+T\+T\+P\+\_\+\+H\+E\+AD@{H\+T\+T\+P\+\_\+\+H\+E\+AD}}}\mbox{\Hypertarget{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfab547cb50f6792b41c3e7d52ee0f8e442}\label{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfab547cb50f6792b41c3e7d52ee0f8e442}} 
+H\+T\+T\+P\+\_\+\+H\+E\+AD&Get the headers for an H\+T\+TP resource \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+P\+O\+ST@{H\+T\+T\+P\+\_\+\+P\+O\+ST}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!H\+T\+T\+P\+\_\+\+P\+O\+ST@{H\+T\+T\+P\+\_\+\+P\+O\+ST}}}\mbox{\Hypertarget{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfaa763023b51da2b3618f24cbf994b34bf}\label{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfaa763023b51da2b3618f24cbf994b34bf}} 
+H\+T\+T\+P\+\_\+\+P\+O\+ST&Write/\+Create an H\+T\+TP resource \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+P\+UT@{H\+T\+T\+P\+\_\+\+P\+UT}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!H\+T\+T\+P\+\_\+\+P\+UT@{H\+T\+T\+P\+\_\+\+P\+UT}}}\mbox{\Hypertarget{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfa2415577115dd0cd5d5a5aa62d52e1512}\label{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfa2415577115dd0cd5d5a5aa62d52e1512}} 
+H\+T\+T\+P\+\_\+\+P\+UT&Write an H\+T\+TP resource \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+D\+E\+L\+E\+TE@{H\+T\+T\+P\+\_\+\+D\+E\+L\+E\+TE}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!H\+T\+T\+P\+\_\+\+D\+E\+L\+E\+TE@{H\+T\+T\+P\+\_\+\+D\+E\+L\+E\+TE}}}\mbox{\Hypertarget{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfa427575ab776ed70f0aa76667affc3942}\label{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfa427575ab776ed70f0aa76667affc3942}} 
+H\+T\+T\+P\+\_\+\+D\+E\+L\+E\+TE&Delete an H\+T\+TP resource \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+O\+P\+T\+I\+O\+NS@{H\+T\+T\+P\+\_\+\+O\+P\+T\+I\+O\+NS}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!H\+T\+T\+P\+\_\+\+O\+P\+T\+I\+O\+NS@{H\+T\+T\+P\+\_\+\+O\+P\+T\+I\+O\+NS}}}\mbox{\Hypertarget{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfa86aa5540a666a38528d28bd7591cb251}\label{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfa86aa5540a666a38528d28bd7591cb251}} 
+H\+T\+T\+P\+\_\+\+O\+P\+T\+I\+O\+NS&Get the communication options for an H\+T\+TP resource \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+P\+A\+T\+CH@{H\+T\+T\+P\+\_\+\+P\+A\+T\+CH}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!H\+T\+T\+P\+\_\+\+P\+A\+T\+CH@{H\+T\+T\+P\+\_\+\+P\+A\+T\+CH}}}\mbox{\Hypertarget{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfae1345469c9ff83a10676dd96e7acf0dc}\label{redfishRawAsync_8h_af5aca1d41f70a50eaea19a14c0eeb2dfae1345469c9ff83a10676dd96e7acf0dc}} 
+H\+T\+T\+P\+\_\+\+P\+A\+T\+CH&Write part of an H\+T\+TP resource \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{redfishRawAsync_8h_ade74b3fb58a184187938876342ed2048}\label{redfishRawAsync_8h_ade74b3fb58a184187938876342ed2048}} 
+\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!add\+Request\+Header@{add\+Request\+Header}}
+\index{add\+Request\+Header@{add\+Request\+Header}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}
+\subsubsection{\texorpdfstring{add\+Request\+Header()}{addRequestHeader()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void add\+Request\+Header (\begin{DoxyParamCaption}\item[{\hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request} $\ast$}]{request,  }\item[{const char $\ast$}]{name,  }\item[{const char $\ast$}]{value }\end{DoxyParamCaption})}
+
+
+
+Add a new header to an existing request. 
+
+This method adds an H\+T\+TP header to the async\+Http\+Request struct.
+
+
+\begin{DoxyParams}{Parameters}
+{\em request} & The request to add the header to. \\
+\hline
+{\em name} & The H\+T\+TP header name \\
+\hline
+{\em value} & The H\+T\+TP header value \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{redfishRawAsync_8h_af40c562befe39efae32e0928fe3b267c}\label{redfishRawAsync_8h_af40c562befe39efae32e0928fe3b267c}} 
+\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!create\+Request@{create\+Request}}
+\index{create\+Request@{create\+Request}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}
+\subsubsection{\texorpdfstring{create\+Request()}{createRequest()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request}$\ast$ create\+Request (\begin{DoxyParamCaption}\item[{const char $\ast$}]{url,  }\item[{\hyperlink{redfishRawAsync_8h_a15f26ab1ae1b376c50b78e58ded397be}{http\+Method}}]{method,  }\item[{size\+\_\+t}]{bodysize,  }\item[{char $\ast$}]{body }\end{DoxyParamCaption})}
+
+
+
+Create an async\+Http\+Request struct. 
+
+This method creates an async\+Http\+Request struct and initializes the values per the parameters.
+
+
+\begin{DoxyParams}{Parameters}
+{\em url} & The url to send the request to. This should be the full U\+RL with protocol schema. \\
+\hline
+{\em method} & The H\+T\+TP method to use \\
+\hline
+{\em bodysize} & The size of the H\+T\+TP body payload \\
+\hline
+{\em body} & The H\+T\+TP body payload to send \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+N\+U\+LL on failure, otherwise an async\+Http\+Request pointer 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishRawAsync_8h_a9b3d455cd04b463cd96e82b054fdee76}{free\+Async\+Request} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishRawAsync_8h_a9b3d455cd04b463cd96e82b054fdee76}\label{redfishRawAsync_8h_a9b3d455cd04b463cd96e82b054fdee76}} 
+\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!free\+Async\+Request@{free\+Async\+Request}}
+\index{free\+Async\+Request@{free\+Async\+Request}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}
+\subsubsection{\texorpdfstring{free\+Async\+Request()}{freeAsyncRequest()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void free\+Async\+Request (\begin{DoxyParamCaption}\item[{\hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request} $\ast$}]{request }\end{DoxyParamCaption})}
+
+
+
+Free an async\+Http\+Request struct. 
+
+This method frees an async\+Http\+Request struct and all associated values.
+
+
+\begin{DoxyParams}{Parameters}
+{\em request} & The request to free. \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{redfishRawAsync_8h_af40c562befe39efae32e0928fe3b267c}{create\+Request} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{redfishRawAsync_8h_addc6f1820205fd4b408ebb8cae10521b}\label{redfishRawAsync_8h_addc6f1820205fd4b408ebb8cae10521b}} 
+\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!free\+Async\+Response@{free\+Async\+Response}}
+\index{free\+Async\+Response@{free\+Async\+Response}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}
+\subsubsection{\texorpdfstring{free\+Async\+Response()}{freeAsyncResponse()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} void free\+Async\+Response (\begin{DoxyParamCaption}\item[{\hyperlink{redfishRawAsync_8h_abce1bfc384186dfa5507dd7a3dc7bcc7}{async\+Http\+Response} $\ast$}]{response }\end{DoxyParamCaption})}
+
+
+
+Free an async\+Http\+Response struct. 
+
+This method frees an async\+Http\+Response struct and all associated values.
+
+
+\begin{DoxyParams}{Parameters}
+{\em response} & The response to free. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{redfishRawAsync_8h_a55dd16ba17a96dbfbe1482978b2a7431}\label{redfishRawAsync_8h_a55dd16ba17a96dbfbe1482978b2a7431}} 
+\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!response\+Get\+Header@{response\+Get\+Header}}
+\index{response\+Get\+Header@{response\+Get\+Header}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}
+\subsubsection{\texorpdfstring{response\+Get\+Header()}{responseGetHeader()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} \hyperlink{redfishRawAsync_8h_a3ee36950587f4749a62b080e3e157280}{http\+Header}$\ast$ response\+Get\+Header (\begin{DoxyParamCaption}\item[{\hyperlink{redfishRawAsync_8h_abce1bfc384186dfa5507dd7a3dc7bcc7}{async\+Http\+Response} $\ast$}]{response,  }\item[{const char $\ast$}]{name }\end{DoxyParamCaption})}
+
+
+
+Finds a header in the response. 
+
+This method finds an H\+T\+TP header in the async\+Http\+Response struct.
+
+
+\begin{DoxyParams}{Parameters}
+{\em response} & The response to search. \\
+\hline
+{\em name} & The H\+T\+TP header name \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+N\+U\+LL if not found, an http\+Header$\ast$ if found 
+\end{DoxyReturn}
+\mbox{\Hypertarget{redfishRawAsync_8h_a947644e2eefe151746a2966e7f06feca}\label{redfishRawAsync_8h_a947644e2eefe151746a2966e7f06feca}} 
+\index{redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}!start\+Raw\+Async\+Request@{start\+Raw\+Async\+Request}}
+\index{start\+Raw\+Async\+Request@{start\+Raw\+Async\+Request}!redfish\+Raw\+Async.\+h@{redfish\+Raw\+Async.\+h}}
+\subsubsection{\texorpdfstring{start\+Raw\+Async\+Request()}{startRawAsyncRequest()}}
+{\footnotesize\ttfamily \hyperlink{redfishService_8h_adde99f84609730688c6f817991c93390}{R\+E\+D\+F\+I\+S\+H\+\_\+\+E\+X\+P\+O\+RT} bool start\+Raw\+Async\+Request (\begin{DoxyParamCaption}\item[{\hyperlink{redfishService_8h_a4c9115c0f0a21de971c0dfae06f26372}{redfish\+Service} $\ast$}]{service,  }\item[{\hyperlink{redfishRawAsync_8h_a18894e379815e825467bd6e13802b07b}{async\+Http\+Request} $\ast$}]{request,  }\item[{\hyperlink{redfishRawAsync_8h_a0fe5b4a806033e1fcf0cbc4b2b53953f}{async\+Raw\+Callback}}]{callback,  }\item[{void $\ast$}]{context }\end{DoxyParamCaption})}
+
+
+
+Start an async request. 
+
+This method will start an async request. It will initialize the queue and start the async thread if they have not already been initilized.
+
+
+\begin{DoxyParams}{Parameters}
+{\em service} & The redfish service used. This is used to maintain a queue and thread per service. \\
+\hline
+{\em request} & The request to send \\
+\hline
+{\em callback} & The function to call upon completion \\
+\hline
+{\em context} & An opaque pointer to pass to the callback \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+false if the request could not be initiated, true otherwise 
+\end{DoxyReturn}

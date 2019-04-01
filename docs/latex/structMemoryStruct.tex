@@ -1,0 +1,71 @@
+\hypertarget{structMemoryStruct}{}\section{Memory\+Struct Struct Reference}
+\label{structMemoryStruct}\index{Memory\+Struct@{Memory\+Struct}}
+
+
+A representation of memory for C\+U\+RL callbacks.  
+
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$ \hyperlink{structMemoryStruct_a218a6fde0f367d44400542cbe523e943}{memory}
+\begin{DoxyCompactList}\small\item\em The memory pointer. \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{structMemoryStruct_a79d6a7ad34b172f766c19d0846688440}{size}
+\begin{DoxyCompactList}\small\item\em The size of the memory region pointed to by memory. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{structMemoryStruct_aaad2180b9716f5bf623bf8275f473a95}{origin}
+\begin{DoxyCompactList}\small\item\em The original memory pointer. \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{structMemoryStruct_a1b96a64b16fc89c7ae010dee990a9bb8}{original\+Size}
+\begin{DoxyCompactList}\small\item\em The original size of the memory pointer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A representation of memory for C\+U\+RL callbacks. 
+
+An item representing memory for use in C\+U\+RL callbacks allowing for movement through the buffer as data is sent/receieved. 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structMemoryStruct_a218a6fde0f367d44400542cbe523e943}\label{structMemoryStruct_a218a6fde0f367d44400542cbe523e943}} 
+\index{Memory\+Struct@{Memory\+Struct}!memory@{memory}}
+\index{memory@{memory}!Memory\+Struct@{Memory\+Struct}}
+\subsubsection{\texorpdfstring{memory}{memory}}
+{\footnotesize\ttfamily char$\ast$ Memory\+Struct\+::memory}
+
+
+
+The memory pointer. 
+
+On data sent to the server this pointer will be incremented as data is sent and will always point to the next byte to be sent. On data receieved from the server this pointer will always point to the first data byte receieved and be reallocated as needed. \mbox{\Hypertarget{structMemoryStruct_aaad2180b9716f5bf623bf8275f473a95}\label{structMemoryStruct_aaad2180b9716f5bf623bf8275f473a95}} 
+\index{Memory\+Struct@{Memory\+Struct}!origin@{origin}}
+\index{origin@{origin}!Memory\+Struct@{Memory\+Struct}}
+\subsubsection{\texorpdfstring{origin}{origin}}
+{\footnotesize\ttfamily char$\ast$ Memory\+Struct\+::origin}
+
+
+
+The original memory pointer. 
+
+On data sent to the server this pointer will point to the first byte sent allowing the buffer to be freed when complete. This pointer is not used on receive. \mbox{\Hypertarget{structMemoryStruct_a1b96a64b16fc89c7ae010dee990a9bb8}\label{structMemoryStruct_a1b96a64b16fc89c7ae010dee990a9bb8}} 
+\index{Memory\+Struct@{Memory\+Struct}!original\+Size@{original\+Size}}
+\index{original\+Size@{original\+Size}!Memory\+Struct@{Memory\+Struct}}
+\subsubsection{\texorpdfstring{original\+Size}{originalSize}}
+{\footnotesize\ttfamily size\+\_\+t Memory\+Struct\+::original\+Size}
+
+
+
+The original size of the memory pointer. 
+
+On data sent to the server this will contain the original value of size. This is used when seeking back in the buffer to resent part of the payload. This pointer is not used on receive. \mbox{\Hypertarget{structMemoryStruct_a79d6a7ad34b172f766c19d0846688440}\label{structMemoryStruct_a79d6a7ad34b172f766c19d0846688440}} 
+\index{Memory\+Struct@{Memory\+Struct}!size@{size}}
+\index{size@{size}!Memory\+Struct@{Memory\+Struct}}
+\subsubsection{\texorpdfstring{size}{size}}
+{\footnotesize\ttfamily size\+\_\+t Memory\+Struct\+::size}
+
+
+
+The size of the memory region pointed to by memory. 
+
+On data sent to the server this value will be reduced as the memory pointer is incremented. On data received from the server this value will be increased to represent the total size of the memory pointer 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/async\+Raw.\+c\end{DoxyCompactItemize}

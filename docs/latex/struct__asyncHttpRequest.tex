@@ -1,0 +1,75 @@
+\hypertarget{struct__asyncHttpRequest}{}\section{\+\_\+async\+Http\+Request Struct Reference}
+\label{struct__asyncHttpRequest}\index{\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}}
+
+
+An asynchronous H\+T\+T\+P(s) request.  
+
+
+
+
+{\ttfamily \#include $<$redfish\+Raw\+Async.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$ \hyperlink{struct__asyncHttpRequest_ade18f96cd3e2cb3395dd978597283a9f}{url}
+\item 
+\hyperlink{redfishRawAsync_8h_a15f26ab1ae1b376c50b78e58ded397be}{http\+Method} \hyperlink{struct__asyncHttpRequest_a43ee659ce0011d76e6e06af3a02f7ee2}{method}
+\item 
+unsigned long \hyperlink{struct__asyncHttpRequest_a471f8b6fb269a1efc9f79c6dd530ed69}{timeout}
+\item 
+\hyperlink{redfishRawAsync_8h_a3ee36950587f4749a62b080e3e157280}{http\+Header} $\ast$ \hyperlink{struct__asyncHttpRequest_a9c9afff85d7852ab125cb1a8ecee5a06}{headers}
+\item 
+size\+\_\+t \hyperlink{struct__asyncHttpRequest_a75d8c04d93312ca23e60ad4b48903cc3}{body\+Size}
+\item 
+char $\ast$ \hyperlink{struct__asyncHttpRequest_ac6484f43afba5232a4346742659a7d04}{body}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+An asynchronous H\+T\+T\+P(s) request. 
+
+A structure with all the information needed to start an H\+T\+T\+P(s) request. 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{struct__asyncHttpRequest_ac6484f43afba5232a4346742659a7d04}\label{struct__asyncHttpRequest_ac6484f43afba5232a4346742659a7d04}} 
+\index{\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}!body@{body}}
+\index{body@{body}!\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}}
+\subsubsection{\texorpdfstring{body}{body}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+async\+Http\+Request\+::body}
+
+The request payload body. char$\ast$ is used for convience. Binary data can be passed and the body\+Size parameter dictates the length \mbox{\Hypertarget{struct__asyncHttpRequest_a75d8c04d93312ca23e60ad4b48903cc3}\label{struct__asyncHttpRequest_a75d8c04d93312ca23e60ad4b48903cc3}} 
+\index{\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}!body\+Size@{body\+Size}}
+\index{body\+Size@{body\+Size}!\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}}
+\subsubsection{\texorpdfstring{body\+Size}{bodySize}}
+{\footnotesize\ttfamily size\+\_\+t \+\_\+async\+Http\+Request\+::body\+Size}
+
+The size of the request payload body \mbox{\Hypertarget{struct__asyncHttpRequest_a9c9afff85d7852ab125cb1a8ecee5a06}\label{struct__asyncHttpRequest_a9c9afff85d7852ab125cb1a8ecee5a06}} 
+\index{\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}!headers@{headers}}
+\index{headers@{headers}!\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}}
+\subsubsection{\texorpdfstring{headers}{headers}}
+{\footnotesize\ttfamily \hyperlink{redfishRawAsync_8h_a3ee36950587f4749a62b080e3e157280}{http\+Header}$\ast$ \+\_\+async\+Http\+Request\+::headers}
+
+Headers to send or N\+U\+LL for none \mbox{\Hypertarget{struct__asyncHttpRequest_a43ee659ce0011d76e6e06af3a02f7ee2}\label{struct__asyncHttpRequest_a43ee659ce0011d76e6e06af3a02f7ee2}} 
+\index{\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}!method@{method}}
+\index{method@{method}!\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}}
+\subsubsection{\texorpdfstring{method}{method}}
+{\footnotesize\ttfamily \hyperlink{redfishRawAsync_8h_a15f26ab1ae1b376c50b78e58ded397be}{http\+Method} \+\_\+async\+Http\+Request\+::method}
+
+The H\+T\+TP method to use \mbox{\Hypertarget{struct__asyncHttpRequest_a471f8b6fb269a1efc9f79c6dd530ed69}\label{struct__asyncHttpRequest_a471f8b6fb269a1efc9f79c6dd530ed69}} 
+\index{\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}!timeout@{timeout}}
+\index{timeout@{timeout}!\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}}
+\subsubsection{\texorpdfstring{timeout}{timeout}}
+{\footnotesize\ttfamily unsigned long \+\_\+async\+Http\+Request\+::timeout}
+
+The timeout for the operation, 0 means never timeout \mbox{\Hypertarget{struct__asyncHttpRequest_ade18f96cd3e2cb3395dd978597283a9f}\label{struct__asyncHttpRequest_ade18f96cd3e2cb3395dd978597283a9f}} 
+\index{\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}!url@{url}}
+\index{url@{url}!\+\_\+async\+Http\+Request@{\+\_\+async\+Http\+Request}}
+\subsubsection{\texorpdfstring{url}{url}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+async\+Http\+Request\+::url}
+
+The url to send the request to 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/\hyperlink{redfishRawAsync_8h}{redfish\+Raw\+Async.\+h}\end{DoxyCompactItemize}

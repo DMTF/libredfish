@@ -1,0 +1,94 @@
+\hypertarget{debug_8h}{}\section{src/debug.h File Reference}
+\label{debug_8h}\index{src/debug.\+h@{src/debug.\+h}}
+
+
+File containing the interface for the internal debug.  
+
+
+{\ttfamily \#include $<$redfish.\+h$>$}\newline
+{\ttfamily \#include $<$syslog.\+h$>$}\newline
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{debug_8h_a16b64743670ad7ceeb9264921a3e6c96}{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT}(...)
+\item 
+\#define \hyperlink{debug_8h_a4ae063cc8d53daa866fce786bccaacbe}{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT}(...)
+\item 
+\#define \hyperlink{debug_8h_ae3443f6d12355d52c7485500d94df20c}{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+I\+N\+F\+O\+\_\+\+P\+R\+I\+NT}(...)
+\item 
+\#define \hyperlink{debug_8h_a9c1f8c19e8ad75ddc69a5ecf8fabeef8}{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+N\+O\+T\+I\+C\+E\+\_\+\+P\+R\+I\+NT}(...)
+\item 
+\#define \hyperlink{debug_8h_aeaa2b465e544b548507f416d48b93f8b}{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+W\+A\+R\+N\+I\+N\+G\+\_\+\+P\+R\+I\+NT}(...)
+\item 
+\#define \hyperlink{debug_8h_a0596d86e8a3efb74ea6d9e4c9ddf1620}{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+E\+R\+R\+\_\+\+P\+R\+I\+NT}(...)
+\item 
+\#define \hyperlink{debug_8h_a85e15b38e97c45edf45bd8dda0b4bfc0}{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+C\+R\+I\+T\+\_\+\+P\+R\+I\+NT}(...)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{redfish_8h_a6773d6c766aabb5d808dc5395dad59a7}{lib\+Redfish\+Debug\+Func} \hyperlink{debug_8h_a16e3f751f6633c44272622be3eb3967b}{g\+Debug\+Func}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File containing the interface for the internal debug. 
+
+\begin{DoxyAuthor}{Author}
+Patrick Boyd This file explains the interface for the internal debug functions 
+\end{DoxyAuthor}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{debug_8h_a85e15b38e97c45edf45bd8dda0b4bfc0}\label{debug_8h_a85e15b38e97c45edf45bd8dda0b4bfc0}} 
+\index{debug.\+h@{debug.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+C\+R\+I\+T\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+C\+R\+I\+T\+\_\+\+P\+R\+I\+NT}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+C\+R\+I\+T\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+C\+R\+I\+T\+\_\+\+P\+R\+I\+NT}!debug.\+h@{debug.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+C\+R\+I\+T\+\_\+\+P\+R\+I\+NT}{REDFISH\_DEBUG\_CRIT\_PRINT}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+C\+R\+I\+T\+\_\+\+P\+R\+I\+NT(\begin{DoxyParamCaption}\item[{}]{... }\end{DoxyParamCaption})}
+
+Log critical level messages \mbox{\Hypertarget{debug_8h_a4ae063cc8d53daa866fce786bccaacbe}\label{debug_8h_a4ae063cc8d53daa866fce786bccaacbe}} 
+\index{debug.\+h@{debug.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT}!debug.\+h@{debug.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT}{REDFISH\_DEBUG\_DEBUG\_PRINT}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT(\begin{DoxyParamCaption}\item[{}]{... }\end{DoxyParamCaption})}
+
+Log debug level messages \mbox{\Hypertarget{debug_8h_a0596d86e8a3efb74ea6d9e4c9ddf1620}\label{debug_8h_a0596d86e8a3efb74ea6d9e4c9ddf1620}} 
+\index{debug.\+h@{debug.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+E\+R\+R\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+E\+R\+R\+\_\+\+P\+R\+I\+NT}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+E\+R\+R\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+E\+R\+R\+\_\+\+P\+R\+I\+NT}!debug.\+h@{debug.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+E\+R\+R\+\_\+\+P\+R\+I\+NT}{REDFISH\_DEBUG\_ERR\_PRINT}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+E\+R\+R\+\_\+\+P\+R\+I\+NT(\begin{DoxyParamCaption}\item[{}]{... }\end{DoxyParamCaption})}
+
+Log error level messages \mbox{\Hypertarget{debug_8h_ae3443f6d12355d52c7485500d94df20c}\label{debug_8h_ae3443f6d12355d52c7485500d94df20c}} 
+\index{debug.\+h@{debug.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+I\+N\+F\+O\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+I\+N\+F\+O\+\_\+\+P\+R\+I\+NT}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+I\+N\+F\+O\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+I\+N\+F\+O\+\_\+\+P\+R\+I\+NT}!debug.\+h@{debug.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+I\+N\+F\+O\+\_\+\+P\+R\+I\+NT}{REDFISH\_DEBUG\_INFO\_PRINT}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+I\+N\+F\+O\+\_\+\+P\+R\+I\+NT(\begin{DoxyParamCaption}\item[{}]{... }\end{DoxyParamCaption})}
+
+Log info level messages \mbox{\Hypertarget{debug_8h_a9c1f8c19e8ad75ddc69a5ecf8fabeef8}\label{debug_8h_a9c1f8c19e8ad75ddc69a5ecf8fabeef8}} 
+\index{debug.\+h@{debug.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+N\+O\+T\+I\+C\+E\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+N\+O\+T\+I\+C\+E\+\_\+\+P\+R\+I\+NT}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+N\+O\+T\+I\+C\+E\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+N\+O\+T\+I\+C\+E\+\_\+\+P\+R\+I\+NT}!debug.\+h@{debug.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+N\+O\+T\+I\+C\+E\+\_\+\+P\+R\+I\+NT}{REDFISH\_DEBUG\_NOTICE\_PRINT}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+N\+O\+T\+I\+C\+E\+\_\+\+P\+R\+I\+NT(\begin{DoxyParamCaption}\item[{}]{... }\end{DoxyParamCaption})}
+
+Log notice level messages \mbox{\Hypertarget{debug_8h_a16b64743670ad7ceeb9264921a3e6c96}\label{debug_8h_a16b64743670ad7ceeb9264921a3e6c96}} 
+\index{debug.\+h@{debug.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT}!debug.\+h@{debug.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT}{REDFISH\_DEBUG\_PRINT}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+P\+R\+I\+NT(\begin{DoxyParamCaption}\item[{}]{... }\end{DoxyParamCaption})}
+
+The syslog style debug print function. Takes a priority, message and a variable number of args \mbox{\Hypertarget{debug_8h_aeaa2b465e544b548507f416d48b93f8b}\label{debug_8h_aeaa2b465e544b548507f416d48b93f8b}} 
+\index{debug.\+h@{debug.\+h}!R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+W\+A\+R\+N\+I\+N\+G\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+W\+A\+R\+N\+I\+N\+G\+\_\+\+P\+R\+I\+NT}}
+\index{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+W\+A\+R\+N\+I\+N\+G\+\_\+\+P\+R\+I\+NT@{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+W\+A\+R\+N\+I\+N\+G\+\_\+\+P\+R\+I\+NT}!debug.\+h@{debug.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+W\+A\+R\+N\+I\+N\+G\+\_\+\+P\+R\+I\+NT}{REDFISH\_DEBUG\_WARNING\_PRINT}}
+{\footnotesize\ttfamily \#define R\+E\+D\+F\+I\+S\+H\+\_\+\+D\+E\+B\+U\+G\+\_\+\+W\+A\+R\+N\+I\+N\+G\+\_\+\+P\+R\+I\+NT(\begin{DoxyParamCaption}\item[{}]{... }\end{DoxyParamCaption})}
+
+Log warning level messages 
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{debug_8h_a16e3f751f6633c44272622be3eb3967b}\label{debug_8h_a16e3f751f6633c44272622be3eb3967b}} 
+\index{debug.\+h@{debug.\+h}!g\+Debug\+Func@{g\+Debug\+Func}}
+\index{g\+Debug\+Func@{g\+Debug\+Func}!debug.\+h@{debug.\+h}}
+\subsubsection{\texorpdfstring{g\+Debug\+Func}{gDebugFunc}}
+{\footnotesize\ttfamily \hyperlink{redfish_8h_a6773d6c766aabb5d808dc5395dad59a7}{lib\+Redfish\+Debug\+Func} g\+Debug\+Func}
+
+The global library debug function 

@@ -1,0 +1,111 @@
+\hypertarget{redpath_8h}{}\section{include/redpath.h File Reference}
+\label{redpath_8h}\index{include/redpath.\+h@{include/redpath.\+h}}
+
+
+File containing the interface for the \char`\"{}redpath\char`\"{} notation.  
+
+
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct__redPathNode}{\+\_\+red\+Path\+Node}
+\begin{DoxyCompactList}\small\item\em A redpath node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{redpath_8h_a7b5be15cb0ced9a082d002aa6a65e2e0}\label{redpath_8h_a7b5be15cb0ced9a082d002aa6a65e2e0}} 
+typedef enum \+\_\+\+Red\+Path\+Op {\bfseries Red\+Path\+Op}
+\item 
+typedef struct \hyperlink{struct__redPathNode}{\+\_\+red\+Path\+Node} \hyperlink{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}{red\+Path\+Node}
+\begin{DoxyCompactList}\small\item\em A redpath node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{redpath_8h_aa3c92404436579a0ac3c2a9c4d09db9c}\label{redpath_8h_aa3c92404436579a0ac3c2a9c4d09db9c}} 
+enum {\bfseries \+\_\+\+Red\+Path\+Op} \{ \newline
+{\bfseries R\+E\+D\+P\+A\+T\+H\+\_\+\+O\+P\+\_\+\+E\+Q\+U\+AL} =0, 
+{\bfseries R\+E\+D\+P\+A\+T\+H\+\_\+\+O\+P\+\_\+\+N\+O\+T\+E\+Q\+U\+AL}, 
+{\bfseries R\+E\+D\+P\+A\+T\+H\+\_\+\+O\+P\+\_\+\+L\+E\+SS}, 
+{\bfseries R\+E\+D\+P\+A\+T\+H\+\_\+\+O\+P\+\_\+\+G\+R\+E\+A\+T\+ER}, 
+\newline
+{\bfseries R\+E\+D\+P\+A\+T\+H\+\_\+\+O\+P\+\_\+\+L\+E\+S\+S\+\_\+\+E\+Q\+U\+AL}, 
+{\bfseries R\+E\+D\+P\+A\+T\+H\+\_\+\+O\+P\+\_\+\+G\+R\+E\+A\+T\+E\+R\+\_\+\+E\+Q\+U\+AL}, 
+{\bfseries R\+E\+D\+P\+A\+T\+H\+\_\+\+O\+P\+\_\+\+E\+X\+I\+S\+TS}, 
+{\bfseries R\+E\+D\+P\+A\+T\+H\+\_\+\+O\+P\+\_\+\+A\+NY}, 
+\newline
+{\bfseries R\+E\+D\+P\+A\+T\+H\+\_\+\+O\+P\+\_\+\+L\+A\+ST}, 
+{\bfseries R\+E\+D\+P\+A\+T\+H\+\_\+\+O\+P\+\_\+\+E\+R\+R\+OR}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}{red\+Path\+Node} $\ast$ \hyperlink{redpath_8h_a9e4939770b3ffd300d0fd90605d5550a}{parse\+Red\+Path} (const char $\ast$path)
+\begin{DoxyCompactList}\small\item\em Parse a redpath string. \end{DoxyCompactList}\item 
+void \hyperlink{redpath_8h_aa017de446150f1e309de8d540abf1140}{cleanup\+Red\+Path} (\hyperlink{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}{red\+Path\+Node} $\ast$node)
+\begin{DoxyCompactList}\small\item\em Free the red\+Path\+Node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File containing the interface for the \char`\"{}redpath\char`\"{} notation. 
+
+\begin{DoxyAuthor}{Author}
+Patrick Boyd This file explains the interface for creating a structured representation of a redpath string.
+\end{DoxyAuthor}
+\begin{DoxySeeAlso}{See also}
+\href{https://github.com/DMTF/libredfish}{\tt https\+://github.\+com/\+D\+M\+T\+F/libredfish} 
+\end{DoxySeeAlso}
+
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}\label{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}} 
+\index{redpath.\+h@{redpath.\+h}!red\+Path\+Node@{red\+Path\+Node}}
+\index{red\+Path\+Node@{red\+Path\+Node}!redpath.\+h@{redpath.\+h}}
+\subsubsection{\texorpdfstring{red\+Path\+Node}{redPathNode}}
+{\footnotesize\ttfamily typedef struct \hyperlink{struct__redPathNode}{\+\_\+red\+Path\+Node}  \hyperlink{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}{red\+Path\+Node}}
+
+
+
+A redpath node. 
+
+A strcuture defining a redpath node. 
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{redpath_8h_aa017de446150f1e309de8d540abf1140}\label{redpath_8h_aa017de446150f1e309de8d540abf1140}} 
+\index{redpath.\+h@{redpath.\+h}!cleanup\+Red\+Path@{cleanup\+Red\+Path}}
+\index{cleanup\+Red\+Path@{cleanup\+Red\+Path}!redpath.\+h@{redpath.\+h}}
+\subsubsection{\texorpdfstring{cleanup\+Red\+Path()}{cleanupRedPath()}}
+{\footnotesize\ttfamily void cleanup\+Red\+Path (\begin{DoxyParamCaption}\item[{\hyperlink{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}{red\+Path\+Node} $\ast$}]{node }\end{DoxyParamCaption})}
+
+
+
+Free the red\+Path\+Node. 
+
+Free the passed in node and any nodes after it.
+
+
+\begin{DoxyParams}{Parameters}
+{\em node} & The node list to free. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{redpath_8h_a9e4939770b3ffd300d0fd90605d5550a}\label{redpath_8h_a9e4939770b3ffd300d0fd90605d5550a}} 
+\index{redpath.\+h@{redpath.\+h}!parse\+Red\+Path@{parse\+Red\+Path}}
+\index{parse\+Red\+Path@{parse\+Red\+Path}!redpath.\+h@{redpath.\+h}}
+\subsubsection{\texorpdfstring{parse\+Red\+Path()}{parseRedPath()}}
+{\footnotesize\ttfamily \hyperlink{redpath_8h_a8b4f53a300a73308d7a81abaa2258fc6}{red\+Path\+Node}$\ast$ parse\+Red\+Path (\begin{DoxyParamCaption}\item[{const char $\ast$}]{path }\end{DoxyParamCaption})}
+
+
+
+Parse a redpath string. 
+
+Take a string representation of redpath and convert it to a red\+Path\+Node version.
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & The string representation. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+N\+U\+LL if the string could not be parsed. A red\+Path\+Node otherwise 
+\end{DoxyReturn}

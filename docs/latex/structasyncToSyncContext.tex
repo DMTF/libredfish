@@ -1,0 +1,55 @@
+\hypertarget{structasyncToSyncContext}{}\section{async\+To\+Sync\+Context Struct Reference}
+\label{structasyncToSyncContext}\index{async\+To\+Sync\+Context@{async\+To\+Sync\+Context}}
+
+
+An internal structure used to convert a call from async to sync.  
+
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{queue_8h_a8c80af1d72030a9dc70c3a2c3e46ae9a}{mutex} \hyperlink{structasyncToSyncContext_aa6966a3a59c87af9a5daa94ce34e07dd}{spin\+Lock}
+\item 
+\hyperlink{queue_8h_a18a0de1af5a8524b75bf94d6b14701b4}{condition} \hyperlink{structasyncToSyncContext_a6c09d06e275e2063e31bd9b79fa0c221}{wait\+For\+It}
+\item 
+\hyperlink{structredfishPayload}{redfish\+Payload} $\ast$ \hyperlink{structasyncToSyncContext_a3b287cb6b52522f115db6dccc600a8f9}{data}
+\item 
+bool \hyperlink{structasyncToSyncContext_a3629d45e7c35e218a5b98cfafde25b44}{success}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+An internal structure used to convert a call from async to sync. 
+
+An internal structure used to convert a call from the new asynchronous to the old synchronous calls 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structasyncToSyncContext_a3b287cb6b52522f115db6dccc600a8f9}\label{structasyncToSyncContext_a3b287cb6b52522f115db6dccc600a8f9}} 
+\index{async\+To\+Sync\+Context@{async\+To\+Sync\+Context}!data@{data}}
+\index{data@{data}!async\+To\+Sync\+Context@{async\+To\+Sync\+Context}}
+\subsubsection{\texorpdfstring{data}{data}}
+{\footnotesize\ttfamily \hyperlink{structredfishPayload}{redfish\+Payload}$\ast$ async\+To\+Sync\+Context\+::data}
+
+The \hyperlink{structredfishPayload}{redfish\+Payload} that was returned \mbox{\Hypertarget{structasyncToSyncContext_aa6966a3a59c87af9a5daa94ce34e07dd}\label{structasyncToSyncContext_aa6966a3a59c87af9a5daa94ce34e07dd}} 
+\index{async\+To\+Sync\+Context@{async\+To\+Sync\+Context}!spin\+Lock@{spin\+Lock}}
+\index{spin\+Lock@{spin\+Lock}!async\+To\+Sync\+Context@{async\+To\+Sync\+Context}}
+\subsubsection{\texorpdfstring{spin\+Lock}{spinLock}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_a8c80af1d72030a9dc70c3a2c3e46ae9a}{mutex} async\+To\+Sync\+Context\+::spin\+Lock}
+
+A lock to control access to the condition variable \mbox{\Hypertarget{structasyncToSyncContext_a3629d45e7c35e218a5b98cfafde25b44}\label{structasyncToSyncContext_a3629d45e7c35e218a5b98cfafde25b44}} 
+\index{async\+To\+Sync\+Context@{async\+To\+Sync\+Context}!success@{success}}
+\index{success@{success}!async\+To\+Sync\+Context@{async\+To\+Sync\+Context}}
+\subsubsection{\texorpdfstring{success}{success}}
+{\footnotesize\ttfamily bool async\+To\+Sync\+Context\+::success}
+
+True means the callback returned success, otherwise false \mbox{\Hypertarget{structasyncToSyncContext_a6c09d06e275e2063e31bd9b79fa0c221}\label{structasyncToSyncContext_a6c09d06e275e2063e31bd9b79fa0c221}} 
+\index{async\+To\+Sync\+Context@{async\+To\+Sync\+Context}!wait\+For\+It@{wait\+For\+It}}
+\index{wait\+For\+It@{wait\+For\+It}!async\+To\+Sync\+Context@{async\+To\+Sync\+Context}}
+\subsubsection{\texorpdfstring{wait\+For\+It}{waitForIt}}
+{\footnotesize\ttfamily \hyperlink{queue_8h_a18a0de1af5a8524b75bf94d6b14701b4}{condition} async\+To\+Sync\+Context\+::wait\+For\+It}
+
+The condition variable to be signalled on the async call completion 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/service.\+c\end{DoxyCompactItemize}

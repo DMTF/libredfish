@@ -1,0 +1,99 @@
+\hypertarget{struct__redPathNode}{}\section{\+\_\+red\+Path\+Node Struct Reference}
+\label{struct__redPathNode}\index{\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}}
+
+
+A redpath node.  
+
+
+
+
+{\ttfamily \#include $<$redpath.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{struct__redPathNode_aeb09e1fb99b1806193adaa558ffa24d7}{is\+Root}
+\item 
+bool \hyperlink{struct__redPathNode_ad4acac474760bda797bcccd94265a916}{is\+Index}
+\item 
+char $\ast$ \hyperlink{struct__redPathNode_aca55747e397ba939a113e611bad76484}{version}
+\item 
+char $\ast$ \hyperlink{struct__redPathNode_a6ac5cdab29eebd1a6f0f24931a6578d3}{node\+Name}
+\item 
+size\+\_\+t \hyperlink{struct__redPathNode_a38c274bebcf1411cf473c561d4171732}{index}
+\item 
+Red\+Path\+Op \hyperlink{struct__redPathNode_aa21623b64c9fec7341109f52911475b3}{op}
+\item 
+char $\ast$ \hyperlink{struct__redPathNode_ac2ebde308389a766045538cfecfba214}{prop\+Name}
+\item 
+char $\ast$ \hyperlink{struct__redPathNode_a492a339d2938c3354cd3c5cbfcd9075b}{value}
+\item 
+struct \hyperlink{struct__redPathNode}{\+\_\+red\+Path\+Node} $\ast$ \hyperlink{struct__redPathNode_ac40678642805053a5c301534e14538b9}{next}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A redpath node. 
+
+A strcuture defining a redpath node. 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{struct__redPathNode_a38c274bebcf1411cf473c561d4171732}\label{struct__redPathNode_a38c274bebcf1411cf473c561d4171732}} 
+\index{\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}!index@{index}}
+\index{index@{index}!\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}}
+\subsubsection{\texorpdfstring{index}{index}}
+{\footnotesize\ttfamily size\+\_\+t \+\_\+red\+Path\+Node\+::index}
+
+The index requested. Only valid if is\+Index is true \mbox{\Hypertarget{struct__redPathNode_ad4acac474760bda797bcccd94265a916}\label{struct__redPathNode_ad4acac474760bda797bcccd94265a916}} 
+\index{\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}!is\+Index@{is\+Index}}
+\index{is\+Index@{is\+Index}!\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}}
+\subsubsection{\texorpdfstring{is\+Index}{isIndex}}
+{\footnotesize\ttfamily bool \+\_\+red\+Path\+Node\+::is\+Index}
+
+Does this node represent an index in a collection \mbox{\Hypertarget{struct__redPathNode_aeb09e1fb99b1806193adaa558ffa24d7}\label{struct__redPathNode_aeb09e1fb99b1806193adaa558ffa24d7}} 
+\index{\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}!is\+Root@{is\+Root}}
+\index{is\+Root@{is\+Root}!\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}}
+\subsubsection{\texorpdfstring{is\+Root}{isRoot}}
+{\footnotesize\ttfamily bool \+\_\+red\+Path\+Node\+::is\+Root}
+
+Does this node represent the service root \mbox{\Hypertarget{struct__redPathNode_ac40678642805053a5c301534e14538b9}\label{struct__redPathNode_ac40678642805053a5c301534e14538b9}} 
+\index{\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}!next@{next}}
+\index{next@{next}!\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}}
+\subsubsection{\texorpdfstring{next}{next}}
+{\footnotesize\ttfamily struct \hyperlink{struct__redPathNode}{\+\_\+red\+Path\+Node}$\ast$ \+\_\+red\+Path\+Node\+::next}
+
+The next redpath node or N\+U\+LL if the end \mbox{\Hypertarget{struct__redPathNode_a6ac5cdab29eebd1a6f0f24931a6578d3}\label{struct__redPathNode_a6ac5cdab29eebd1a6f0f24931a6578d3}} 
+\index{\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}!node\+Name@{node\+Name}}
+\index{node\+Name@{node\+Name}!\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}}
+\subsubsection{\texorpdfstring{node\+Name}{nodeName}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+red\+Path\+Node\+::node\+Name}
+
+The node\+Name to be examined \mbox{\Hypertarget{struct__redPathNode_aa21623b64c9fec7341109f52911475b3}\label{struct__redPathNode_aa21623b64c9fec7341109f52911475b3}} 
+\index{\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}!op@{op}}
+\index{op@{op}!\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}}
+\subsubsection{\texorpdfstring{op}{op}}
+{\footnotesize\ttfamily Red\+Path\+Op \+\_\+red\+Path\+Node\+::op}
+
+The operation to perform \mbox{\Hypertarget{struct__redPathNode_ac2ebde308389a766045538cfecfba214}\label{struct__redPathNode_ac2ebde308389a766045538cfecfba214}} 
+\index{\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}!prop\+Name@{prop\+Name}}
+\index{prop\+Name@{prop\+Name}!\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}}
+\subsubsection{\texorpdfstring{prop\+Name}{propName}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+red\+Path\+Node\+::prop\+Name}
+
+The property to perform the operation on \mbox{\Hypertarget{struct__redPathNode_a492a339d2938c3354cd3c5cbfcd9075b}\label{struct__redPathNode_a492a339d2938c3354cd3c5cbfcd9075b}} 
+\index{\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}!value@{value}}
+\index{value@{value}!\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}}
+\subsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+red\+Path\+Node\+::value}
+
+The value of the operation \mbox{\Hypertarget{struct__redPathNode_aca55747e397ba939a113e611bad76484}\label{struct__redPathNode_aca55747e397ba939a113e611bad76484}} 
+\index{\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}!version@{version}}
+\index{version@{version}!\+\_\+red\+Path\+Node@{\+\_\+red\+Path\+Node}}
+\subsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+red\+Path\+Node\+::version}
+
+The version of Redfish being requested. Only valid if is\+Root is true 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/\hyperlink{redpath_8h}{redpath.\+h}\end{DoxyCompactItemize}
