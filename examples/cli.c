@@ -33,6 +33,9 @@
 #define	LOG_NOTICE	5
 #define	LOG_INFO	6
 #define	LOG_DEBUG	7
+
+#define strcasecmp stricmp
+#define strtok_r strtok_s
 #else
 #include <syslog.h>
 #endif
