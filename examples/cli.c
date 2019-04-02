@@ -3,6 +3,7 @@
 // Copyright 2017-2019 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
