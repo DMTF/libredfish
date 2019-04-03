@@ -90,7 +90,9 @@ void inthand(int signum)
     stop = 1;
 }
 
-
+#ifndef _MSC_VER
+__attribute__((format(printf, 2, 3)))
+#endif
 void syslogPrintf(int priority, const char* message, ...)
 {
     va_list args;
