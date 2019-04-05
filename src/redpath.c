@@ -8,6 +8,7 @@
 
 #include <redpath.h>
 #include "util.h"
+#include "debug.h"
 
 static char* getVersion(const char* path, char** end);
 static void parseNode(const char* path, redPathNode* node, redPathNode** end);
@@ -156,6 +157,11 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
         return;
     }
     node->next->propName = (char*)malloc((opChars - index)+1);
+    if(node->next->propName == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to allocate space for propName", __func__);
+        return;
+    }
     memcpy(node->next->propName, index, (opChars - index));
     node->next->propName[(opChars - index)] = 0;
 
@@ -205,7 +211,7 @@ static void parseNode(const char* path, redPathNode* node, redPathNode** end)
     }
 
 #ifdef _MSC_VER
-	node->next->value = _strdup(opChars + tmpIndex);
+    node->next->value = _strdup(opChars + tmpIndex);
 #else
     node->next->value = strdup(opChars+tmpIndex);
 #endif

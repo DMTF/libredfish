@@ -4,6 +4,7 @@
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
+#include <stdbool.h>
 
 #include "redfishPayload.h"
 #include "debug.h"
@@ -72,6 +73,12 @@ redfishPayload* createRedfishPayloadFromContent(const char* content, size_t cont
         else
         {
             ret->content = malloc(contentLength);
+            if(ret->content == NULL)
+            {
+                REDFISH_DEBUG_ERR_PRINT("%s: Unable to allocate buffer for returned content!", __func__);
+                free(ret);
+                return NULL;
+            }
             memcpy(ret->content, content, contentLength);
         }
         ret->contentLength = contentLength;
@@ -97,6 +104,11 @@ redfishPayload* copyRedfishPayload(const redfishPayload* original)
     }
 
     ret = (redfishPayload*)calloc(sizeof(redfishPayload), 1);
+    if(ret == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to allocate space for clone!", __func__);
+        return NULL;
+    }
     if(original->json)
     {
         ret->json = json_deep_copy(original->json);
@@ -847,6 +859,11 @@ bool getPayloadForPathAsync(redfishPayload* payload, redPathNode* redpath, redfi
     }
 
     myContext = malloc(sizeof(redpathAsyncContext));
+    if(myContext == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to alloacte context!", __func__);
+        return false;
+    }
     myContext->callback = callback;
     myContext->originalContext = context;
     myContext->redpath = redpath;

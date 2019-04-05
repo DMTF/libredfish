@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
@@ -502,6 +503,12 @@ bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsy
     setupRequestFromOptions(request, service, options);
 
     myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
+    if(myContext == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate context.\n", __func__);
+        serviceDecRef(service);
+        return false;
+    }
     myContext->callback = callback;
     myContext->originalContext = context;
     myContext->originalOptions = options;
@@ -529,6 +536,7 @@ bool patchUriFromServiceAsync(redfishService* service, const char* uri, redfishP
     url = makeUrlForService(service, uri);
     if(!url)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not make url for uri %s\n", __func__, uri);
         serviceDecRef(service);
         return false;
     }
@@ -539,6 +547,12 @@ bool patchUriFromServiceAsync(redfishService* service, const char* uri, redfishP
     addRequestHeader(request, "Content-Type", getPayloadContentType(payload));
 
     myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
+    if(myContext == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate context.\n", __func__);
+        serviceDecRef(service);
+        return false;
+    }
     myContext->callback = callback;
     myContext->originalContext = context;
     myContext->originalOptions = options;
@@ -563,6 +577,7 @@ bool postUriFromServiceAsync(redfishService* service, const char* uri, redfishPa
     url = makeUrlForService(service, uri);
     if(!url)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not make url for uri %s\n", __func__, uri);
         serviceDecRef(service);
         return false;
     }
@@ -573,6 +588,12 @@ bool postUriFromServiceAsync(redfishService* service, const char* uri, redfishPa
     addRequestHeader(request, "Content-Type", getPayloadContentType(payload));
 
     myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
+    if(myContext == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate context.\n", __func__);
+        serviceDecRef(service);
+        return false;
+    }
     myContext->callback = callback;
     myContext->originalContext = context;
     myContext->originalOptions = options;
@@ -597,6 +618,7 @@ bool deleteUriFromServiceAsync(redfishService* service, const char* uri, redfish
     url = makeUrlForService(service, uri);
     if(!url)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not make url for uri %s\n", __func__, uri);
         serviceDecRef(service);
         return false;
     }
@@ -606,6 +628,12 @@ bool deleteUriFromServiceAsync(redfishService* service, const char* uri, redfish
     setupRequestFromOptions(request, service, options);
 
     myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
+    if(myContext == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate context.\n", __func__);
+        serviceDecRef(service);
+        return false;
+    }
     myContext->callback = callback;
     myContext->originalContext = context;
     myContext->originalOptions = options;
@@ -1114,6 +1142,11 @@ static redfishService* createServiceEnumeratorNoAuth(const char* host, const cha
     redfishService* ret;
 
     ret = (redfishService*)calloc(1, sizeof(redfishService));
+	if(ret == NULL)
+	{
+		REDFISH_DEBUG_CRIT_PRINT("%s: Unable to allocate service!", __func__);
+		return NULL;
+	}
     serviceIncRef(ret);
 #ifdef _MSC_VER
 	ret->host = _strdup(host);
@@ -1473,6 +1506,11 @@ static bool createServiceEnumeratorSessionAuthAsync(const char* host, const char
     createServiceSessionAuthAsyncContext* myContext;
 
     myContext = malloc(sizeof(createServiceSessionAuthAsyncContext));
+    if(myContext == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to allocate context!", __func__);
+        return false;
+    }
     myContext->username = safeStrdup(username);
     myContext->password = safeStrdup(password);
     myContext->originalCallback = callback;
@@ -1526,13 +1564,24 @@ static bool createServiceEnumeratorTokenAsync(const char* host, const char* root
 static char* makeUrlForService(redfishService* service, const char* uri)
 {
     char* url;
+    size_t size;
     if(service->host == NULL)
     {
         return NULL;
     }
-    url = (char*)malloc(strlen(service->host)+strlen(uri)+1);
+    size = strlen(service->host) + strlen(uri) + 1;
+    url = (char*)malloc(size);
+    if(url == NULL)
+    {
+        return NULL;
+    }
+#ifdef _MSC_VER
+    strcpy_s(url, size, service->host);
+    strcat_s(url, size, uri);
+#else
     strcpy(url, service->host);
     strcat(url, uri);
+#endif
     return url;
 }
 
