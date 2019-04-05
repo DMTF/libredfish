@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <getopt.h>
 #ifndef _MSC_VER
 #include <unistd.h>
@@ -378,6 +379,11 @@ static void gotRedfishService(redfishService* service, void* context)
             break;
     }
     myContext = malloc(sizeof(gotPayloadContext));
+    if(myContext == NULL)
+    {
+        fprintf(stderr, "Unable to allocate context!");
+        exit(-1);
+    }
     myContext->method = gRedfishParams.method;
     myContext->leaf = leaf;
     myContext->query = gRedfishParams.query;
@@ -467,6 +473,11 @@ int main(int argc, char** argv)
                 if(auth == NULL)
                 {
                     auth = malloc(sizeof(enumeratorAuthentication));
+                    if(auth == NULL)
+                    {
+                        fprintf(stderr, "Failed to allocate auth pointer!");
+                        exit(-1);
+                    }
                     auth->authType = REDFISH_AUTH_BASIC;
                 }
                 auth->authCodes.userPass.username = strdup(optarg);
@@ -475,6 +486,11 @@ int main(int argc, char** argv)
                 if(auth == NULL)
                 {
                     auth = malloc(sizeof(enumeratorAuthentication));
+                    if(auth == NULL)
+                    {
+                        fprintf(stderr, "Failed to allocate auth pointer!");
+                        exit(-1);
+                    }
                     auth->authType = REDFISH_AUTH_BASIC;
                 }
                 auth->authCodes.userPass.password = strdup(optarg);
@@ -483,6 +499,11 @@ int main(int argc, char** argv)
                 if(auth == NULL)
                 {
                     auth = malloc(sizeof(enumeratorAuthentication));
+                    if(auth == NULL)
+                    {
+                        fprintf(stderr, "Failed to allocate auth pointer!");
+                        exit(-1);
+                    }
                 }
                 auth->authCodes.authToken.token = strdup(optarg);
                 auth->authType = REDFISH_AUTH_BEARER_TOKEN;
@@ -491,6 +512,11 @@ int main(int argc, char** argv)
                 if(auth == NULL)
                 {
                     auth = malloc(sizeof(enumeratorAuthentication));
+                    if (auth == NULL)
+                    {
+                        fprintf(stderr, "Failed to allocate auth pointer!");
+                        exit(-1);
+                    }
                 }
                 auth->authType = REDFISH_AUTH_SESSION;
                 break;
