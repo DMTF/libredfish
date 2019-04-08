@@ -3,6 +3,7 @@ Priority: optional
 Section: libs
 Maintainer: Patrick Boyd <Patrick_Boyd@Dell.com>
 Build-Depends: libcurl-dev, libjansson-dev, libreadline-dev, python-minimal
+XS-Python-Version: all
 Standards-Version: 3.9.8
 Homepage: https://dmtf.github.io/libredfish/
 Vcs-Git: https://github.com/DMTF/libredfish.git
