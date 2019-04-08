@@ -2,7 +2,7 @@ Source: libredfish
 Priority: optional
 Section: libs
 Maintainer: Patrick Boyd <Patrick_Boyd@Dell.com>
-Build-Depends: libcurl-dev, libjansson-dev, libreadline-dev
+Build-Depends: libcurl-dev, libjansson-dev, libreadline-dev, python-minimal
 Standards-Version: 3.9.8
 Homepage: https://dmtf.github.io/libredfish/
 Vcs-Git: https://github.com/DMTF/libredfish.git
