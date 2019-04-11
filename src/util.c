@@ -54,6 +54,10 @@ char* getStringTill(const char* string, const char* terminator, char** retEnd)
         return safeStrdup(string);
     }
     ret = (char*)malloc((end-string)+1);
+    if(ret == NULL)
+    {
+        return NULL;
+    }
     memcpy(ret, string, (end-string));
     ret[(end-string)] = 0;
     return ret;
@@ -65,10 +69,15 @@ static void initWinsock()
 {
 	WORD wVersionRequested;
 	WSADATA wsaData;
+	int ret;
 
 	/* Use the MAKEWORD(lowbyte, highbyte) macro declared in Windef.h */
 	wVersionRequested = MAKEWORD(2, 2);
-	WSAStartup(wVersionRequested, &wsaData);
+	ret = WSAStartup(wVersionRequested, &wsaData);
+	if(ret != 0)
+	{
+		REDFISH_DEBUG_ERR_PRINT("%s: WSAStartup returned %d!", __func__, ret);
+	}
 }
 
 static wchar_t* windowsStringFromCString(const char* cstr)
