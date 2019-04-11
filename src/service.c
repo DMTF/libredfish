@@ -523,6 +523,14 @@ bool patchUriFromServiceAsync(redfishService* service, const char* uri, redfishP
     bool ret;
 
     REDFISH_DEBUG_DEBUG_PRINT("%s: Entered. service = %p, uri = %s, payload = %p\n", __func__, service, uri, payload);
+#if _DEBUG
+    url = payloadToString(payload, false);
+    if(url)
+    {
+        REDFISH_DEBUG_DEBUG_PRINT("%s: Payload content = %s\n", __func__, url);
+        free(url);
+    }
+#endif
 
     serviceIncRef(service);
 
