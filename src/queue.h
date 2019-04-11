@@ -57,12 +57,12 @@
  *
  * @return true if the value was replaced. false otherwise
  */
-inline bool cas(void* ptr, size_t comp, size_t replace)
+inline bool cas(void* ptr, void* comp, void* replace)
 {
 #if _WIN64
-    return (InterlockedCompareExchange64(ptr, replace, comp) == comp);
+    return (InterlockedCompareExchange64(ptr, (size_t)replace, (size_t)comp) == (size_t)comp);
 #else
-    return (InterlockedCompareExchange(ptr, replace, comp) == comp);
+    return (InterlockedCompareExchange(ptr, (size_t)replace, (size_t)comp) == (size_t)comp);
 #endif
 }
 #else

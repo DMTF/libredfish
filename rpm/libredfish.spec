@@ -10,8 +10,10 @@ Source0:	https://github.com/DMTF/libredfish/archive/%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  libcurl-devel
 BuildRequires:  jansson-devel
+BuildRequires:  readline-devel
 Requires:       libcurl 
 Requires:       jansson
+Requires:       readline
 
 %description
 
