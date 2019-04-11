@@ -26,6 +26,7 @@ find_package(CURL REQUIRED)
 find_package(Jansson REQUIRED)
 find_package(CZMQ)
 find_package(OpenSSL)
+find_package(Readline)
 
 include_directories(${CURL_INCLUDE_DIR})
 include_directories(${JANSSON_INCLUDE_DIRS})
@@ -49,6 +50,13 @@ target_link_libraries(redfishtest redfish)
 
 add_executable(redfishtestasync "${CMAKE_CURRENT_SOURCE_DIR}/examples/testAsync.c")
 target_link_libraries(redfishtestasync redfish)
+
+add_executable(redfishcli "${CMAKE_CURRENT_SOURCE_DIR}/examples/cli.c")
+target_link_libraries(redfishcli redfish jansson)
+if(READLINE_FOUND)
+    add_definitions(-DHAVE_READLINE)
+    target_link_libraries(redfishcli ${Readline_LIBRARY})
+endif()
 
 if(CZMQ_FOUND)
   add_executable(redfishevent "${CMAKE_CURRENT_SOURCE_DIR}/httpd/cgi.c")
