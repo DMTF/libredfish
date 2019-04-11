@@ -123,6 +123,8 @@ typedef void (*redfishEventCallback)(redfishPayload* event, enumeratorAuthentica
 //Values for flags
 /** A flag used to indicate that the Redfish Service lacks the version document (in violation of the Redfish spec) **/
 #define REDFISH_FLAG_SERVICE_NO_VERSION_DOC 0x00000001
+/** A flag used to indicate that the Redfish Service is not RFC compliant in terms of issuing Redirects **/
+#define REDFISH_FLAG_SERVICE_BAD_REDIRECTS  0x00000002
 
 /**
  * @brief Create a redfish service connection.
