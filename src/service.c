@@ -231,6 +231,12 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
         return NULL;
     }
     payload = createRedfishPayloadFromString(content, service);
+    if(payload == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate payload structure\n", __func__);
+        cleanupAsyncToSyncContext(context);
+        return false;
+    }
     tmp = patchUriFromServiceAsync(service, uri, payload, NULL, asyncToSyncConverter, context);
     cleanupPayload(payload);
     if(tmp == false)
@@ -280,6 +286,12 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
         return NULL;
     }
     payload = createRedfishPayloadFromContent(content, contentLength, contentType, service);
+    if(payload == NULL)
+    {
+        REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate payload!\n", __func__);
+        cleanupAsyncToSyncContext(context);
+        return NULL;
+    }
     tmp = postUriFromServiceAsync(service, uri, payload, NULL, asyncToSyncConverter, context);
     cleanupPayload(payload);
     if(tmp == false)
@@ -511,6 +523,12 @@ bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsy
 
     request = createRequest(url, HTTP_GET, 0, NULL);
     free(url);
+    if(request == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate request structure\n", __func__);
+        serviceDecRef(service);
+        return false;
+    }
     setupRequestFromOptions(request, service, options);
 
     myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
@@ -555,6 +573,12 @@ bool patchUriFromServiceAsync(redfishService* service, const char* uri, redfishP
 
     request = createRequest(url, HTTP_PATCH, getPayloadSize(payload), getPayloadBody(payload));
     free(url);
+    if(request == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate request structure\n", __func__);
+        serviceDecRef(service);
+        return false;
+    }
     setupRequestFromOptions(request, service, options);
     addRequestHeader(request, "Content-Type", getPayloadContentType(payload));
 
@@ -589,6 +613,12 @@ bool postUriFromServiceAsync(redfishService* service, const char* uri, redfishPa
 
     request = createRequest(url, HTTP_POST, getPayloadSize(payload), getPayloadBody(payload));
     free(url);
+    if(request == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate request structure\n", __func__);
+        serviceDecRef(service);
+        return false;
+    }
     setupRequestFromOptions(request, service, options);
     addRequestHeader(request, "Content-Type", getPayloadContentType(payload));
 
@@ -623,6 +653,12 @@ bool deleteUriFromServiceAsync(redfishService* service, const char* uri, redfish
 
     request = createRequest(url, HTTP_DELETE, 0, NULL);
     free(url);
+    if(request == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate request structure\n", __func__);
+        serviceDecRef(service);
+        return false;
+    }
     setupRequestFromOptions(request, service, options);
 
     myContext = malloc(sizeof(rawAsyncCallbackContextWrapper));
@@ -766,6 +802,11 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
     if(service->eventThreadQueue == NULL)
     {
         service->eventThreadQueue = newQueue();
+        if(service->eventThreadQueue == NULL)
+        {
+            REDFISH_DEBUG_ERR_PRINT("%s: Unable to allocate event queue!\n", __func__);
+            return false;
+        }
         startEventThread(service);
     }
     registerCallback(service, callback, eventTypes, context);
@@ -1890,6 +1931,11 @@ static char* getDestinationAddress(const char* addressInfo, SOCKET* socket)
     {
         addressType++;
         addressType = getStringTill(addressType, ":", &portStr);
+        if(addressType == NULL)
+        {
+            REDFISH_DEBUG_ERR_PRINT("%s: Unable to allocate addressType for %s\n", __func__, addressInfo);
+            return NULL;
+        }
         freeAddressType = true;
         if(portStr == NULL)
         {
@@ -1910,6 +1956,11 @@ static char* getDestinationAddress(const char* addressInfo, SOCKET* socket)
         ret = getIpv6Address(networkInterface);
     }
     free(networkInterface);
+    if(ret == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to obtain IP address for %s\n", __func__, addressInfo);
+        return NULL;
+    }
     *socket = getSocket(ret, &port);
     if(strcmp(addressType, "ipv4") == 0)
     {
