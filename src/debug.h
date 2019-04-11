@@ -10,6 +10,8 @@
  *
  * This file explains the interface for the internal debug functions
  */
+#ifndef _REDFISH_DEBUG_H_
+#define _REDFISH_DEBUG_H_
 #include <redfish.h>
 
 #ifdef _MSC_VER
@@ -106,5 +108,6 @@ extern libRedfishDebugFunc gDebugFunc;
  * Log critical level messages
  */
 #define REDFISH_DEBUG_CRIT_PRINT(...)
+#endif
 #endif
 /* vim: set tabstop=4 shiftwidth=4 ff=unix expandtab: */

@@ -4,8 +4,10 @@
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
+#include <stdbool.h>
 
 #include "internal_service.h"
+#include "redfishService.h"
 #include "asyncEvent.h"
 #include "util.h"
 #include "debug.h"
