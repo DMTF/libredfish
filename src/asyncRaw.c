@@ -217,7 +217,7 @@ struct MemoryStruct
   size_t originalSize;
 };
 
-static void cleanupCurl()
+static void cleanupCurl(void)
 {
     //Call this when the whole program exits...
     curl_global_cleanup();
@@ -479,7 +479,7 @@ static size_t asyncHeaderCallback(char* buffer, size_t size, size_t nitems, void
     char* tmp;
     char* name;
     char* value;
-    char* save;
+    char* save = NULL;
     asyncHttpResponse* response = (asyncHttpResponse*)userdata;
     if(response == NULL)
     {
@@ -586,7 +586,7 @@ static int curlSeekMemory(void *userp, curl_off_t offset, int origin)
     }
 
     pooh->memory = pooh->origin+offset;
-    pooh->size = pooh->originalSize-offset;
+    pooh->size = pooh->originalSize-(size_t)offset;
 
     return CURL_SEEKFUNC_OK;
 }
