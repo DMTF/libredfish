@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 2.6)
 
+set(LIBREDFISH_VERSION_MAJOR 1)
+if(DEFINED ENV{TRAVIS_TAG})
+    set(LIBREDFISH_VERSION_STRING $ENV{TRAVIS_TAG})
+elseif(DEFINED ENV{VERSION})
+    set(LIBREDFISH_VERSION_STRING $ENV{VERSION})
+else()
+    set(LIBREDFISH_VERSION_STRING "1.99.0")
+endif()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
@@ -32,6 +41,7 @@ include_directories(${CURL_INCLUDE_DIR})
 include_directories(${JANSSON_INCLUDE_DIRS})
 
 add_library(redfish SHARED ${REDFISH_SRC} ${REDFISH_HDR_PRIVATE})
+set_target_properties(redfish PROPERTIES VERSION ${LIBREDFISH_VERSION_STRING} SOVERSION ${LIBREDFISH_VERSION_MAJOR})
 target_link_libraries(redfish jansson curl)
 if(CZMQ_FOUND)
   target_link_libraries(redfish czmq)
