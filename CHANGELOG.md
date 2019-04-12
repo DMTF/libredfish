@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.2.0] - 2019-04-12
+- Added Chassis entity support
+- Various compiler, warning, and code checker improvements
+- Various NULL checks added
+- Updated Fedora build to use newer versions
+- Added Debian package support
+- Added sample CLI code
+
 ## [1.1.9] - 2019-03-26
 - Made change to ensure session based auth calls back in separate thread
 
