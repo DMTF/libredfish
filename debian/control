@@ -1,0 +1,15 @@
+Source: libredfish
+Priority: optional
+Section: libs
+Maintainer: Patrick Boyd <Patrick_Boyd@Dell.com>
+Build-Depends: debhelper (>= 9), libcurl-dev, libjansson-dev, libreadline-dev, python, python-dev
+XS-Python-Version: all
+Standards-Version: 3.9.8
+Homepage: https://dmtf.github.io/libredfish/
+Vcs-Git: https://github.com/DMTF/libredfish.git
+Vcs-Browser: https://github.com/DMTF/libredfish
+
+Package: libredfish
+Architecture: any
+Depends: libcurl, libjansson, libreadline, ${shlibs:Depends}, ${misc:Depends}
+Description: libRedfish is a C client library that allows for Creation of Entities (POST), Read of Entities (GET), Update of Entities (PATCH), Deletion of Entities (DELETE), running Actions (POST), receiving events, and providing some basic query abilities.

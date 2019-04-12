@@ -7,7 +7,7 @@ module1 = Extension('libredfish',
                     define_macros = [('NO_CZMQ', 1)],
                     include_dirs = ['include'],
                     libraries = ['jansson', 'curl'],
-                    sources = ['src/main.c', 'src/payload.c', 'src/redpath.c', 'src/service.c', 'bindings/python/pyredfish.c'])
+                    sources = ['src/main.c', 'src/payload.c', 'src/redpath.c', 'src/service.c', 'src/asyncEvent.c', 'src/asyncRaw.c', 'src/queue.c', 'src/util.c', 'bindings/python/pyredfish.c'])
 
 setup (name = 'libRedfish',
        version = '1.0',

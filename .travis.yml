@@ -16,6 +16,8 @@ env:
   - OS=fedora DIST=28
   - OS=Windows VISUAL_STUDIO="Visual Studio 15 2017" JANSSON_LIB="jansson.lib" ARCH=x86
   - OS=Windows VISUAL_STUDIO="Visual Studio 15 2017 Win64" JANSSON_LIB="janssonx64.lib" ARCH=x64
+  - OS=ubuntu DIST=bionic
+  - OS=debian DIST=stretch
 matrix:
   exclude:
   - os: windows
@@ -26,6 +28,10 @@ matrix:
     env: OS=fedora DIST=29
   - os: windows
     env: OS=fedora DIST=28
+  - os: windows
+    env: OS=ubuntu DIST=bionic
+  - os: windows
+    env: OS=debian DIST=stretch
   - os: linux
     env: OS=Windows VISUAL_STUDIO="Visual Studio 15 2017" JANSSON_LIB="jansson.lib" ARCH=x86
   - os: linux
