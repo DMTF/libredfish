@@ -10,28 +10,28 @@ cache:
 language: C
 env:
   matrix:
-  - OS=el DIST=6
-  - OS=el DIST=7
-  - OS=fedora DIST=29
-  - OS=fedora DIST=28
+  - OS=el DIST=6 PACKAGE=*.rpm
+  - OS=el DIST=7 PACKAGE=*.rpm
+  - OS=fedora DIST=29 PACKAGE=*.rpm
+  - OS=fedora DIST=28 PACKAGE=*.rpm
   - OS=Windows VISUAL_STUDIO="Visual Studio 15 2017" JANSSON_LIB="jansson.lib" ARCH=x86
   - OS=Windows VISUAL_STUDIO="Visual Studio 15 2017 Win64" JANSSON_LIB="janssonx64.lib" ARCH=x64
-  - OS=ubuntu DIST=bionic
-  - OS=debian DIST=stretch
+  - OS=ubuntu DIST=bionic PACKAGE=*.deb
+  - OS=debian DIST=stretch PACKAGE=*.deb
 matrix:
   exclude:
   - os: windows
-    env: OS=el DIST=6
+    env: OS=el DIST=6 PACKAGE=*.rpm
   - os: windows
-    env: OS=el DIST=7
+    env: OS=el DIST=7 PACKAGE=*.rpm
   - os: windows
-    env: OS=fedora DIST=29
+    env: OS=fedora DIST=29 PACKAGE=*.rpm
   - os: windows
-    env: OS=fedora DIST=28
+    env: OS=fedora DIST=28 PACKAGE=*.rpm
   - os: windows
-    env: OS=ubuntu DIST=bionic
+    env: OS=ubuntu DIST=bionic PACKAGE=*.deb
   - os: windows
-    env: OS=debian DIST=stretch
+    env: OS=debian DIST=stretch PACKAGE=*.deb
   - os: linux
     env: OS=Windows VISUAL_STUDIO="Visual Studio 15 2017" JANSSON_LIB="jansson.lib" ARCH=x86
   - os: linux
@@ -42,7 +42,7 @@ script:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then sh -xe travisWinBuild.sh; fi
 before_deploy:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then rm -f build/*debuginfo* && rm -f build/*debugsource*; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mkdir deploy && cp build/*.rpm deploy/; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mkdir deploy && cp build/$PACKAGE deploy/; fi
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cd deploy && 7z a -sdel libredfish-$TRAVIS_TAG-$ARCH.zip * && cd ..; fi
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then sleep 5 && ls deploy/*; fi
 deploy:
