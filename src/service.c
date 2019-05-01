@@ -536,6 +536,7 @@ bool getUriFromServiceAsync(redfishService* service, const char* uri, redfishAsy
     if(myContext == NULL)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate context.\n", __func__);
+        freeAsyncRequest(request);
         serviceDecRef(service);
         return false;
     }
@@ -595,6 +596,7 @@ bool patchUriFromServiceAsync(redfishService* service, const char* uri, redfishP
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate context.\n", __func__);
         serviceDecRef(service);
+        freeAsyncRequest(request);
         return false;
     }
     myContext->callback = callback;
@@ -641,6 +643,7 @@ bool postUriFromServiceAsync(redfishService* service, const char* uri, redfishPa
     if(myContext == NULL)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate context.\n", __func__);
+        freeAsyncRequest(request);
         serviceDecRef(service);
         return false;
     }
@@ -687,6 +690,7 @@ bool deleteUriFromServiceAsync(redfishService* service, const char* uri, redfish
     if(myContext == NULL)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Error. Could not allocate context.\n", __func__);
+        freeAsyncRequest(request);
         serviceDecRef(service);
         return false;
     }
