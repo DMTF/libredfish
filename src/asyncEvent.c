@@ -990,18 +990,26 @@ static int mkSSLCert(X509** x509Ptr, EVP_PKEY** publicKeyPtr)
     X509* cert;
     RSA* rsa;
     X509_NAME* name=NULL;
-    BIGNUM e;
+    BIGNUM* e;
 
     *publicKeyPtr = EVP_PKEY_new();
     cert = X509_new();
     rsa = RSA_new();
 
-    BN_init(&e);
-    BN_set_word(&e, 17);
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
+    e = BN_new();
+#else
+    e = malloc(sizeof(BIGNUM));
+    BN_init(e);
+#endif
+    BN_set_word(e, 17);
 
-    RSA_generate_key_ex(rsa, 2048, &e, NULL);
+    RSA_generate_key_ex(rsa, 2048, e, NULL);
     EVP_PKEY_assign_RSA((*publicKeyPtr), rsa);
-    BN_free(&e);
+    BN_free(e);
+#if OPENSSL_VERSION_NUMBER < 0x1010000fL
+    free(e);
+#endif
     //RSA_free(rsa);
 
     X509_set_version(cert, 2);
