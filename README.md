@@ -6,20 +6,58 @@ Copyright 2017-2019 DMTF. All rights reserved.
 
 libRedfish is a C client library that allows for Creation of Entities (POST), Read of Entities (GET), Update of Entities (PATCH), Deletion of Entities (DELETE), running Actions (POST), receiving events, and providing some basic query abilities.
 
+# Installation
+
+## CentOS 7/Redhat Linux 7
+
+1. Add the EPEL repository
+```# yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm```
+2. Install libjansson, libcurl, and libreadline
+```# yum install jansson libcurl readline```
+3. Download RPM (example only please download latest RPM)
+```$ wget https://github.com/DMTF/libredfish/releases/download/1.2.0/libredfish-1.2.0-1.el7.x86_64.rpm```
+4. Install the RPM (substititue the file name from the lastest RPM)
+```# rpm -ivh libredfish-1.2.0-1.el7.x86_64.rpm```
+
+## CentOS 6/Redhat Linux 6
+
+1. Add the EPEL repository
+```# yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm```
+2. Install libjansson, libcurl, and libreadline
+```# yum install jansson libcurl readline```
+3. Download RPM (example only please download latest RPM)
+```$ wget https://github.com/DMTF/libredfish/releases/download/1.2.0/libredfish-1.2.0-1.el6.x86_64.rpm```
+4. Install the RPM (substititue the file name from the lastest RPM)
+```# rpm -ivh libredfish-1.2.0-1.el6.x86_64.rpm```
+
+## Ubuntu
+
+1. Install libjansson, libcurl, and libreadline
+```apt-get install libjansson4 libcurl4 libreadline7```
+2. Download Debian Package
+3. Install Debian Package
+```#dpkg -i libredfish-1.2.0-1.x86_64.deb```
+
+## Other OS/Distro
+
+Compile from source, see below.
+
+# Compilation
+
 ## Pre-requisists
 
 libRedfish is based on C and the compiling system is required to have:
 * CMake
 * C Compiler
-* libjanson - http://www.digip.org/jansson/
+* libjansson - http://www.digip.org/jansson/
 * libcurl - https://curl.haxx.se/libcurl/
 To receive events a user needs an existing webserver supporting FastCGI (such as Apache or nginx) and libczmq (https://github.com/zeromq/czmq).
 
-## Compilation
+## Build
 
 Run cmake.
 
-## RedPath
+# RedPath
 
 libRedfish uses a query language based on XPath (https://www.w3.org/TR/1999/REC-xpath-19991116/). This library and query language essentially treat the entire Redfish Service like it was a single JSON document. In other words whenever it encounters an @odata.id it will retrieve the new document (if needed).
 
@@ -49,7 +87,7 @@ Some examples:
 * /Chassis[Location.Info] - Will return all the Chassis instances that have a Location field and a Info subfield of Location
 * /Systems[Status.Health=OK] - Will return all System instances that have a Health of OK
 
-## C Example
+# C Example
 
 ```C
 #include <redfish.h>
@@ -67,7 +105,7 @@ int main(int argc, char** argv)
 }
 ```
 
-## Release Process
+# Release Process
 
 1. Update `CHANGELOG.md` with the list of changes since the last release
 2. Update `Version` in `rpm/libredfish.spec` to reflect the new library version
