@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.2.1] - 2019-05-10
+- Fixed various leaks
+- Added support for OpenSSL 1.1.0
+
 ## [1.2.0] - 2019-04-12
 - Added Chassis entity support
 - Various compiler, warning, and code checker improvements
