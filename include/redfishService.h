@@ -297,6 +297,9 @@ REDFISH_EXPORT void serviceDecRef(redfishService* service);
  */
 REDFISH_EXPORT void serviceDecRefAndWait(redfishService* service);
 
+/** There was an error parsing the returned payload **/
+#define REDFISH_ERROR_PARSING 0xFFFE
+
 /** Accept any type of response **/
 #define REDFISH_ACCEPT_ALL  0xFFFFFFFF
 /** Accept a JSON response **/

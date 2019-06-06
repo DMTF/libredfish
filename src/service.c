@@ -428,6 +428,15 @@ static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* res
             success = true;
         }
         payload = getPayloadFromAsyncResponse(response, myContext->service);
+        if(payload == NULL)
+        {
+            success = false;
+            if(response->httpResponseCode == 200)
+            {
+                //Override with an error code indicating parsing issues.
+                response->httpResponseCode = REDFISH_ERROR_PARSING;
+            }
+        }
         myContext->callback(success, (unsigned short)response->httpResponseCode, payload, myContext->originalContext);
     }
     freeAsyncRequest(request);
