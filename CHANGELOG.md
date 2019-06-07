@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.2.2] - 2019-06-07
+- Added error checking for when 200 OK is returned, but the payload could not be parsed
+
 ## [1.2.1] - 2019-05-10
 - Fixed various leaks
 - Added support for OpenSSL 1.1.0
