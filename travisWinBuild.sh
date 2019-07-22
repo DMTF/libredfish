@@ -8,7 +8,7 @@ wget https://curl.haxx.se/windows/dl-7.65.3/curl-7.65.3-win64-mingw.zip
 mv curl-7.65.3-win64-mingw curl
 else
 CMAKE_FLAGS=
-wget https://curl.haxx.se/windows/dl-7.65.0/curl-7.65.3-win32-mingw.zip
+wget https://curl.haxx.se/windows/dl-7.65.3/curl-7.65.3-win32-mingw.zip
 7z x curl-7.65.3-win32-mingw.zip
 mv curl-7.65.3-win32-mingw curl
 fi
