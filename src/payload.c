@@ -451,13 +451,9 @@ redfishPayload* getPayloadForPath(redfishPayload* payload, redPathNode* redpath)
     {
         ret = getPayloadByIndex(payload, redpath->index);
     }
-    else if(redpath->op)
-    {
-        ret = getOpResult(payload, redpath->propName, redpath->op, redpath->value);
-    }
     else
     {
-        return NULL;
+        ret = getOpResult(payload, redpath->propName, redpath->op, redpath->value);
     }
 
     if(redpath->next == NULL || ret == NULL)
@@ -484,6 +480,7 @@ redfishPayload* getPayloadForPathString(redfishPayload* payload, const char* str
     redpath = parseRedPath(string);
     if(redpath == NULL)
     {
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to parse redpath %s!", __func__, string);
         return NULL;
     }
     ret = getPayloadForPath(payload, redpath);
