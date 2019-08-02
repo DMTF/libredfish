@@ -1033,9 +1033,16 @@ static void gotSSEUri(bool success, unsigned short httpCode, redfishPayload* pay
 {
     bool tmp;
     regStruct* regContext = (regStruct*)context;
+    char* uri;
+
+    (void)httpCode;
 
     if(success == false)
     {
+        if(payload)
+        {
+            cleanupPayload(payload);
+        }
         if(regContext->registration && regContext->registration->regTypes & REDFISH_REG_TYPE_POST)
         {
             tmp = doEventPostRegAsync(regContext->service, regContext->registration, regContext->frontend, regContext->callback);
@@ -1053,26 +1060,31 @@ static void gotSSEUri(bool success, unsigned short httpCode, redfishPayload* pay
         free(regContext);
         return;
     }
-    printf("%s: success = %d httpCode = %d payload = %p context = %p\n", __func__, success, httpCode, payload, context);
+    uri = getPayloadStringValue(payload);
+    startSSEListener(regContext->service, uri);
+    free(uri);
+    cleanupPayload(payload);
+    free(regContext);
 }
 
-static char* getIP(int ipType, const char* interface)
+static char* getIP(int ipType, const char* interfaceName)
 {
     if(ipType == REDFISH_REG_IP_TYPE_4)
     {
-        return getIpv4Address(interface);
+        return getIpv4Address(interfaceName);
     }
     else if(ipType == REDFISH_REG_IP_TYPE_6)
     {
-        return getIpv6Address(interface);
+        return getIpv6Address(interfaceName);
     }
     else
     {
         return NULL;
     }
 }
-
+#ifndef _MSC_VER
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
 static char* getDestStringForReg(redfishEventRegistration* registration)
 {
     char* ip = getIP(registration->postBackInterfaceIPType, registration->postBackInterface);
@@ -1096,7 +1108,9 @@ static char* getDestStringForReg(redfishEventRegistration* registration)
     free(ip);
     return safeStrdup(destUri);
 }
+#ifndef _MSC_VER
 #pragma GCC diagnostic warning "-Wformat-nonliteral"
+#endif
 
 static redfishPayload* getPayloadForSubscription(redfishService* service, redfishEventRegistration* registration)
 {
@@ -1143,9 +1157,17 @@ static void postSubDone(bool success, unsigned short httpCode, redfishPayload* p
 {
     regStruct* regContext = (regStruct*)context;
 
-    printf("%s: success = %d httpCode = %d payload = %p context = %p\n", __func__, success, httpCode, payload, context);
+    (void)httpCode;
+
     regContext->service->eventRegistrationUri = getPayloadUri(payload);
     cleanupPayload(payload);
+    if(success == false)
+    {
+        //Tell the caller that we didn't register...
+        regContext->callback(NULL, NULL, NULL);
+        free(regContext);
+        return;
+    }
     free(context);
 }
 
