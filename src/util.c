@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/un.h>
 #include <netdb.h>
 #else
 #include <winsock2.h>
@@ -265,11 +266,7 @@ SOCKET getSocket(const char* ip, unsigned int* portNum)
     }
     if(bind(ret, addr, size) < 0)
     {
-#ifdef _MSC_VER
-		closesocket(ret);
-#else
-        close(ret);
-#endif
+        socketClose(ret);
         return -1;
     }
     listen(ret, 5);
@@ -295,11 +292,54 @@ SOCKET getSocket(const char* ip, unsigned int* portNum)
     return ret;
 }
 
+SOCKET getDomainSocket(const char* name)
+{
+    SOCKET ret;
+    struct sockaddr_un addr;
+
+    ret = socket(AF_UNIX, SOCK_STREAM, 0);
+    if(ret < 0)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to open socket\n", __func__);
+        return ret;
+    }
+    unlink(name);
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, name, sizeof(addr.sun_path)-1);
+    if(bind(ret, (struct sockaddr*)&addr, sizeof(addr)) < 0)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to bind socket %s\n", __func__, name);
+		socketClose(ret);
+        return -1;
+    }
+    listen(ret, 5);
+    return ret;
+}
+
 thread getThreadId()
 {
 #ifndef _MSC_VER
     return pthread_self();
 #else
     return GetCurrentThread();
+#endif
+}
+
+void addStringToJsonArray(json_t* array, const char* value)
+{
+    json_t* jValue = json_string(value);
+
+    json_array_append(array, jValue);
+
+    json_decref(jValue);
+}
+
+void socketClose(SOCKET socket)
+{
+#ifdef _MSC_VER
+	closesocket(socket);
+#else
+    close(socket);
 #endif
 }

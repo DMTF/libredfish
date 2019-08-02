@@ -16,13 +16,17 @@
 
 #include <redfishService.h>
 
+#define CONNECT_TYPE_TCP 1
+#define CONNECT_TYPE_SSL 2
+#define CONNECT_TYPE_ANY 3
+
 bool registerCallback(redfishService* service, redfishEventCallback callback, unsigned int eventTypes, const char* context);
 bool unregisterCallback(redfishService* service, redfishEventCallback callback, unsigned int eventTypes, const char* context);
 void startEventThread(redfishService* service);
 void terminateAsyncEventThread(redfishService* service);
 
 bool startSSEListener(redfishService* service, const char* sseUri);
-bool startTCPListener(redfishService* service, SOCKET socket);
+bool startTCPListener(redfishService* service, SOCKET socket, int type);
 bool startZeroMQListener(redfishService* service);
 
 #endif

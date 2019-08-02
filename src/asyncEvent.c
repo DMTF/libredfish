@@ -87,6 +87,8 @@ static size_t gotSSEData(void *contents, size_t size, size_t nmemb, void *userp)
 static size_t getRedfishEventInfoFromRawHttp(const char* buffer, redfishService* service, EventInfo** events);
 static unsigned int getEventTypeFromEventPayload(redfishPayload* payload);
 static void freeWorkItem(EventWorkItem* wi);
+static bool doSSERegAsync(redfishService* service, redfishEventRegistration* registration, redfishEventFrontEnd* frontend, redfishEventCallback callback);
+static bool doEventPostRegAsync(redfishService* service, redfishEventRegistration* registration, redfishEventFrontEnd* frontend, redfishEventCallback callback);
 #ifdef HAVE_OPENSSL
 static void initOpenssl();
 static void cleanupOpenssl();
@@ -154,6 +156,7 @@ struct SSEThreadData {
 struct TCPThreadData {
     redfishService* service;
 	SOCKET socket;
+    int type;
 };
 
 bool startSSEListener(redfishService* service, const char* sseUri)
@@ -189,7 +192,7 @@ bool startSSEListener(redfishService* service, const char* sseUri)
     return ret;
 }
 
-bool startTCPListener(redfishService* service, SOCKET socket)
+bool startTCPListener(redfishService* service, SOCKET socket, int type)
 {
     struct TCPThreadData* data = malloc(sizeof(struct TCPThreadData));
     if(data == NULL)
@@ -198,6 +201,7 @@ bool startTCPListener(redfishService* service, SOCKET socket)
     }
     data->service = service;
     data->socket = socket;
+    data->type = type;
 #ifdef _MSC_VER
     service->tcpThread = CreateThread(NULL, 0, tcpThread, data, 0, NULL);
 #else
@@ -224,6 +228,36 @@ bool startZeroMQListener(redfishService* service)
     //Either already running or just started
     return true;
 #endif
+}
+
+bool registerForEventsAsync(redfishService* service, redfishEventRegistration* registration, redfishEventFrontEnd* frontend, redfishEventCallback callback)
+{
+    if(service == NULL)
+    {
+        return false;
+    }
+
+    if(service->eventThreadQueue == NULL)
+    {
+        service->eventThreadQueue = newQueue();
+        if(service->eventThreadQueue == NULL)
+        {
+            REDFISH_DEBUG_ERR_PRINT("%s: Unable to allocate event queue!\n", __func__);
+            return false;
+        }
+        startEventThread(service);
+    }
+    registerCallback(service, callback, REDFISH_EVENT_TYPE_ALL, NULL);
+
+    if(registration == NULL || registration->regTypes & REDFISH_REG_TYPE_SSE)
+    {
+        return doSSERegAsync(service, registration, frontend, callback);
+    }
+    if(registration->regTypes & REDFISH_REG_TYPE_POST)
+    {
+        return doEventPostRegAsync(service, registration, frontend, callback);
+    }
+    return false;
 }
 
 static threadRet WINAPI eventActorTask(void* args)
@@ -389,10 +423,10 @@ static threadRet WINAPI sseThread(void* args)
 
 #define EVENT_BUFFER_SIZE 12288
 
-static threadRet WINAPI tcpThread(void* args)
+static void listenOpenSSL(struct TCPThreadData* data)
 {
-    struct TCPThreadData* data = (struct TCPThreadData*)args;
-	SOCKET tmpSock;
+#ifdef HAVE_OPENSSL
+    SOCKET tmpSock;
     char buffer[EVENT_BUFFER_SIZE];
     size_t eventCount, i;
     EventInfo* events;
@@ -410,7 +444,6 @@ static threadRet WINAPI tcpThread(void* args)
     initOpenssl();
 
     ctx = createSSLContext();
-#endif
 
     while(1)
     {
@@ -426,19 +459,13 @@ static threadRet WINAPI tcpThread(void* args)
         rv = poll(ufds, 1, 500);
         if(rv < 0)
         {
-#ifdef HAVE_OPENSSL
             SSL_CTX_free(ctx);
             cleanupOpenssl();
-#endif
-            free(args);
 #ifdef _MSC_VER
 			rv = WSAGetLastError();
 			REDFISH_DEBUG_CRIT_PRINT("%s: WSAPoll returned %d\n", __FUNCTION__, rv);
-            return 0;
-#else
-            pthread_exit(NULL);
-            return NULL;
 #endif
+            return;
         }
         else if(rv == 0)
         {
@@ -448,35 +475,18 @@ static threadRet WINAPI tcpThread(void* args)
         if(ufds[0].revents & POLLNVAL)
         {
             REDFISH_DEBUG_ERR_PRINT("Poll found an error with the socket. Exit thread. %x\n", ufds[0].revents);
-#ifdef HAVE_OPENSSL
             SSL_CTX_free(ctx);
             cleanupOpenssl();
-#endif
-            free(args);
-#ifdef _MSC_VER
-            return 0;
-#else
-            pthread_exit(NULL);
-            return NULL;
-#endif
+            return;
         }
         tmpSock = accept(data->socket, NULL, NULL);
         if(tmpSock < 0)
         {
             REDFISH_DEBUG_ERR_PRINT("%s: Unable to open client socket!\n", __func__);
-#ifdef HAVE_OPENSSL
             SSL_CTX_free(ctx);
             cleanupOpenssl();
-#endif
-            free(args);
-#ifdef _MSC_VER
-            return 0;
-#else
-            pthread_exit(NULL);
-            return NULL;
-#endif
+            return;
         }
-#ifdef HAVE_OPENSSL
         ssl = SSL_new(ctx);
         SSL_set_fd(ssl, tmpSock);
         if(SSL_accept(ssl) <= 0)
@@ -491,7 +501,6 @@ static threadRet WINAPI tcpThread(void* args)
         }
 #endif
         memset(buffer, 0, sizeof(buffer));
-#ifdef HAVE_OPENSSL
         buffPos = 0;
         while((unsigned int)buffPos < sizeof(buffer)-1)
         {
@@ -515,7 +524,83 @@ static threadRet WINAPI tcpThread(void* args)
             }
             buffPos += readCount;
         }
+        if(tmpSock == -1)
+        {
+            continue;
+        }
+        eventCount = getRedfishEventInfoFromRawHttp(buffer, data->service, &events);
+        if(eventCount)
+        {
+            SSL_write(ssl,"HTTP/1.1 200 OK\nConnection: Closed\n\n",36);
+        }
+        else
+        {
+            REDFISH_DEBUG_ERR_PRINT("%s: Unrecognized payload!\n", __func__);
+            SSL_write(ssl,"HTTP/1.1 400 Bad Request\nConnection: Closed\n\n",45);
+        }
+        SSL_free(ssl);
+        socketClose(tmpSock);
+        for(i = 0; i < eventCount; i++)
+        {
+            addEventToQueue(data->service, &(events[i]), true);
+        }
+        free(events);
+    }
+    SSL_CTX_free(ctx);
+    cleanupOpenssl();
 #else
+    //Can't do it without OpenSSL compiled in
+    return;
+#endif
+}
+
+static void listenTCP(struct TCPThreadData* data)
+{
+    SOCKET tmpSock;
+    char buffer[EVENT_BUFFER_SIZE];
+    size_t eventCount, i;
+    EventInfo* events;
+    struct pollfd ufds[1];
+    int rv;
+    int readCount;
+
+    while(1)
+    {
+        ufds[0].fd = data->socket;
+#ifdef _MSC_VER
+		ufds[0].events = POLLIN;
+#else
+        ufds[0].events = POLLIN | POLLNVAL;
+#endif
+        ufds[0].revents = 0;
+        // wait for events on the sockets, 0.5 second timeout
+        // This let's the thread error out when the socket is closed and no events are received... 
+        rv = poll(ufds, 1, 500);
+        if(rv < 0)
+        {
+#ifdef _MSC_VER
+			rv = WSAGetLastError();
+			REDFISH_DEBUG_CRIT_PRINT("%s: WSAPoll returned %d\n", __FUNCTION__, rv);
+#endif
+            return;
+        }
+        else if(rv == 0)
+        {
+            //Timeout...
+            continue;
+        }
+        if(ufds[0].revents & POLLNVAL)
+        {
+            REDFISH_DEBUG_ERR_PRINT("Poll found an error with the socket. Exit thread. %x\n", ufds[0].revents);
+            return;
+        }
+        tmpSock = accept(data->socket, NULL, NULL);
+        if(tmpSock < 0)
+        {
+            REDFISH_DEBUG_ERR_PRINT("%s: Unable to open client socket!\n", __func__);
+            return;
+        }
+        memset(buffer, 0, sizeof(buffer));
         readCount = recv(tmpSock, buffer, (EVENT_BUFFER_SIZE-1), 0);
         //REDFISH_DEBUG_INFO_PRINT("%s: recv returned %d bytes\n", __func__, readCount);
         //REDFISH_DEBUG_INFO_PRINT("%s: Current Buffer is %s\n", __func__, buffer);
@@ -524,14 +609,9 @@ static threadRet WINAPI tcpThread(void* args)
             //Too large!
             REDFISH_DEBUG_ERR_PRINT("%s: Event payload is too large for buffer!\n", __func__);
             send(tmpSock,"HTTP/1.1 413 Request Entity Too Large\nConnection: Closed\n\n",58, 0);
-#ifdef _MSC_VER
-           	closesocket(tmpSock);
-#else
-            close(tmpSock);
-#endif
+            socketClose(tmpSock);
             tmpSock = -1;
         }
-#endif
         if(tmpSock == -1)
         {
             continue;
@@ -539,40 +619,51 @@ static threadRet WINAPI tcpThread(void* args)
         eventCount = getRedfishEventInfoFromRawHttp(buffer, data->service, &events);
         if(eventCount)
         {
-#ifdef HAVE_OPENSSL
-            SSL_write(ssl,"HTTP/1.1 200 OK\nConnection: Closed\n\n",36);
-#else
             send(tmpSock,"HTTP/1.1 200 OK\nConnection: Closed\n\n",36, 0);
-#endif
         }
         else
         {
             REDFISH_DEBUG_ERR_PRINT("%s: Unrecognized payload!\n", __func__);
-#ifdef HAVE_OPENSSL
-            SSL_write(ssl,"HTTP/1.1 400 Bad Request\nConnection: Closed\n\n",45);
-#else
 			send(tmpSock,"HTTP/1.1 400 Bad Request\nConnection: Closed\n\n",45, 0);
-#endif
         }
-#ifdef HAVE_OPENSSL
-        SSL_free(ssl);
-#endif
-#ifdef _MSC_VER
-		closesocket(tmpSock);
-#else
-        close(tmpSock);
-#endif
+        socketClose(tmpSock);
         for(i = 0; i < eventCount; i++)
         {
             addEventToQueue(data->service, &(events[i]), true);
         }
         free(events);
     }
-    free(args);
+}
+
+static threadRet WINAPI tcpThread(void* args)
+{
+    struct TCPThreadData* data = (struct TCPThreadData*)args;
+
+    if(data->type == CONNECT_TYPE_ANY)
+    {
 #ifdef HAVE_OPENSSL
-    SSL_CTX_free(ctx);
-    cleanupOpenssl();
+        listenOpenSSL(data);
+#else
+        listenTCP(data);
 #endif
+    }
+    else if(data->type == CONNECT_TYPE_SSL)
+    {
+#ifdef HAVE_OPENSSL
+        REDFISH_DEBUG_CRIT_PRINT("%s: OpenSSL socket requested without OpenSSL compiled in\n", __func__);
+#else
+        listenOpenSSL(data);
+#endif
+    }
+    else if(data->type == CONNECT_TYPE_TCP)
+    {
+        listenTCP(data);
+    }
+    else
+    {
+        REDFISH_DEBUG_CRIT_PRINT("%s: Unknown socket type %d requested\n", __func__, data->type);
+    }
+    free(args);
 #ifdef _MSC_VER
     return 0;
 #else
@@ -928,6 +1019,250 @@ static void freeWorkItem(EventWorkItem* wi)
         }
         free(wi);
     }
+}
+
+typedef struct
+{
+    redfishService* service;
+    redfishEventRegistration* registration;
+    redfishEventFrontEnd* frontend;
+    redfishEventCallback callback;
+} regStruct;
+
+static void gotSSEUri(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    bool tmp;
+    regStruct* regContext = (regStruct*)context;
+
+    if(success == false)
+    {
+        if(regContext->registration && regContext->registration->regTypes & REDFISH_REG_TYPE_POST)
+        {
+            tmp = doEventPostRegAsync(regContext->service, regContext->registration, regContext->frontend, regContext->callback);
+            if(tmp == false)
+            {
+                //Tell the caller that we didn't register...
+                regContext->callback(NULL, NULL, NULL);
+            }
+        }
+        else
+        {
+            //Tell the caller that we didn't register...
+            regContext->callback(NULL, NULL, NULL);
+        }
+        free(regContext);
+        return;
+    }
+    printf("%s: success = %d httpCode = %d payload = %p context = %p\n", __func__, success, httpCode, payload, context);
+}
+
+static char* getIP(int ipType, const char* interface)
+{
+    if(ipType == REDFISH_REG_IP_TYPE_4)
+    {
+        return getIpv4Address(interface);
+    }
+    else if(ipType == REDFISH_REG_IP_TYPE_6)
+    {
+        return getIpv6Address(interface);
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+static char* getDestStringForReg(redfishEventRegistration* registration)
+{
+    char* ip = getIP(registration->postBackInterfaceIPType, registration->postBackInterface);
+    char ip6tmp[100];
+    char destUri[512];
+
+    if(registration->postBackInterfaceIPType == REDFISH_REG_IP_TYPE_4)
+    {
+        snprintf(destUri, sizeof(destUri)-1, registration->postBackURI, ip);
+    }
+    else if(registration->postBackInterfaceIPType == REDFISH_REG_IP_TYPE_6)
+    {
+        snprintf(ip6tmp, sizeof(ip6tmp)-1, "[%s]", ip);
+        snprintf(destUri, sizeof(destUri)-1, registration->postBackURI, ip6tmp);
+    }
+    else
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: Unknown IP type %d\n", __func__, registration->postBackInterfaceIPType);
+        return NULL;
+    }
+    free(ip);
+    return safeStrdup(destUri);
+}
+#pragma GCC diagnostic warning "-Wformat-nonliteral"
+
+static redfishPayload* getPayloadForSubscription(redfishService* service, redfishEventRegistration* registration)
+{
+    redfishPayload* subPayload;
+    char* destStr;
+    json_t* typeArray;
+
+    subPayload = createEmptyRedfishPayload(service);
+    if(subPayload)
+    {
+        if(strstr(registration->postBackURI, "%s"))
+        {
+            destStr = getDestStringForReg(registration);
+            if(destStr == NULL)
+            {
+                cleanupPayload(subPayload);
+                return NULL;
+            }
+            setPayloadStringByName(subPayload, "Destination", destStr);
+            free(destStr);
+        }
+        else
+        {
+            setPayloadStringByName(subPayload, "Destination", registration->postBackURI);
+        }
+        if(registration->context)
+        {
+            setPayloadStringByName(subPayload, "Context", registration->context);
+        }
+        setPayloadStringByName(subPayload, "Protocol", "Redfish");
+        typeArray = json_array();
+        addStringToJsonArray(typeArray, "StatusChange");
+        addStringToJsonArray(typeArray, "ResourceUpdated");
+        addStringToJsonArray(typeArray, "ResourceAdded");
+        addStringToJsonArray(typeArray, "ResourceRemoved");
+        addStringToJsonArray(typeArray, "Alert");
+        setPayloadElementByName(subPayload, "EventTypes", typeArray);
+        json_decref(typeArray);
+    } 
+    return subPayload;
+}
+
+static void postSubDone(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    regStruct* regContext = (regStruct*)context;
+
+    printf("%s: success = %d httpCode = %d payload = %p context = %p\n", __func__, success, httpCode, payload, context);
+    regContext->service->eventRegistrationUri = getPayloadUri(payload);
+    cleanupPayload(payload);
+    free(context);
+}
+
+static void gotPostSubUri(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
+{
+    bool tmp;
+    regStruct* regContext = (regStruct*)context;
+    redfishPayload* subPayload;
+    SOCKET socket;
+    char* ip;
+
+    (void)httpCode;
+
+    if(success == false)
+    {
+        //Tell the caller that we didn't register...
+        regContext->callback(NULL, NULL, NULL);
+        cleanupPayload(payload);
+        free(regContext);
+        return;
+    }
+    subPayload = getPayloadForSubscription(regContext->service, regContext->registration);
+    if(subPayload == NULL)
+    {
+        //Tell the caller that we didn't register...
+        regContext->callback(NULL, NULL, NULL);
+        cleanupPayload(payload);
+        free(regContext);
+        return;
+    }
+
+    if(regContext->frontend == NULL)
+    {
+        REDFISH_DEBUG_ERR_PRINT("%s: No frontend provided\n", __func__);
+        //Tell the caller that we didn't register...
+        regContext->callback(NULL, NULL, NULL);
+        cleanupPayload(subPayload);
+        cleanupPayload(payload);
+        free(regContext);
+        return;
+    }
+
+    tmp = postPayloadAsync(payload, subPayload, NULL, postSubDone, context);
+    cleanupPayload(subPayload);
+    cleanupPayload(payload);
+    if(tmp)
+    {
+        switch(regContext->frontend->frontEndType)
+        {
+            case REDFISH_EVENT_FRONT_END_OPEN_SOCKET:
+                startTCPListener(regContext->service, regContext->frontend->socket, CONNECT_TYPE_ANY);
+                break;
+            case REDFISH_EVENT_FRONT_END_TCP_SOCKET:
+                ip = getIP(regContext->frontend->socketIPType, regContext->frontend->socketInterface);
+                socket = getSocket(ip, &regContext->frontend->socketPort);
+                startTCPListener(regContext->service, socket, CONNECT_TYPE_TCP);
+                break;
+            case REDFISH_EVENT_FRONT_END_SSL_SOCKET:
+                ip = getIP(regContext->frontend->socketIPType, regContext->frontend->socketInterface);
+                socket = getSocket(ip, &regContext->frontend->socketPort);
+                startTCPListener(regContext->service, socket, CONNECT_TYPE_SSL);
+                break;
+            case REDFISH_EVENT_FRONT_END_DOMAIN_SOCKET:
+                socket = getDomainSocket(regContext->frontend->socketName);
+                startTCPListener(regContext->service, socket, CONNECT_TYPE_TCP);
+                break;
+            default:
+                REDFISH_DEBUG_ERR_PRINT("%s: Unknown frontend type %d\n", __func__, regContext->frontend->frontEndType);
+                break;
+        }
+    }
+}
+
+static bool doSSERegAsync(redfishService* service, redfishEventRegistration* registration, redfishEventFrontEnd* frontend, redfishEventCallback callback)
+{
+    bool tmp;
+    regStruct* context = malloc(sizeof(regStruct));
+
+    if(context == NULL)
+    {
+        return false;
+    }
+    context->service = service;
+    context->registration = registration;
+    context->frontend = frontend;
+    context->callback = callback;
+
+    tmp = getPayloadByPathAsync(service, "/EventService/ServerSentEventUri", NULL, gotSSEUri, context);
+    if(tmp == false)
+    {
+        tmp = doEventPostRegAsync(service, registration, frontend, callback);
+    }
+    
+    return tmp;
+}
+
+static bool doEventPostRegAsync(redfishService* service, redfishEventRegistration* registration, redfishEventFrontEnd* frontend, redfishEventCallback callback)
+{
+    bool tmp;
+    regStruct* context = malloc(sizeof(regStruct));
+
+    if(context == NULL)
+    {
+        return false;
+    }
+    context->service = service;
+    context->registration = registration;
+    context->frontend = frontend;
+    context->callback = callback;
+
+    tmp = getPayloadByPathAsync(service, "/EventService/Subscriptions", NULL, gotPostSubUri, context);
+    if(tmp == false)
+    {
+        free(context);
+    }
+
+    return tmp;
 }
 
 #ifdef HAVE_OPENSSL

@@ -20,6 +20,23 @@ static redfishPayload* createCollection(redfishService* service, size_t count, r
 static json_t*         json_object_get_by_index(json_t* json, size_t index);
 static bool            isOdataIdNode(json_t* json, char** uriPtr);
 
+redfishPayload* createEmptyRedfishPayload(redfishService* service)
+{
+    redfishPayload* payload;
+    payload = (redfishPayload*)calloc(sizeof(redfishPayload), 1);
+    if(payload != NULL)
+    {
+        payload->json = json_object();
+        payload->service = service;
+        if(service)
+        {
+            serviceIncRef(service);
+        }
+        payload->contentType = PAYLOAD_CONTENT_JSON;
+    }
+    return payload;
+}
+
 redfishPayload* createRedfishPayload(json_t* value, redfishService* service)
 {
     redfishPayload* payload;
@@ -490,6 +507,26 @@ size_t getCollectionSize(redfishPayload* payload)
         return 0;
     }
     return (size_t)json_integer_value(count);
+}
+
+bool setPayloadElementByName(redfishPayload* payload, const char* name, json_t* element)
+{
+    int rc;
+    rc = json_object_set(payload->json, name, element);
+    return (rc == 0);
+}
+
+bool setPayloadStringByName(redfishPayload* payload, const char* name, const char* string)
+{
+    json_t* val = json_string(string);
+    bool tmp;
+    if(val == NULL)
+    {
+        return false;
+    }
+    tmp = setPayloadElementByName(payload, name, val);
+    json_decref(val);
+    return tmp;
 }
 
 redfishPayload* patchPayloadStringProperty(redfishPayload* payload, const char* propertyName, const char* value)

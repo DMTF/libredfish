@@ -61,6 +61,9 @@ static struct option long_options[] =
     {0, 0, 0, 0}
 };
 
+#ifndef _MSC_VER
+__attribute__((format(printf, 2, 3)))
+#endif
 void syslogPrintf(int priority, const char* message, ...)
 {
     va_list args;

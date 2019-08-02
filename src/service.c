@@ -48,7 +48,6 @@ static char* makeUrlForService(redfishService* service, const char* uri);
 static json_t* getVersions(redfishService* service, const char* rootUri);
 static char* getSSEUri(redfishService* service);
 static char* getEventSubscriptionUri(redfishService* service);
-static void addStringToJsonArray(json_t* array, const char* value);
 static void addStringToJsonObject(json_t* object, const char* key, const char* value);
 static redfishPayload* getPayloadFromAsyncResponse(asyncHttpResponse* response, redfishService* service);
 static unsigned char* base64_encode(const unsigned char* src, size_t len, size_t* out_len);
@@ -878,7 +877,7 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
             REDFISH_DEBUG_CRIT_PRINT("Unable to obtain destination address from string \"%s\"\n", postbackUri);
             return false;
         }
-        ret = startTCPListener(service, socket);
+        ret = startTCPListener(service, socket, CONNECT_TYPE_ANY);
     }
 
     eventSubscriptionUri = getEventSubscriptionUri(service);
@@ -1866,15 +1865,6 @@ static char* getEventSubscriptionUri(redfishService* service)
     ret = safeStrdup(json_string_value(odataId));
     cleanupPayload(eventSub);
     return ret;
-}
-
-static void addStringToJsonArray(json_t* array, const char* value)
-{
-    json_t* jValue = json_string(value);
-
-    json_array_append(array, jValue);
-
-    json_decref(jValue);
 }
 
 static void addStringToJsonObject(json_t* object, const char* key, const char* value)

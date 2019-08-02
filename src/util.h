@@ -15,6 +15,7 @@
 #define _UTIL_H_
 
 #include "queue.h"
+#include <jansson.h>
 
 #ifndef _MSC_VER
 typedef int SOCKET;
@@ -74,6 +75,16 @@ char* getIpv6Address(const char* networkInterface);
 SOCKET getSocket(const char* ip, unsigned int* portNum);
 
 /**
+ * @brief Get a named socket.
+ *
+ * Get a named socket.
+ *
+ * @param name The name to bind to
+ * @return The socket or -1 on error
+ */
+SOCKET getDomainSocket(const char* name);
+
+/**
  * @brief Get the id of the currently running thread.
  *
  * Get the id of the currently running thread.
@@ -81,6 +92,25 @@ SOCKET getSocket(const char* ip, unsigned int* portNum);
  * @return The id of the currently running thread
  */
 thread getThreadId();
+
+/**
+ * @brief Add a string value to a json array
+ *
+ * Add a string value to a json array
+ *
+ * @param array The array to add to
+ * @param value The string value to add
+ */
+void addStringToJsonArray(json_t* array, const char* value);
+
+/**
+ * @brief Close a socket
+ *
+ * Close a socket
+ *
+ * @param socket The socket to close
+ */
+void socketClose(SOCKET socket);
 
 #endif
 /* vim: set tabstop=4 shiftwidth=4 expandtab: */

@@ -307,6 +307,30 @@ REDFISH_EXPORT void serviceDecRefAndWait(redfishService* service);
 /** Accept an XML response **/
 #define REDFISH_ACCEPT_XML  2
 
+/** Try Registering for events through SSE, if supported will be tried first **/
+#define REDFISH_REG_TYPE_SSE  1
+/** Try Registering for events through EventDestination POST **/
+#define REDFISH_REG_TYPE_POST 2
+
+/** Get the IPv4 address **/
+#define REDFISH_REG_IP_TYPE_4 4
+/** Get the IPv6 address **/
+#define REDFISH_REG_IP_TYPE_6 6
+
+#ifndef _MSC_VER
+/** Make Unix and Windows use same type for sockets **/
+typedef int SOCKET;
+#endif
+
+/** An already opened socket, provided in the socket field **/
+#define REDFISH_EVENT_FRONT_END_OPEN_SOCKET 1
+/** Open a TCP socket, socketInterface and socketIPType should be specified, socketPort may be specified if not random port will be used **/
+#define REDFISH_EVENT_FRONT_END_TCP_SOCKET  2
+/** Open a SSL/TLS socket, socketInterface and socketIPType should be specified, socketPort may be specified if not random port will be used **/
+#define REDFISH_EVENT_FRONT_END_SSL_SOCKET  3
+/** Open a POSIX domain socket, socketName should be specified **/
+#define REDFISH_EVENT_FRONT_END_DOMAIN_SOCKET 4
+
 /** Extra async options for the call **/
 typedef struct
 {
@@ -315,6 +339,36 @@ typedef struct
     /** The timeout for the operation, 0 means never timeout **/
     unsigned long timeout;
 } redfishAsyncOptions;
+
+typedef struct
+{
+    /** Event Registration Types to try **/
+    int regTypes;
+    /** The context to send **/
+    char* context;
+    /** POST Back URI (only valid if regTypes contains REDFISH_REG_TYPE_POST), to have libredfish obtain interface IP use %s **/
+    char* postBackURI;
+    /** POST Back Interface IP Type (only valid if regTypes contains REDFISH_REG_TYPE_POST and postBackURI contains %s), the type of IP to obtain **/
+    int postBackInterfaceIPType;
+    /** POST Back Interface (only valid if regTypes contains REDFISH_REG_TYPE_POST and postBackURI contains %s), the interface to obtain the IP for **/
+    char* postBackInterface;
+} redfishEventRegistration;
+
+typedef struct
+{
+    /** The type of font end to use */
+    int frontEndType;
+    /** An already open socket pointer to use. Only valid if frontEndType is REDFISH_EVENT_FRONT_END_OPEN_SOCKET **/
+    SOCKET socket;
+    /** The IP Address type to use. Only valid if frontEndType is REDFISH_EVENT_FRONT_END_TCP_SOCKET or REDFISH_EVENT_FRONT_END_SSL_SOCKET **/
+    int socketIPType;
+    /** The IP interface to use, if NULL is specified then the library will listen on all. Only valid if frontEndType is REDFISH_EVENT_FRONT_END_TCP_SOCKET or REDFISH_EVENT_FRONT_END_SSL_SOCKET **/
+    char* socketInterface;
+    /** The TCP port to use, if 0 is specified then the library will use a random open port. Only valid if frontEndType is REDFISH_EVENT_FRONT_END_TCP_SOCKET or REDFISH_EVENT_FRONT_END_SSL_SOCKET **/
+    unsigned int socketPort;
+    /** The name of the socket to use. Only valid if frontEndType is REDFISH_EVENT_FRONT_END_DOMAIN_SOCKET **/
+    char* socketName;
+} redfishEventFrontEnd;
 
 typedef void (*redfishCreateAsyncCallback)(redfishService* service, void* context);
 
@@ -437,5 +491,18 @@ REDFISH_EXPORT bool getRedfishServiceRootAsync(redfishService* service, const ch
  * @return false if the request could not be started. True otherwise
  */
 REDFISH_EXPORT bool getPayloadByPathAsync(redfishService* service, const char* path, redfishAsyncOptions* options, redfishAsyncCallback callback, void* context);
+/**
+ * @brief Register for notification of async redfish events, with the registration done asynchronously.
+ *
+ * Register for notification of async redfish events, with the registration done asynchronously.
+ *
+ * @param service The service to obtain events from
+ * @param registration The type and information needed for the registration
+ * @param frontend Information on how libredfish will recieve the events
+ * @param callback The function to call upon reciept of an event
+
+ * @return A boolean indicating success or failure
+ */
+REDFISH_EXPORT bool    registerForEventsAsync(redfishService* service, redfishEventRegistration* registration, redfishEventFrontEnd* frontend, redfishEventCallback callback);
 
 #endif

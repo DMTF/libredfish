@@ -45,6 +45,7 @@ static struct option long_options[] =
     {"method",     required_argument, 0,      'M'},
     {"file",       required_argument, 0,      'f'},
     {"events",     required_argument, 0,      'e'},
+    {"aevents",    required_argument, 0,      'E'},
     {"workaround", required_argument, 0,      'W'},
     {"username",   required_argument, 0,      'u'},
     {"password",   required_argument, 0,      'p'},
@@ -229,6 +230,17 @@ void printRedfishEvent(redfishPayload* event, enumeratorAuthentication* auth, co
     {
         printf("Authentication provided!\n");
     }
+    if(event == NULL)
+    {
+        printf("Got null event. Stopping...\n");
+#ifdef _MSC_VER
+        stop = 1;
+#else
+        sleep(1);
+        raise(SIGINT);
+#endif
+        return;
+    }
     string = payloadToString(event, true);
     printf("Event:\n%s\n", string);
     free(string);
@@ -392,10 +404,11 @@ int main(int argc, char** argv)
     commandMapping* command = NULL;
     bool valgrind = false;
     bool ret;
+    bool asyncEvents = false;
 
     memset(&auth, 0, sizeof(auth));
 
-    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:XC:", long_options, &opt_index)) != -1)
+    while((arg = getopt_long(argc, argv, "?VSH:M:f:W:u:p:vT:c:XC:E:", long_options, &opt_index)) != -1)
     {
         switch(arg)
         {
@@ -470,6 +483,9 @@ int main(int argc, char** argv)
             case 'C':
                 userContext = strdup(optarg);
                 break;
+            case 'E':
+                asyncEvents = true;
+                break;
         }
     }
     if(host == NULL)
@@ -502,6 +518,57 @@ int main(int argc, char** argv)
     }
     safeFree(token);
 
+    if(asyncEvents)
+    {
+        redfishEventRegistration reg;
+        redfishEventFrontEnd frontEnd;
+        reg.regTypes = REDFISH_REG_TYPE_SSE | REDFISH_REG_TYPE_POST;
+        reg.context = "libredfish";
+        reg.postBackURI = "https://%s/test";
+        reg.postBackInterfaceIPType = REDFISH_REG_IP_TYPE_4;
+        reg.postBackInterface = "eth0";
+        frontEnd.frontEndType = REDFISH_EVENT_FRONT_END_DOMAIN_SOCKET;
+        frontEnd.socket = -1;
+        frontEnd.socketIPType = REDFISH_REG_IP_TYPE_4;
+        frontEnd.socketInterface = "eth0";
+        frontEnd.socketPort = 0;
+        frontEnd.socketName = "/tmp/socket";
+        if(registerForEventsAsync(redfish, &reg, &frontEnd, printRedfishEvent))
+        {
+#ifdef _MSC_VER
+			SetConsoleCtrlHandler(CtrlHandler, TRUE);
+#else
+            signal(SIGINT, inthand);
+#endif
+            printf("Successfully registered. Waiting for events...\n");
+            while(!stop)
+            {
+#ifdef _MSC_VER
+				Sleep(1000);
+#else
+                sleep(2);
+#endif
+            }
+        }
+        else
+        {
+            printf("Failed to register for events! Cleaning up...\n");
+        }
+        safeFree(userContext);
+        free(eventUri);
+        serviceDecRefAndWait(redfish);
+        if(host)
+        {
+            free(host);
+        }
+        if(filename)
+        {
+            free(filename);
+        }
+        safeFree(username);
+        safeFree(password);
+        return 0;
+    }
     if(eventUri != NULL)
     {
         if(registerForEvents(redfish, eventUri, REDFISH_EVENT_TYPE_ALL, printRedfishEvent, userContext) == true)
