@@ -20,6 +20,16 @@
 #include "redpath.h"
 
 /**
+ * @brief Create an empty redfish payload
+ *
+ * Create an empty redfish payload representation from a service
+ *
+ * @param service The redfish service for this payload
+ * @return A new redfish payload structure
+ * @see cleanupPayload
+ */
+REDFISH_EXPORT redfishPayload* createEmptyRedfishPayload(redfishService* service);
+/**
  * @brief Create a redfish payload from json and a service
  *
  * Create a new redfish payload representation from a json_t* and a service
@@ -203,6 +213,28 @@ REDFISH_EXPORT redfishPayload* getPayloadForPathString(redfishPayload* payload, 
  * @return 0 if the payload is not a collection. The total number of elements in the collection otherwise.
  */
 REDFISH_EXPORT size_t          getCollectionSize(redfishPayload* payload);
+/**
+ * @brief Set json element by name from json_t
+ *
+ * Set a json element from a json element
+ *
+ * @param payload The payload to set the element in
+ * @param name The name of the element to set
+ * @param element The element to set
+ * @return true on success, false otherwise
+ */
+REDFISH_EXPORT bool            setPayloadElementByName(redfishPayload* payload, const char* name, json_t* element);
+/**
+ * @brief Set json element by name from a string
+ *
+ * Set a json element from a string
+ *
+ * @param payload The payload to set the string in
+ * @param name The name of the string to set
+ * @param value The string to set
+ * @return true on success, false otherwise
+ */
+REDFISH_EXPORT bool            setPayloadStringByName(redfishPayload* payload, const char* name, const char* string);
 /**
  * @brief PATCH a string property of the payload (works for enums too).
  *
