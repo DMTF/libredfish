@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.2.3] - 2019-08-09
+- Added support for asynchronous event notification
+- Made fix to path searching
+
 ## [1.2.2] - 2019-06-07
 - Added error checking for when 200 OK is returned, but the payload could not be parsed
 
