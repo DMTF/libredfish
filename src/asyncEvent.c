@@ -289,7 +289,7 @@ static threadRet WINAPI eventActorTask(void* args)
                 wi->registration = NULL;//This is cleaned up, or not as appropirate in the prior call...
                 break;
             case WorkItemEvent:
-                REDFISH_DEBUG_ERR_PRINT("%s: Got new event %p (registrations = %p)\n", __func__, wi->event, registrations);
+                REDFISH_DEBUG_WARNING_PRINT("%s: Got new event %p (registrations = %p)\n", __func__, wi->event, registrations);
                 current = registrations;
                 while(current)
                 {
