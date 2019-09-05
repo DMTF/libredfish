@@ -232,6 +232,9 @@ bool startZeroMQListener(redfishService* service)
 
 bool registerForEventsAsync(redfishService* service, redfishEventRegistration* registration, redfishEventFrontEnd* frontend, redfishEventCallback callback)
 {
+    redfishEventRegistration* regCopy = NULL;
+    redfishEventFrontEnd* feCopy = NULL;
+
     if(service == NULL)
     {
         return false;
@@ -251,23 +254,37 @@ bool registerForEventsAsync(redfishService* service, redfishEventRegistration* r
 
     if(registration != NULL)
     {
-        registration->context           = safeStrdup(registration->context);
-        registration->postBackURI       = safeStrdup(registration->postBackURI);
-        registration->postBackInterface = safeStrdup(registration->postBackInterface);
+        regCopy = malloc(sizeof(redfishEventRegistration));
+        if(!regCopy)
+        {
+            REDFISH_DEBUG_ERR_PRINT("%s: Unable to allocate registration copy!\n", __func__);
+            return false;
+        }
+        memcpy(regCopy, registration, sizeof(redfishEventRegistration));
+        regCopy->context           = safeStrdup(registration->context);
+        regCopy->postBackURI       = safeStrdup(registration->postBackURI);
+        regCopy->postBackInterface = safeStrdup(registration->postBackInterface);
     }
     if(frontend != NULL)
     {
-        frontend->socketInterface       = safeStrdup(frontend->socketInterface);
-        frontend->socketName            = safeStrdup(frontend->socketName);
+        feCopy = malloc(sizeof(redfishEventFrontEnd));
+        if(!feCopy)
+        {
+            REDFISH_DEBUG_ERR_PRINT("%s: Unable to allocate frontend copy!\n", __func__);
+            return false;
+        }
+        memcpy(feCopy, frontend, sizeof(redfishEventFrontEnd));
+        feCopy->socketInterface       = safeStrdup(frontend->socketInterface);
+        feCopy->socketName            = safeStrdup(frontend->socketName);
     }
 
-    if(registration == NULL || registration->regTypes & REDFISH_REG_TYPE_SSE)
+    if(regCopy == NULL || regCopy->regTypes & REDFISH_REG_TYPE_SSE)
     {
-        return doSSERegAsync(service, registration, frontend, callback);
+        return doSSERegAsync(service, regCopy, feCopy, callback);
     }
-    if(registration->regTypes & REDFISH_REG_TYPE_POST)
+    if(regCopy->regTypes & REDFISH_REG_TYPE_POST)
     {
-        return doEventPostRegAsync(service, registration, frontend, callback);
+        return doEventPostRegAsync(service, regCopy, feCopy, callback);
     }
     return false;
 }
@@ -1089,11 +1106,13 @@ static void gotSSEUri(bool success, unsigned short httpCode, redfishPayload* pay
         safeFree(regContext->registration->context);
         safeFree(regContext->registration->postBackURI);
         safeFree(regContext->registration->postBackInterface);
+        free(regContext->registration);
     }
     if(regContext->frontend)
     {
         safeFree(regContext->frontend->socketInterface);
         safeFree(regContext->frontend->socketName);
+        free(regContext->frontend);
     }
     free(regContext);
 }
@@ -1222,11 +1241,13 @@ static void gotPostSubUri(bool success, unsigned short httpCode, redfishPayload*
             safeFree(regContext->registration->context);
             safeFree(regContext->registration->postBackURI);
             safeFree(regContext->registration->postBackInterface);
+            free(regContext->registration);
         }
         if(regContext->frontend)
         {
             safeFree(regContext->frontend->socketInterface);
             safeFree(regContext->frontend->socketName);
+            free(regContext->frontend);
         }
         free(regContext);
         return;
@@ -1242,11 +1263,13 @@ static void gotPostSubUri(bool success, unsigned short httpCode, redfishPayload*
             safeFree(regContext->registration->context);
             safeFree(regContext->registration->postBackURI);
             safeFree(regContext->registration->postBackInterface);
+            free(regContext->registration);
         }
         if(regContext->frontend)
         {
             safeFree(regContext->frontend->socketInterface);
             safeFree(regContext->frontend->socketName);
+            free(regContext->frontend);
         }
         free(regContext);
         return;
@@ -1264,6 +1287,7 @@ static void gotPostSubUri(bool success, unsigned short httpCode, redfishPayload*
             safeFree(regContext->registration->context);
             safeFree(regContext->registration->postBackURI);
             safeFree(regContext->registration->postBackInterface);
+            free(regContext->registration);
         }
         free(regContext);
         return;
@@ -1275,6 +1299,7 @@ static void gotPostSubUri(bool success, unsigned short httpCode, redfishPayload*
         safeFree(regContext->registration->context);
         safeFree(regContext->registration->postBackURI);
         safeFree(regContext->registration->postBackInterface);
+        free(regContext->registration);
     }
     cleanupPayload(subPayload);
     cleanupPayload(payload);
@@ -1306,6 +1331,7 @@ static void gotPostSubUri(bool success, unsigned short httpCode, redfishPayload*
     }
     safeFree(regContext->frontend->socketInterface);
     safeFree(regContext->frontend->socketName);
+    free(regContext->frontend);
 }
 
 static bool doSSERegAsync(redfishService* service, redfishEventRegistration* registration, redfishEventFrontEnd* frontend, redfishEventCallback callback)
@@ -1353,11 +1379,13 @@ static bool doEventPostRegAsync(redfishService* service, redfishEventRegistratio
             safeFree(registration->context);
             safeFree(registration->postBackURI);
             safeFree(registration->postBackInterface);
+            free(registration);
         }
         if(frontend)
         {
             safeFree(frontend->socketInterface);
             safeFree(frontend->socketName);
+            free(frontend);
         }
         free(context);
     }
