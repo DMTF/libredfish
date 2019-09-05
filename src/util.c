@@ -15,6 +15,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <netdb.h>
+#include <sys/stat.h>
 #else
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -314,6 +315,7 @@ SOCKET getDomainSocket(const char* name)
 		socketClose(ret);
         return -1;
     }
+    chmod(name, S_IRWXU|S_IRWXG|S_IROTH|S_IWOTH);
     listen(ret, 5);
     return ret;
 }

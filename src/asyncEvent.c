@@ -249,6 +249,18 @@ bool registerForEventsAsync(redfishService* service, redfishEventRegistration* r
     }
     registerCallback(service, callback, REDFISH_EVENT_TYPE_ALL, NULL);
 
+    if(registration != NULL)
+    {
+        registration->context           = safeStrdup(registration->context);
+        registration->postBackURI       = safeStrdup(registration->postBackURI);
+        registration->postBackInterface = safeStrdup(registration->postBackInterface);
+    }
+    if(frontend != NULL)
+    {
+        frontend->socketInterface       = safeStrdup(frontend->socketInterface);
+        frontend->socketName            = safeStrdup(frontend->socketName);
+    }
+
     if(registration == NULL || registration->regTypes & REDFISH_REG_TYPE_SSE)
     {
         return doSSERegAsync(service, registration, frontend, callback);
@@ -1029,6 +1041,14 @@ typedef struct
     redfishEventCallback callback;
 } regStruct;
 
+static void safeFree(void* ptr)
+{
+    if(ptr)
+    {
+        free(ptr);
+    }
+}
+
 static void gotSSEUri(bool success, unsigned short httpCode, redfishPayload* payload, void* context)
 {
     bool tmp;
@@ -1064,6 +1084,17 @@ static void gotSSEUri(bool success, unsigned short httpCode, redfishPayload* pay
     startSSEListener(regContext->service, uri);
     free(uri);
     cleanupPayload(payload);
+    if(regContext->registration)
+    {
+        safeFree(regContext->registration->context);
+        safeFree(regContext->registration->postBackURI);
+        safeFree(regContext->registration->postBackInterface);
+    }
+    if(regContext->frontend)
+    {
+        safeFree(regContext->frontend->socketInterface);
+        safeFree(regContext->frontend->socketName);
+    }
     free(regContext);
 }
 
@@ -1186,6 +1217,17 @@ static void gotPostSubUri(bool success, unsigned short httpCode, redfishPayload*
         //Tell the caller that we didn't register...
         regContext->callback(NULL, NULL, NULL);
         cleanupPayload(payload);
+        if(regContext->registration)
+        {
+            safeFree(regContext->registration->context);
+            safeFree(regContext->registration->postBackURI);
+            safeFree(regContext->registration->postBackInterface);
+        }
+        if(regContext->frontend)
+        {
+            safeFree(regContext->frontend->socketInterface);
+            safeFree(regContext->frontend->socketName);
+        }
         free(regContext);
         return;
     }
@@ -1195,6 +1237,17 @@ static void gotPostSubUri(bool success, unsigned short httpCode, redfishPayload*
         //Tell the caller that we didn't register...
         regContext->callback(NULL, NULL, NULL);
         cleanupPayload(payload);
+        if(regContext->registration)
+        {
+            safeFree(regContext->registration->context);
+            safeFree(regContext->registration->postBackURI);
+            safeFree(regContext->registration->postBackInterface);
+        }
+        if(regContext->frontend)
+        {
+            safeFree(regContext->frontend->socketInterface);
+            safeFree(regContext->frontend->socketName);
+        }
         free(regContext);
         return;
     }
@@ -1206,11 +1259,23 @@ static void gotPostSubUri(bool success, unsigned short httpCode, redfishPayload*
         regContext->callback(NULL, NULL, NULL);
         cleanupPayload(subPayload);
         cleanupPayload(payload);
+        if(regContext->registration)
+        {
+            safeFree(regContext->registration->context);
+            safeFree(regContext->registration->postBackURI);
+            safeFree(regContext->registration->postBackInterface);
+        }
         free(regContext);
         return;
     }
 
     tmp = postPayloadAsync(payload, subPayload, NULL, postSubDone, context);
+    if(regContext->registration)
+    {
+        safeFree(regContext->registration->context);
+        safeFree(regContext->registration->postBackURI);
+        safeFree(regContext->registration->postBackInterface);
+    }
     cleanupPayload(subPayload);
     cleanupPayload(payload);
     if(tmp)
@@ -1239,6 +1304,8 @@ static void gotPostSubUri(bool success, unsigned short httpCode, redfishPayload*
                 break;
         }
     }
+    safeFree(regContext->frontend->socketInterface);
+    safeFree(regContext->frontend->socketName);
 }
 
 static bool doSSERegAsync(redfishService* service, redfishEventRegistration* registration, redfishEventFrontEnd* frontend, redfishEventCallback callback)
@@ -1281,6 +1348,17 @@ static bool doEventPostRegAsync(redfishService* service, redfishEventRegistratio
     tmp = getPayloadByPathAsync(service, "/EventService/Subscriptions", NULL, gotPostSubUri, context);
     if(tmp == false)
     {
+        if(registration)
+        {
+            safeFree(registration->context);
+            safeFree(registration->postBackURI);
+            safeFree(registration->postBackInterface);
+        }
+        if(frontend)
+        {
+            safeFree(frontend->socketInterface);
+            safeFree(frontend->socketName);
+        }
         free(context);
     }
 
