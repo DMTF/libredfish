@@ -214,6 +214,15 @@ REDFISH_EXPORT redfishPayload* getPayloadForPathString(redfishPayload* payload, 
  */
 REDFISH_EXPORT size_t          getCollectionSize(redfishPayload* payload);
 /**
+ * @brief Obtain the number of members of an array
+ *
+ * Return the number of elements in the array.
+ *
+ * @param payload The payload to get number of elements in
+ * @return 0 if the payload is not an array. The total number of elements in the array otherwise.
+ */
+REDFISH_EXPORT size_t          getArraySize(redfishPayload* payload);
+/**
  * @brief Set json element by name from json_t
  *
  * Set a json element from a json element

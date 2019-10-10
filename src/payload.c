@@ -506,6 +506,15 @@ size_t getCollectionSize(redfishPayload* payload)
     return (size_t)json_integer_value(count);
 }
 
+size_t getArraySize(redfishPayload *payload)
+{
+    if(!payload || !json_is_array(payload->json))
+    {
+        return 0;
+    }
+    return json_array_size(payload->json);
+}
+
 bool setPayloadElementByName(redfishPayload* payload, const char* name, json_t* element)
 {
     int rc;
