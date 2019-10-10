@@ -55,4 +55,5 @@ deploy:
   on:
     tags: true
 after_failure:
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cat build/CMakeFiles/CMakeOutput.log
+- cat build/CMakeFiles/CMakeOutput.log
+- cat CMakeFiles/CMakeOutput.log
