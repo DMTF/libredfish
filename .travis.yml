@@ -56,4 +56,3 @@ deploy:
     tags: true
 after_failure:
 - cat build/CMakeFiles/CMakeOutput.log
-- cat CMakeFiles/CMakeOutput.log
