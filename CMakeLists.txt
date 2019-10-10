@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
+project(libredfish)
 
 set(LIBREDFISH_VERSION_MAJOR 1)
 if(DEFINED ENV{TRAVIS_TAG})
