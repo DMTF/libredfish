@@ -54,3 +54,5 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
+after_failure:
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cat build/CMakeFiles/CMakeOutput.log
