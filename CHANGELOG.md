@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.2.4] - 2019-10-11
+- Changed event received log message severity from error to warning
+- Added getArraySize helper
+
 ## [1.2.3] - 2019-08-09
 - Added support for asynchronous event notification
 - Made fix to path searching
