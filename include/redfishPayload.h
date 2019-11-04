@@ -152,6 +152,17 @@ REDFISH_EXPORT char*           getPayloadStringValue(redfishPayload* payload);
  * @return int contained in the payload or 0 if not a string entity
  */
 REDFISH_EXPORT int             getPayloadIntValue(redfishPayload* payload);
+/**
+ * @brief Get the boolean value for the payload
+ *
+ * If the value of the payload is not a boolean, is_boolean will be set to false and the return value should be considered invalid. Otherwise return
+ * the boolean contained in the payload.
+ *
+ * @param payload The payload to get the bool value of
+ * @param is_boolean Pointer whose value will be set to true if the value of the payload is a boolean
+ * @return bool contained in the payload
+ */
+REDFISH_EXPORT bool            getPayloadBoolValue(redfishPayload* payload, bool* is_boolean);
 
 /**
  * @brief Obtain the node in the payload identified by the specified nodeName
