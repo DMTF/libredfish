@@ -262,6 +262,13 @@ int getPayloadIntValue(redfishPayload* payload)
     return (int)json_integer_value(payload->json);
 }
 
+bool getPayloadBoolValue(redfishPayload* payload, bool* is_boolean) {
+  if (is_boolean != NULL) {
+    *is_boolean = json_is_boolean(payload->json);
+  }
+  return json_boolean_value(payload->json);
+}
+
 redfishPayload* getPayloadByNodeName(redfishPayload* payload, const char* nodeName)
 {
     json_t* value;
