@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.2.5] - 2019-11-08
+- Added getPayloadBoolValue helper
+
 ## [1.2.4] - 2019-10-11
 - Changed event received log message severity from error to warning
 - Added getArraySize helper
