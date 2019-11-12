@@ -269,6 +269,14 @@ bool getPayloadBoolValue(redfishPayload* payload, bool* is_boolean) {
   return json_boolean_value(payload->json);
 }
 
+double getPayloadDoubleValue(redfishPayload* payload, bool* is_double) {
+    if (is_double != NULL)
+    {
+      *is_double = json_is_real(payload->json);
+    }
+    return json_real_value(payload->json);
+}
+
 redfishPayload* getPayloadByNodeName(redfishPayload* payload, const char* nodeName)
 {
     json_t* value;
