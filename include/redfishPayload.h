@@ -163,6 +163,17 @@ REDFISH_EXPORT int             getPayloadIntValue(redfishPayload* payload);
  * @return bool contained in the payload
  */
 REDFISH_EXPORT bool            getPayloadBoolValue(redfishPayload* payload, bool* is_boolean);
+/**
+ * @brief Get the double value for the payload
+ *
+ * If the value of the payload is not a double, *is_double will be set to false and the return value should be considered invalid. Otherwise return
+ * the double contained in the payload.
+ *
+ * @param payload The payload to get the double value of
+ * @param is_double Pointer whose value will be set to true if the value of the payload is a double
+ * @return double contained in the payload
+ */
+REDFISH_EXPORT double          getPayloadDoubleValue(redfishPayload* payload, bool* is_double);
 
 /**
  * @brief Obtain the node in the payload identified by the specified nodeName
