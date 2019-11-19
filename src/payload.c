@@ -262,6 +262,11 @@ int getPayloadIntValue(redfishPayload* payload)
     return (int)json_integer_value(payload->json);
 }
 
+long long getPayloadLongLongValue(redfishPayload* payload)
+{
+    return json_integer_value(payload->json);
+}
+
 bool getPayloadBoolValue(redfishPayload* payload, bool* is_boolean) {
   if (is_boolean != NULL) {
     *is_boolean = json_is_boolean(payload->json);
