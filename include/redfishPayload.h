@@ -149,9 +149,18 @@ REDFISH_EXPORT char*           getPayloadStringValue(redfishPayload* payload);
  * If the value of the payload is not an int (i.e. is a float, string, object, array, etc.) Return 0. Otherwise return the int contained in the payload
  *
  * @param payload The payload to get the int value of
- * @return int contained in the payload or 0 if not a string entity
+ * @return int contained in the payload or 0 if not a int entity
  */
 REDFISH_EXPORT int             getPayloadIntValue(redfishPayload* payload);
+/**
+ * @brief Get the long long value for the payload
+ *
+ * If the value of the payload is not an int (i.e. is a float, string, object, array, etc.) Return 0. Otherwise return the long long contained in the payload
+ *
+ * @param payload The payload to get the long long value of
+ * @return long long contained in the payload or 0 if not a int entity
+ */
+REDFISH_EXPORT json_int_t      getPayloadLongLongValue(redfishPayload* payload);
 /**
  * @brief Get the boolean value for the payload
  *
