@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.2.7] - 2019-11-21
+- Added getPayloadLongLongValue helper
+
 ## [1.2.6] - 2019-11-15
 - Added getPayloadDoubleValue helper
 
