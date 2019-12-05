@@ -1227,7 +1227,7 @@ static void gotPostSubUri(bool success, unsigned short httpCode, redfishPayload*
     regStruct* regContext = (regStruct*)context;
     redfishPayload* subPayload;
     SOCKET socket;
-    char* ip;
+    char* ip = NULL;
 
     (void)httpCode;
 
@@ -1329,6 +1329,7 @@ static void gotPostSubUri(bool success, unsigned short httpCode, redfishPayload*
                 break;
         }
     }
+    safeFree(ip);
     safeFree(regContext->frontend->socketInterface);
     safeFree(regContext->frontend->socketName);
     free(regContext->frontend);
