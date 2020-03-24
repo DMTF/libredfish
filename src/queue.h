@@ -90,7 +90,13 @@ inline bool cas(void* ptr, void* comp, void* replace)
 /** Broadcast a condition **/
 #define cond_broadcast    pthread_cond_broadcast
 /** Wait for a condition signal/broadcast **/
-#define cond_wait         pthread_cond_wait
+#define cond_wait(c,m)    \
+{ \
+    struct timespec ts; \
+    clock_gettime(CLOCK_REALTIME, &ts); \
+    ts.tv_sec += 5; \
+    pthread_cond_timedwait((c), (m), &ts); \
+}
 /** Free/Destroy a condition **/
 #define cond_destroy      pthread_cond_destroy
 
