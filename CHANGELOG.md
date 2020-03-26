@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.2.8] - 2020-03-26
+- Added timeout to conditional wait to prevent queue threads from hanging
+
 ## [1.2.7] - 2019-11-21
 - Added getPayloadLongLongValue helper
 
