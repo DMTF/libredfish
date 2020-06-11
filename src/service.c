@@ -1015,10 +1015,6 @@ redfishPayload* getRedfishServiceRoot(redfishService* service, const char* versi
     value = getUriFromService(service, verUrl);
     if(value == NULL)
     {
-        if((service->flags & REDFISH_FLAG_SERVICE_NO_VERSION_DOC) == 0)
-        {
-            json_decref(versionNode);
-        }
         return NULL;
     }
     return createRedfishPayload(value, service);
