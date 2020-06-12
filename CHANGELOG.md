@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.2.9] - 2020-06-12
+- Corrected extraneous cleanup being performed when connections drop that will prevent the version resource from being read again
+
 ## [1.2.8] - 2020-03-26
 - Added timeout to conditional wait to prevent queue threads from hanging
 
