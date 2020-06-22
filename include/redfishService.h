@@ -140,10 +140,14 @@ typedef void (*redfishEventCallback)(redfishPayload* event, enumeratorAuthentica
  * HTTPS           | IPv4               | https://127.0.0.1
  * HTTP            | IPv6               | http://[::1]
  * HTTPS           | IPv6               | https://[::1]
+ * UDS             | Unix Filepath      | unix:///var/run/my.socket
  *
- * @param host The host to connect to. This must contain the protocol schema see above for more details.
- * @param rootUri The root URI of the redfish service. If NULL the connection with assume /redfish
- * @param auth The authentication method to use for the redfish service. If NULL the connection will be made with no authentication
+ * @param host The host to connect to. This must contain the protocol schema see
+ * above for more details.
+ * @param rootUri The root URI of the redfish service. If NULL the connection
+ * with assume /redfish
+ * @param auth The authentication method to use for the redfish service. If NULL
+ * the connection will be made with no authentication
  * @param flags Any extra flags to pass to the service
  * @return A new redfish service structure representing the connection.
  * @see serviceDecRef
@@ -386,10 +390,14 @@ typedef void (*redfishCreateAsyncCallback)(redfishService* service, void* contex
  * HTTPS           | IPv4               | https://127.0.0.1
  * HTTP            | IPv6               | http://[::1]
  * HTTPS           | IPv6               | https://[::1]
+ * UDS             | Unix Filepath      | unix:///var/run/my.socket
  *
- * @param host The host to connect to. This must contain the protocol schema see above for more details.
- * @param rootUri The root URI of the redfish service. If NULL the connection with assume /redfish
- * @param auth The authentication method to use for the redfish service. If NULL the connection will be made with no authentication
+ * @param host The host to connect to. This must contain the protocol schema see
+ * above for more details.
+ * @param rootUri The root URI of the redfish service. If NULL the connection
+ * with assume /redfish
+ * @param auth The authentication method to use for the redfish service. If NULL
+ * the connection will be made with no authentication
  * @param flags Any extra flags to pass to the service
  * @param callback The callback to call when the service is created
  * @param context The context to pass to the callback

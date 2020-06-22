@@ -1119,6 +1119,7 @@ static void freeServicePtr(redfishService* service)
     terminateAsyncThread(service);
     free(service->host);
     service->host = NULL;
+    free(service->unix_domain_socket);
     json_decref(service->versions);
     service->versions = NULL;
     if(service->sessionToken != NULL)
@@ -1206,6 +1207,28 @@ void serviceDecRefAndWait(redfishService* service)
     }
 }
 
+static void handleHostnameToRedfishService(const char* host,
+                                           redfishService* service) {
+#ifdef _MSC_VER
+  service->host = _strdup(host);
+  service->unix_domain_socket = NULL;
+#else
+  // If the find the prefix "unix://", then host is a domain socket.
+  size_t host_len = strlen(host);
+  if (strlen(host) > 7 && strncmp("unix://", host, 7) == 0) {
+    size_t unix_domain_len = host_len - 7 + 1;
+    service->unix_domain_socket = (char*)malloc(unix_domain_len);
+    memset(service->unix_domain_socket, 0, unix_domain_len);
+    sprintf(service->unix_domain_socket, "%s", host + 7);
+    // CURL needs some dummy hostname to create requests.
+    service->host = strdup("uds");
+  } else {
+    service->host = strdup(host);
+    service->unix_domain_socket = NULL;
+  }
+#endif
+}
+
 static redfishService* createServiceEnumeratorNoAuth(const char* host, const char* rootUri, bool enumerate, unsigned int flags)
 {
     redfishService* ret;
@@ -1217,11 +1240,7 @@ static redfishService* createServiceEnumeratorNoAuth(const char* host, const cha
 		return NULL;
 	}
     serviceIncRef(ret);
-#ifdef _MSC_VER
-	ret->host = _strdup(host);
-#else
-    ret->host = strdup(host);
-#endif
+    handleHostnameToRedfishService(host, ret);
     ret->flags = flags;
     ret->tcpSocket = -1;
     if(enumerate)
@@ -1243,11 +1262,7 @@ static bool createServiceEnumeratorNoAuthAsync(const char* host, const char* roo
         return false;
     }
     serviceIncRef(ret);
-#ifdef _MSC_VER
-    ret->host = _strdup(host);
-#else
-    ret->host = strdup(host);
-#endif
+    handleHostnameToRedfishService(host, ret);
     ret->flags = flags;
     ret->tcpSocket = -1;
     rc = getVersionsAsync(ret, rootUri, callback, context);

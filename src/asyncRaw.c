@@ -270,6 +270,11 @@ threadRet rawAsyncWorkThread(void* data)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readChunk);
     curl_easy_setopt(curl, CURLOPT_READDATA, &writeChunk);
 
+    if (service->unix_domain_socket) {
+      curl_easy_setopt(curl, CURLOPT_UNIX_SOCKET_PATH,
+                       service->unix_domain_socket);
+    }
+
     while(queuePop(q, (void**)&workItem) == 0)
     {
         if(workItem->term)
