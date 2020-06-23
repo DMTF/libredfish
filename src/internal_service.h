@@ -32,8 +32,10 @@
 typedef struct _redfishService {
     /** The host, including protocol schema **/
     char* host;
+#ifndef _MSC_VER
     /** The unix domain socket path if applicable, NULL otherwise **/
     char* unix_domain_socket;
+#endif
     /** The queue of asynchronous HTTP(s) requests **/
     queue* queue;
     /** The thread running asynchronous HTTP(s) requests **/

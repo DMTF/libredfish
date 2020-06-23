@@ -1119,7 +1119,10 @@ static void freeServicePtr(redfishService* service)
     terminateAsyncThread(service);
     free(service->host);
     service->host = NULL;
+#ifndef _MSC_VER
     free(service->unix_domain_socket);
+    service->unix_domain_socket = NULL;
+#endif
     json_decref(service->versions);
     service->versions = NULL;
     if(service->sessionToken != NULL)
