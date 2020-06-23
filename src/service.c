@@ -343,7 +343,6 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
         json_decref(json);
         json = NULL;
     }
-    mutex_unlock(&context->spinLock);
     cleanupAsyncToSyncContext(context);
     REDFISH_DEBUG_DEBUG_PRINT("%s: Exit.\n", __func__);
     return json;
