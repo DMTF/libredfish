@@ -94,6 +94,8 @@ typedef struct
     mutex spinLock;
     /** The condition variable to be signalled on the async call completion **/
     condition waitForIt;
+    /** Number of threads still using this context **/
+    int refcount;
     /** The redfishPayload that was returned **/
     redfishPayload* data;
     /** True means the callback returned success, otherwise false **/
@@ -109,17 +111,33 @@ static asyncToSyncContext* makeAsyncToSyncContext()
     {
         mutex_init(&context->spinLock);
         cond_init(&context->waitForIt);
+        context->refcount = 1;
         //We start out locked...
         mutex_lock(&context->spinLock);
     }
     return context;
 }
 
+/**
+ * Cleans up the asyncToSync context. The context lock must be held when
+ * entering this function. If the context is still being referenced elsewhere,
+ * this function will only decrement the refcount and release the lock. When
+ * no other references exist, the context's memory will be deleted.
+ */
 static void cleanupAsyncToSyncContext(asyncToSyncContext* context)
 {
-    mutex_destroy(&context->spinLock);
-    cond_destroy(&context->waitForIt);
-    free(context);
+    context->refcount--;
+    if (context->refcount == 0) {
+      if (context->data) {
+        cleanupPayload(context->data);
+      }
+      mutex_unlock(&context->spinLock);
+      mutex_destroy(&context->spinLock);
+      cond_destroy(&context->waitForIt);
+      free(context);
+    } else {
+      mutex_unlock(&context->spinLock);
+    }
 }
 
 static bool isOnAsyncThread(redfishService* service)
@@ -157,7 +175,9 @@ void asyncToSyncConverter(bool success, unsigned short httpCode, redfishPayload*
             free(content);
         }
     }
+    mutex_lock(&myContext->spinLock);
     cond_broadcast(&myContext->waitForIt);
+    cleanupAsyncToSyncContext(myContext);
 }
 
 json_t* getUriFromService(redfishService* service, const char* uri)
@@ -183,10 +203,12 @@ json_t* getUriFromService(redfishService* service, const char* uri)
         REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __func__);
         return NULL;
     }
+    context->refcount++;
     tmp = getUriFromServiceAsync(service,uri, NULL, asyncToSyncConverter, context);
     if(tmp == false)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __func__);
+        context->refcount--;
         cleanupAsyncToSyncContext(context);
         return NULL;
     }
@@ -195,7 +217,6 @@ json_t* getUriFromService(redfishService* service, const char* uri)
     if(context->data)
     {
         json = json_incref(context->data->json);
-        cleanupPayload(context->data);
     }
     else
     {
@@ -237,11 +258,13 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
         cleanupAsyncToSyncContext(context);
         return false;
     }
+    context->refcount++;
     tmp = patchUriFromServiceAsync(service, uri, payload, NULL, asyncToSyncConverter, context);
     cleanupPayload(payload);
     if(tmp == false)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __func__);
+        context->refcount--;
         cleanupAsyncToSyncContext(context);
         return NULL;
     }
@@ -250,7 +273,6 @@ json_t* patchUriFromService(redfishService* service, const char* uri, const char
     if(context->data)
     {
         json = json_incref(context->data->json);
-        cleanupPayload(context->data);
     }
     else
     {
@@ -292,11 +314,13 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
         cleanupAsyncToSyncContext(context);
         return NULL;
     }
+    context->refcount++;
     tmp = postUriFromServiceAsync(service, uri, payload, NULL, asyncToSyncConverter, context);
     cleanupPayload(payload);
     if(tmp == false)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __func__);
+        context->refcount--;
         cleanupAsyncToSyncContext(context);
         return NULL;
     }
@@ -305,7 +329,6 @@ json_t* postUriFromService(redfishService* service, const char* uri, const char*
     if(context->data)
     {
         json = json_incref(context->data->json);
-        cleanupPayload(context->data);
     }
     else
     {
@@ -347,10 +370,12 @@ bool deleteUriFromService(redfishService* service, const char* uri)
         REDFISH_DEBUG_CRIT_PRINT("%s: Failed to allocate context!\n", __func__);
         return false;
     }
+    context->refcount++;
     tmp = deleteUriFromServiceAsync(service, uri, NULL, asyncToSyncConverter, context);
     if(tmp == false)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __func__);
+        context->refcount--;
         cleanupAsyncToSyncContext(context);
         return tmp;
     }
@@ -963,12 +988,14 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
         cleanupPayload(postPayload);
         return false;
     }
+    asyncContext->refcount++;
     ret = postUriFromServiceAsync(service, eventSubscriptionUri, postPayload, NULL, asyncToSyncConverter, asyncContext);
     free(eventSubscriptionUri);
     cleanupPayload(postPayload);
     if(ret == false)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Async call failed immediately...\n", __func__);
+        asyncContext->refcount--;
         cleanupAsyncToSyncContext(asyncContext);
         return false;
     }
@@ -977,7 +1004,6 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
     if(asyncContext->data)
     {
         service->eventRegistrationUri = getPayloadUri(asyncContext->data);
-        cleanupPayload(asyncContext->data);
     }
     if(asyncContext->success == false)
     {
