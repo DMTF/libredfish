@@ -28,6 +28,10 @@
 #include <openssl/rsa.h>
 #endif
 
+#ifdef _MSC_VER
+#define strtok_r strtok_s
+#endif
+
 typedef struct {
     /** The redfishPayload from the event **/
     redfishPayload* event;
@@ -426,6 +430,7 @@ static threadRet WINAPI sseThread(void* args)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readChunk);
     curl_easy_setopt(curl, CURLOPT_URL, uri);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    REDFISH_DEBUG_DEBUG_PRINT("%s: Listening for events on %s\n", __func__, uri);
     res = curl_easy_perform(curl);
     if(res != CURLE_OK)
     {
@@ -868,31 +873,6 @@ static bool processNewRegistrations(EventCallbackRegister* newReg, queueNode** r
     return true;
 }
 
-static size_t gotSSEData(void *contents, size_t size, size_t nmemb, void *userp)
-{
-  size_t realsize = size * nmemb;
-  struct SSEStruct *mem = (struct SSEStruct *)userp;
-  void* tmp;
-
-  tmp = (char*)realloc(mem->memory, mem->size + realsize + 1);
-  if(tmp == NULL)
-  {
-      free(mem->memory);
-      mem->memory = NULL;
-      mem->size = 0;
-      return 0;
-  }
-  mem->memory = tmp;
-
-  memcpy(&(mem->memory[mem->size]), contents, realsize);
-  mem->size += realsize;
-  mem->memory[mem->size] = 0;
-
-  REDFISH_DEBUG_ERR_PRINT("SSE data: %s\n", mem->memory);
-
-  return realsize;
-}
-
 static size_t getRedfishEventInfoFromPayload(redfishPayload* payload, enumeratorAuthentication* auth, EventInfo** events)
 {
     EventInfo* ret;
@@ -948,6 +928,58 @@ static size_t getRedfishEventInfoFromPayload(redfishPayload* payload, enumerator
         free(contextStr);
     }
     return count;
+}
+
+static size_t gotSSEData(void *contents, size_t size, size_t nmemb, void *userp)
+{
+  size_t realsize = size * nmemb;
+  struct SSEStruct *mem = (struct SSEStruct *)userp;
+  void* tmp;
+  char* line;
+  char* tokPtr = NULL;
+  redfishPayload* payload;
+  EventInfo* events;
+  size_t eventCount, i;
+
+  tmp = (char*)realloc(mem->memory, mem->size + realsize + 1);
+  if(tmp == NULL)
+  {
+      free(mem->memory);
+      mem->memory = NULL;
+      mem->size = 0;
+      return 0;
+  }
+  mem->memory = tmp;
+
+  memcpy(&(mem->memory[mem->size]), contents, realsize);
+  mem->size += realsize;
+  mem->memory[mem->size] = 0;
+
+  //Parse line by line...
+  line = strtok_r(mem->memory, "\n", &tokPtr);
+  while(line) {
+      //Is this a data line?
+      if(line[0] == 'd' && line[1] == 'a' && line[2] == 't' && line[3] == 'a' && line[4] == ':') {
+          payload = createRedfishPayloadFromString(line+5, mem->service);
+          eventCount = getRedfishEventInfoFromPayload(payload, NULL, &events);
+          for(i = 0; i < eventCount; i++) {
+            addEventToQueue(mem->service, &(events[i]), true);
+          }
+          free(events);
+      }
+      line = strtok_r(NULL, "\n", &tokPtr);
+  }
+  //Reset internal state after handling events
+  if(eventCount > 0)
+  {
+      free(mem->memory);
+      mem->memory = malloc(1);
+      mem->size = 0;
+      mem->origin = mem->memory;
+      mem->originalSize = 0;
+  }
+
+  return realsize;
 }
 
 static size_t getRedfishEventInfoFromRawHttp(const char* buffer, redfishService* service, EventInfo** events)
@@ -1071,6 +1103,7 @@ static void gotSSEUri(bool success, unsigned short httpCode, redfishPayload* pay
     bool tmp;
     regStruct* regContext = (regStruct*)context;
     char* uri;
+    char uriConstruct[255];
 
     (void)httpCode;
 
@@ -1098,6 +1131,22 @@ static void gotSSEUri(bool success, unsigned short httpCode, redfishPayload* pay
         return;
     }
     uri = getPayloadStringValue(payload);
+    if(uri == NULL) {
+        REDFISH_DEBUG_ERR_PRINT("%s: Unable to register for events as the ServerSentEventUri is not in the correct format!\n", __func__);
+        cleanupPayload(payload);
+        //Tell the caller that we didn't register...
+        regContext->callback(NULL, NULL, NULL);
+        free(regContext);
+        return;
+    }
+    //is the URI relative or absolute?
+    if(uri[0] == '/')
+    {
+        //Need to add the host
+        snprintf(uriConstruct, sizeof(uriConstruct)-1, "%s%s", regContext->service->host, uri);
+        free(uri);
+        uri = safeStrdup(uriConstruct);
+    }
     startSSEListener(regContext->service, uri);
     free(uri);
     cleanupPayload(payload);
