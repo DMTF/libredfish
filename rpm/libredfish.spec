@@ -1,5 +1,5 @@
 Name:		libredfish
-Version:	1.3.0
+Version:	1.3.1
 Release:	1%{?dist}
 Summary:	libRedfish is a C client library that allows for Creation of Entities (POST), Read of Entities (GET), Update of Entities (PATCH), Deletion of Entities (DELETE), running Actions (POST), receiving events, and providing some basic query abilities.
 

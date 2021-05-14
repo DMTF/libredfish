@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.3.1] - 2021-05-14
+- Added support for SSE streams to call their callback routine
+
 ## [1.3.0] - 2020-06-26
 - Various fixes to handling cleanup of asyncToSync
 
