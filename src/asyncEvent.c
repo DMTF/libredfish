@@ -584,6 +584,7 @@ static void listenOpenSSL(struct TCPThreadData* data)
     cleanupOpenssl();
 #else
     //Can't do it without OpenSSL compiled in
+    (void)data; //Stop compiler warning
     return;
 #endif
 }

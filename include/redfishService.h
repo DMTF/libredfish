@@ -64,11 +64,13 @@ typedef struct {
 } redfishPayload;
 
 /** The connection should use HTTP basic authentication to authenticate to the Redfish service**/
-#define REDFISH_AUTH_BASIC        0
+#define REDFISH_AUTH_BASIC            0
 /** The connection should use a bearer token to authenticate to the Redfish service **/
-#define REDFISH_AUTH_BEARER_TOKEN 1
+#define REDFISH_AUTH_BEARER_TOKEN     1
 /** The connection should use Redfish service authentication as documented in the Redfish specification to authenticate to the Redfish service **/
-#define REDFISH_AUTH_SESSION      2
+#define REDFISH_AUTH_SESSION          2
+/** The connection should use a preexisting Redfish session token obtained through external means **/
+#define REDFISH_AUTH_EXISTING_SESSION 3
 
 /**
  * @brief A representation of how to authenticate to the service
@@ -92,6 +94,13 @@ typedef struct {
                 /** The bearer token to authenticate with **/
                 char* token;
             } authToken;
+            /** The data used for REDFISH_AUTH_EXISTING_SESSION **/
+            struct {
+                /** The session token to authenticate with **/
+                char* token;
+                /** The session URI so that the session can be cleaned up, if this is set to NULL no session clean up will be performed **/
+                char* uri;
+            } session;
         } authCodes;
 } enumeratorAuthentication;
 
@@ -504,5 +513,21 @@ REDFISH_EXPORT bool getPayloadByPathAsync(redfishService* service, const char* p
  * @return A boolean indicating success or failure
  */
 REDFISH_EXPORT bool    registerForEventsAsync(redfishService* service, redfishEventRegistration* registration, redfishEventFrontEnd* frontend, redfishEventCallback callback);
+
+/**
+ * @brief Destroy the redfish service connection without closeing the session.
+ * 
+ * This function will destroy the local copy of the redfish service enumerator returning the session token and session URI. This is only useful when passing the token/URI to
+ * external code or another interface that will clean up the session.
+ * 
+ * This will return false if session based auth was not used to create the service or if the service has outstanding payloads.
+ * 
+ * @param service The service to obtain session info from
+ * @param token The session token
+ * @param sessionUri The session URI
+ * 
+ * @return A boolean indicating success or failure
+ */
+REDFISH_EXPORT bool destroyServiceForSession(redfishService* service, char** token, char** sessionUri);
 
 #endif
