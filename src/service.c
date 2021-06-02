@@ -464,7 +464,7 @@ static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* res
         }
         myContext->service->sessionToken = safeStrdup(header->value);
     }
-    if(myContext->service->flags & REDFISH_FLAG_SERVICE_BAD_REDIRECTS || isRedirectCode(response->httpResponseCode))
+    if(myContext->service->flags & REDFISH_FLAG_SERVICE_BAD_REDIRECTS || isRedirectCode((unsigned short)response->httpResponseCode))
     {
         //This is a created response, go get the actual payload...
         header = responseGetHeader(response, "Location");

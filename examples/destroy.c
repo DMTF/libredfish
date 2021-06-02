@@ -13,6 +13,8 @@
 #define	LOG_NOTICE	5
 #define	LOG_INFO	6
 #define	LOG_DEBUG	7
+
+#define strcasecmp _stricmp
 #else
 #include <syslog.h>
 #endif

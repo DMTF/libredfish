@@ -33,4 +33,48 @@ typedef void (*libRedfishDebugFunc)(int priority, const char* message, ...);
  */
 void REDFISH_EXPORT libredfishSetDebugFunction(libRedfishDebugFunc debugFunc);
 
+/**
+ * malloc style function to be used by libredfish
+ */
+typedef void* (*libRedfishMallocFunc)(size_t size);
+
+/**
+ * free style function to be used by libredfish
+ */
+typedef void (*libRedfishFreeFunc)(void* ptr);
+
+/**
+ * realloc style function to be used by libredfish
+ */
+typedef void* (*libRedfishReallocFunc)(void* ptr, size_t size);
+
+/**
+ * strdup style function to be used by libredfish
+ */
+typedef char* (*libRedfishStrdupFunc)(const char* str);
+
+/**
+ * calloc style function to be used by libredfish
+ */
+typedef void* (*libRedfishCallocFunc)(size_t nmemb, size_t size);
+
+/**
+ * Set the memory functions to be used by libredfish
+ *
+ * @param malloc_func the function to replace malloc with, NULL to use malloc()
+ * @param free_func the function to replace free with, NULL to use free()
+ * @param realloc_func the function to replace realloc with, NULL to use realloc()
+ * @param strdup_func the function to replace strdup with, NULL to use strdup()
+ * @param calloc_func the function to replace strdup with, NULL to use calloc()
+ */
+void REDFISH_EXPORT libredfishSetMemoryFunctions(libRedfishMallocFunc malloc_func, 
+                                                 libRedfishFreeFunc free_func,
+                                                 libRedfishReallocFunc realloc_func,
+                                                 libRedfishStrdupFunc strdup_func,
+                                                 libRedfishCallocFunc calloc_func);
+
+
+
+
+
 #endif

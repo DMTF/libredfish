@@ -305,10 +305,18 @@ SOCKET getDomainSocket(const char* name)
         REDFISH_DEBUG_ERR_PRINT("%s: Unable to open socket\n", __func__);
         return ret;
     }
+#ifdef _MSC_VER
+    _unlink(name);
+#else
     unlink(name);
+#endif
     memset(&addr, 0, sizeof(addr));
     addr.sun_family = AF_UNIX;
+#ifdef _MSC_VER
+    strncpy_s(addr.sun_path, sizeof(addr.sun_path), name, sizeof(addr.sun_path)-1);
+#else
     strncpy(addr.sun_path, name, sizeof(addr.sun_path)-1);
+#endif
     if(bind(ret, (struct sockaddr*)&addr, sizeof(addr)) < 0)
     {
         REDFISH_DEBUG_ERR_PRINT("%s: Unable to bind socket %s\n", __func__, name);
