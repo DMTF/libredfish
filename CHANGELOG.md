@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.3.2] - 2021-06-04
+- Added destroyServiceForSession to extract a session token without closing the session
+
 ## [1.3.1] - 2021-05-14
 - Added support for SSE streams to call their callback routine
 
