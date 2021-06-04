@@ -244,7 +244,7 @@ size_t enumerateJsonPayload(json_t* json, jsonProperty** properties)
 char* guessLinkFromId(const char* id)
 {
     char tmp1[256] = {0};
-    char tmpRet[256] = {0};
+    char tmpRet[512] = {0};
     char* tmp;
     //Hopefully this implementation follows the OpenAPI stuff... otherwise this probably isn't going to work...
     tmp = strchr(id+1, '/');

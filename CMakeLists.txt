@@ -79,6 +79,9 @@ if(READLINE_FOUND)
     target_link_libraries(redfishcli ${Readline_LIBRARY})
 endif()
 
+add_executable(destorytest "${CMAKE_CURRENT_SOURCE_DIR}/examples/destroy.c")
+target_link_libraries(destorytest redfish)
+
 if(CZMQ_FOUND)
   add_executable(redfishevent "${CMAKE_CURRENT_SOURCE_DIR}/httpd/cgi.c")
   target_link_libraries(redfishevent czmq)

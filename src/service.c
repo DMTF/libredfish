@@ -43,6 +43,7 @@ redfishAsyncOptions gDefaultOptions = {
 static redfishService* createServiceEnumeratorNoAuth(const char* host, const char* rootUri, bool enumerate, unsigned int flags);
 static redfishService* createServiceEnumeratorBasicAuth(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags);
 static redfishService* createServiceEnumeratorSessionAuth(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags);
+static redfishService* createServiceEnumeratorExistingSessionAuth(const char* host, const char* rootUri, const char* token, const char* sessionUri, unsigned int flags);
 static redfishService* createServiceEnumeratorToken(const char* host, const char* rootUri, const char* token, unsigned int flags);
 static char* makeUrlForService(redfishService* service, const char* uri);
 static json_t* getVersions(redfishService* service, const char* rootUri);
@@ -55,8 +56,10 @@ static bool createServiceEnumeratorNoAuthAsync(const char* host, const char* roo
 static bool createServiceEnumeratorBasicAuthAsync(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
 static bool createServiceEnumeratorSessionAuthAsync(const char* host, const char* rootUri, const char* username, const char* password, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
 static bool createServiceEnumeratorTokenAsync(const char* host, const char* rootUri, const char* token, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
+static bool createServiceEnumeratorExistingSessionAuthAsync(const char* host, const char* rootUri, const char* token, const char* sessionUri, unsigned int flags, redfishCreateAsyncCallback callback, void* context);
 static bool getVersionsAsync(redfishService* service, const char* rootUri, redfishCreateAsyncCallback callback, void* context);
 static char* getDestinationAddress(const char* addressInfo, SOCKET* socket);
+static void freeServicePtr(redfishService* service);
 
 redfishService* createServiceEnumerator(const char* host, const char* rootUri, enumeratorAuthentication* auth, unsigned int flags)
 {
@@ -76,6 +79,10 @@ redfishService* createServiceEnumerator(const char* host, const char* rootUri, e
     else if(auth->authType == REDFISH_AUTH_SESSION)
     {
         return createServiceEnumeratorSessionAuth(host, rootUri, auth->authCodes.userPass.username, auth->authCodes.userPass.password, flags);
+    }
+    else if(auth->authType == REDFISH_AUTH_EXISTING_SESSION)
+    {
+        return createServiceEnumeratorExistingSessionAuth(host, rootUri, auth->authCodes.session.token, auth->authCodes.session.uri, flags);
     }
     else
     {
@@ -386,6 +393,33 @@ bool deleteUriFromService(redfishService* service, const char* uri)
     return tmp;
 }
 
+bool destroyServiceForSession(redfishService* service, char** token, char** sessionUri)
+{
+    if(service->sessionToken == NULL)
+    {
+        //Not a session based servie
+        return false;
+    }
+    if(service->refCount > 1)
+    {
+        //Still outstanding users of this session, fail
+        return false;
+    }
+    if(token)
+    {
+        *token = safeStrdup(service->sessionToken);
+    }
+    if(sessionUri)
+    {
+        *sessionUri = safeStrdup(service->sessionUri);
+    }
+    //Free this and set it to NULL so that the freeServicePtr code doesn't kill the session
+    free(service->sessionUri);
+    service->sessionUri = NULL;
+    freeServicePtr(service);
+    return true;
+}
+
 /**
  * @brief An internal structure used to convert Redfish calls to raw async HTTP(s) calls.
  *
@@ -430,7 +464,7 @@ static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* res
         }
         myContext->service->sessionToken = safeStrdup(header->value);
     }
-    if(myContext->service->flags & REDFISH_FLAG_SERVICE_BAD_REDIRECTS || isRedirectCode(response->httpResponseCode))
+    if(myContext->service->flags & REDFISH_FLAG_SERVICE_BAD_REDIRECTS || isRedirectCode((unsigned short)response->httpResponseCode))
     {
         //This is a created response, go get the actual payload...
         header = responseGetHeader(response, "Location");
@@ -529,6 +563,10 @@ bool createServiceEnumeratorAsync(const char* host, const char* rootUri, enumera
     else if(auth->authType == REDFISH_AUTH_SESSION)
     {
         return createServiceEnumeratorSessionAuthAsync(host, rootUri, auth->authCodes.userPass.username, auth->authCodes.userPass.password, flags, callback, context);
+    }
+    else if(auth->authType == REDFISH_AUTH_EXISTING_SESSION)
+    {
+        return createServiceEnumeratorExistingSessionAuthAsync(host, rootUri, auth->authCodes.session.token, auth->authCodes.session.uri, flags, callback, context);
     }
     else
     {
@@ -1411,6 +1449,20 @@ static redfishService* createServiceEnumeratorSessionAuth(const char* host, cons
     return ret;
 }
 
+static redfishService* createServiceEnumeratorExistingSessionAuth(const char* host, const char* rootUri, const char* token, const char* sessionUri, unsigned int flags)
+{
+    redfishService* ret;
+
+    ret = createServiceEnumeratorNoAuth(host, rootUri, true, flags);
+    if(ret == NULL)
+    {
+        return NULL;
+    }
+    ret->sessionToken = safeStrdup(token);
+    ret->sessionUri = safeStrdup(sessionUri);
+    return ret;
+}
+
 typedef struct {
     char* username;
     char* password;
@@ -1648,6 +1700,27 @@ static bool createServiceEnumeratorTokenAsync(const char* host, const char* root
         return false;
     }
     ret->bearerToken = safeStrdup(token);
+    rc = getVersionsAsync(ret, rootUri, callback, context);
+    if(rc == false)
+    {
+        serviceDecRef(ret);
+    }
+    return rc;
+}
+
+static bool createServiceEnumeratorExistingSessionAuthAsync(const char* host, const char* rootUri, const char* token, const char* sessionUri, unsigned int flags, redfishCreateAsyncCallback callback, void* context)
+{
+    redfishService* ret;
+    bool rc;
+
+    //This does no network interactions when enumerate is false... use it because it's easier
+    ret = createServiceEnumeratorNoAuth(host, rootUri, false, flags);
+    if(ret == NULL)
+    {
+        return false;
+    }
+    ret->sessionToken = safeStrdup(token);
+    ret->sessionUri = safeStrdup(sessionUri);
     rc = getVersionsAsync(ret, rootUri, callback, context);
     if(rc == false)
     {
