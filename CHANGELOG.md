@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.3.3] - 2021-07-02
+- Added missing reference incrementer
+
 ## [1.3.2] - 2021-06-04
 - Added destroyServiceForSession to extract a session token without closing the session
 
