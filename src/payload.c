@@ -861,6 +861,7 @@ bool getPayloadByIndexAsync(redfishPayload* payload, size_t index, redfishAsyncO
         free(uri);
         return ret;
     }
+    json_incref(value);
     retPayload = createRedfishPayload(value, payload->service);
     callback(true, 200, retPayload, context);
     return true;
