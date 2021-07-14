@@ -957,6 +957,7 @@ static size_t gotSSEData(void *contents, size_t size, size_t nmemb, void *userp)
   mem->memory[mem->size] = 0;
 
   //Parse line by line...
+  eventCount = 0;
   line = strtok_r(mem->memory, "\n", &tokPtr);
   while(line) {
       //Is this a data line?
