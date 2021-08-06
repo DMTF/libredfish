@@ -1260,6 +1260,7 @@ static void postSubDone(bool success, unsigned short httpCode, redfishPayload* p
 
     (void)httpCode;
 
+    safeFree(regContext->service->eventRegistrationUri);    // if this is a re-registration we need to free the old URI data!
     regContext->service->eventRegistrationUri = getPayloadUri(payload);
     cleanupPayload(payload);
     if(success == false)
