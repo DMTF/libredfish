@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.3.4] - 2021-08-06
+- Fixed memory leak when an event re-registration occurs
+
 ## [1.3.3] - 2021-07-02
 - Added missing reference incrementer
 
