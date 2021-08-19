@@ -20,13 +20,17 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-set(REDFISH_HDR_PUBLIC 
+set(REDFISH_HDR_PUBLIC_RED 
    ${CMAKE_CURRENT_SOURCE_DIR}/include/redfish.h
    ${CMAKE_CURRENT_SOURCE_DIR}/include/redfishEvent.h
    ${CMAKE_CURRENT_SOURCE_DIR}/include/redfishPayload.h
    ${CMAKE_CURRENT_SOURCE_DIR}/include/redfishRawAsync.h
    ${CMAKE_CURRENT_SOURCE_DIR}/include/redfishService.h
    ${CMAKE_CURRENT_SOURCE_DIR}/include/redpath.h)
+
+set(REDFISH_HDR_PUBLIC_ENTITIES 
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/entities/chassis.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/entities/resource.h)
 
 file(GLOB REDFISH_SRC src/*.c src/entities/*.c)
 
@@ -90,7 +94,8 @@ endif()
 install(TARGETS redfishtest redfish
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib)
-install(FILES ${REDFISH_HDR_PUBLIC} DESTINATION include)
+install(FILES ${REDFISH_HDR_PUBLIC_RED} DESTINATION include)
+install(FILES ${REDFISH_HDR_PUBLIC_ENTITIES} DESTINATION include/entities)
 
 ENABLE_TESTING()
 
