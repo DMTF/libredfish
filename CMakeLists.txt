@@ -76,7 +76,7 @@ add_executable(redfishcli "${CMAKE_CURRENT_SOURCE_DIR}/examples/cli.c")
 target_link_libraries(redfishcli redfish jansson)
 if(READLINE_FOUND)
     add_definitions(-DHAVE_READLINE)
-    target_link_libraries(redfishcli ${Readline_LIBRARY})
+    target_link_libraries(redfishcli ${Readline_LIBRARY} ${Tinfo_LIBRARY})
 endif()
 
 add_executable(destorytest "${CMAKE_CURRENT_SOURCE_DIR}/examples/destroy.c")
