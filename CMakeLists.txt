@@ -100,7 +100,7 @@ install(FILES ${REDFISH_HDR_PUBLIC_ENTITIES} DESTINATION include/entities)
 ENABLE_TESTING()
 
 if(CMAKE_COMPILER_IS_GNUCC)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wdeclaration-after-statement -Wshadow -Wformat=2 -ggdb3")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wdeclaration-after-statement -Wshadow -Wformat=2 -ggdb3 -O2")
     if(CMAKE_C_COMPILER_VERSION VERSION_GREATER 6.0)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wnull-dereference")
     endif()

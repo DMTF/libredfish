@@ -1082,8 +1082,8 @@ static void doCLI(redfishService* service)
 #endif
     commandFunc command;
     int res;
-    int argc;
-    char** argv;
+    int argc = 0;
+    char** argv = NULL;
     int i;
 
 #ifdef HAVE_READLINE
