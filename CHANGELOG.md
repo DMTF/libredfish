@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.3.5] - 2021-08-23
+- Fixed cmake dependencies to include installation of chassis.h and resource.h header files
+
 ## [1.3.4] - 2021-08-06
 - Fixed memory leak when an event re-registration occurs
 
