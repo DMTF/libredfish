@@ -107,7 +107,10 @@ int main(int argc, char** argv)
 
 # Release Process
 
-1. Update `CHANGELOG.md` with the list of changes since the last release
-2. Update `Version` in `rpm/libredfish.spec` to reflect the new library version
-3. Push changes to Github
-4. Create a new release in Github
+Run the `release.sh` script to publish a new version.
+
+```bash
+sh release.sh <NewVersion>
+```
+
+Enter the release notes when prompted; an empty line signifies no more notes to add.
