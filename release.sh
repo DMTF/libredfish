@@ -28,10 +28,10 @@ xit
 eof
 
 # Commit and push changes
-#git add CHANGELOG.md rf_protocol_validator.py
-#git commit -m "$1 versioning"
-#git push origin master
+git add CHANGELOG.md rf_protocol_validator.py
+git commit -m "$1 versioning"
+git push origin master
 
 # Make new release in GitHub
-#CHANGES="Changes since last release:"$'\n\n'"$CHANGES"
-#gh release create $1 -n "$CHANGES"
+CHANGES="Changes since last release:"$'\n\n'"$CHANGES"
+gh release create $1 -n "$CHANGES"
