@@ -10,28 +10,34 @@ cache:
 language: C
 env:
   matrix:
-  - OS=el DIST=6 PACKAGE=*.rpm
+  - OS=el DIST=8 PACKAGE=*.rpm
   - OS=el DIST=7 PACKAGE=*.rpm
-  - OS=fedora DIST=29 PACKAGE=*.rpm
-  - OS=fedora DIST=28 PACKAGE=*.rpm
+#  - OS=fedora DIST=33 PACKAGE=*.rpm
+#  - OS=fedora DIST=34 PACKAGE=*.rpm
   - OS=Windows VISUAL_STUDIO="Visual Studio 15 2017" JANSSON_LIB="jansson.lib" ARCH=x86
   - OS=Windows VISUAL_STUDIO="Visual Studio 15 2017 Win64" JANSSON_LIB="janssonx64.lib" ARCH=x64
   - OS=ubuntu DIST=bionic PACKAGE=*.deb
+  - OS=ubuntu DIST=focal PACKAGE=*.deb
   - OS=debian DIST=stretch PACKAGE=*.deb
+  - OS=debian DIST=buster PACKAGE=*.deb
 matrix:
   exclude:
   - os: windows
-    env: OS=el DIST=6 PACKAGE=*.rpm
+    env: OS=el DIST=8 PACKAGE=*.rpm
   - os: windows
     env: OS=el DIST=7 PACKAGE=*.rpm
   - os: windows
-    env: OS=fedora DIST=29 PACKAGE=*.rpm
+    env: OS=fedora DIST=33 PACKAGE=*.rpm
   - os: windows
-    env: OS=fedora DIST=28 PACKAGE=*.rpm
+    env: OS=fedora DIST=34 PACKAGE=*.rpm
   - os: windows
     env: OS=ubuntu DIST=bionic PACKAGE=*.deb
   - os: windows
+    env: OS=ubuntu DIST=focal PACKAGE=*.deb
+  - os: windows
     env: OS=debian DIST=stretch PACKAGE=*.deb
+  - os: windows
+    env: OS=debian DIST=buster PACKAGE=*.deb
   - os: linux
     env: OS=Windows VISUAL_STUDIO="Visual Studio 15 2017" JANSSON_LIB="jansson.lib" ARCH=x86
   - os: linux
@@ -39,6 +45,7 @@ matrix:
 script:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then git clone https://github.com/packpack/packpack.git packpack; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then VERSION=${TRAVIS_TAG} packpack/packpack; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then VERSION=${TRAVIS_TAG} /bin/bash renamedeb.sh; fi
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then sh -xe travisWinBuild.sh; fi
 before_deploy:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then rm -f build/*debuginfo* && rm -f build/*debugsource*; fi
