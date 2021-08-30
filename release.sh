@@ -28,7 +28,7 @@ xit
 eof
 
 # Commit and push changes
-git add CHANGELOG.md rf_protocol_validator.py
+git add CHANGELOG.md rpm/libredfish.spec
 git commit -m "$1 versioning"
 git push origin master
 
