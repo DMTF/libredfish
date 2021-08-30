@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.3.6] - 2021-08-30
+- Updated build packages to include EL8 and the latest Debian
+
 ## [1.3.5] - 2021-08-23
 - Fixed cmake dependencies to include installation of chassis.h and resource.h header files
 
