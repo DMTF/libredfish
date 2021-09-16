@@ -36,6 +36,11 @@ file(GLOB REDFISH_SRC src/*.c src/entities/*.c)
 
 source_group("Library Sources" FILES ${REDFISH_SRC})
 
+if (WIN32)
+set(CURL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/curl/include)
+set(CURL_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/curl/lib/curl.lib)
+endif()
+
 find_package(CURL REQUIRED)
 find_package(Jansson REQUIRED)
 find_package(CZMQ)
