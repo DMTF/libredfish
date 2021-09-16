@@ -41,19 +41,19 @@ jobs:
     
     - name: Get Curl
       run: |
-        wget https://curl.se/windows/dl-7.76.1/curl-7.76.1-win64-mingw.zip
-        7z x curl-7.76.1-win64-mingw.zip
-        mv curl-7.76.1-win64-mingw curl
-        cp curl/lib/libcurl.dll.a curl/lib/curl.lib
+        Invoke-WebRequest -Uri https://curl.se/windows/dl-7.76.1/curl-7.76.1-win64-mingw.zip -OutFile curl.zip
+        Expand-Archive curl.zip
+        Move-Item .\curl\*\* .\curl\
+        Copy-Item .\curl\lib\libcurl.dll.a .\curl\lib\curl.lib
         
     - name: Get Jansson
       run: |
-        wget -O jansson.lib https://github.com/pboyd04/jansson/releases/download/v2.11/$JANSSON_LIB
-        wget -O include/jansson.h https://github.com/pboyd04/jansson/releases/download/v2.11/jansson.h
-        wget -O include/jansson_config.h https://github.com/pboyd04/jansson/releases/download/v2.11/jansson_config.h
+        Invoke-WebRequest -OutFile jansson.lib -Uri https://github.com/pboyd04/jansson/releases/download/v2.11/janssonx64.lib
+        Invoke-WebRequest -OutFile include/jansson.h -Uri https://github.com/pboyd04/jansson/releases/download/v2.11/jansson.h
+        Invoke-WebRequest -OutFile include/jansson_config.h -Uri https://github.com/pboyd04/jansson/releases/download/v2.11/jansson_config.h
         
     - name: Get getopt.h
-      run: wget -O include/getopt.h https://raw.githubusercontent.com/skandhurkat/Getopt-for-Visual-Studio/master/getopt.h
+      run: Invoke-WebRequest -OutFile include/getopt.h -Uri https://raw.githubusercontent.com/skandhurkat/Getopt-for-Visual-Studio/master/getopt.h
   
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
