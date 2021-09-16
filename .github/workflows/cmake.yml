@@ -34,9 +34,9 @@ jobs:
   build-windows:
     runs-on: windows-2019
     
-  steps:
-  - uses: actions/checkout@v2
+    steps:
+    - uses: actions/checkout@v2
   
-  - name: Build
-    run: sh -xe travisWinBuild.sh
+    - name: Build
+      run: sh -xe travisWinBuild.sh
       
