@@ -38,6 +38,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v2
+    - uses: olegtarasov/get-tag@v2.1
+      id: tagName
     
     - name: Get Curl
       run: |
@@ -65,4 +67,7 @@ jobs:
     - name: Build
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Compress artifacts
+      run: Compress-Archive .\build\bin\Release\* -DestinationPath .\build\libredfish-${{ steps.tagName.outputs.tag }}-x64.zip
       
