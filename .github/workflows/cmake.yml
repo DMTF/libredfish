@@ -19,6 +19,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: olegtarasov/get-tag@v2.1
+      id: tagName
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -32,6 +34,21 @@ jobs:
     - name: Build
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - uses: jiro4989/build-deb-action@v2
+      with:
+        package: libredfish
+        package_root: .debpkg
+        maintainer: Patrick_Boyd@Dell.com
+        version: ${{ steps.tagName.outputs.tag }}
+        arch: 'amd64'
+        desc: 'libRedfish is a C client library that allows for Creation of Entities (POST), Read of Entities (GET), Update of Entities (PATCH), Deletion of Entities (DELETE), running Actions (POST), receiving events, and providing some basic query abilities.'
+        
+    - uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}
+        path: ./*.deb
+        
       
   build-windows-x64:
     runs-on: windows-2019
@@ -72,6 +89,6 @@ jobs:
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: windows-x66
+        name: windows-x64
         path: ${{github.workspace}}\build\libredfish-${{ steps.tagName.outputs.tag }}-x64.zip
       
