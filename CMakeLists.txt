@@ -39,6 +39,8 @@ source_group("Library Sources" FILES ${REDFISH_SRC})
 if (WIN32)
 set(CURL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/curl/include)
 set(CURL_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/curl/lib/curl.lib)
+set(JANSSON_LIBRARIES ${CMAKE_CURRENT_SOURCE_DIR}/jansson.lib)
+set(JANSSON_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
 find_package(CURL REQUIRED)
