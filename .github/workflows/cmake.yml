@@ -45,7 +45,7 @@ jobs:
         maintainer: Patrick_Boyd@Dell.com
         version: ${{ env.GIT_TAG_NAME }}
         arch: 'amd64'
-        desc: 'libRedfish is a C client library that allows for Creation of Entities (POST), Read of Entities (GET), Update of Entities (PATCH), Deletion of Entities (DELETE), running Actions (POST), receiving events, and providing some basic query abilities.'
+        desc: 'libredfish'
         
     - uses: actions/upload-artifact@v2
       with:
