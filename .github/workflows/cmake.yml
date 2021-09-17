@@ -53,11 +53,22 @@ jobs:
         arch: 'x86_64'
         format: 'deb'
         package: package-dev.yaml
+    
+    - name: build RPM package
+      id: rpm_build
+      uses: naveenrajm7/rpmbuild@master
+      with:
+        spec_file: "rpm/libredfish.spec"
         
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.os }}
         path: ./*.deb
+        
+    - uses: actions/upload-artifact@v2
+      with:
+        name: RPM
+        path: ./*.rpm
         
       
   build-windows-x64:
