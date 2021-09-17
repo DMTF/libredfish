@@ -38,7 +38,7 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
       
-    - uses: kentik/pkg@v1
+    - uses: kentik/pkg@v1.0.0-rc7
       with:
         name: libredfish
         version: ${{ env.GIT_TAG_NAME }}
