@@ -58,7 +58,7 @@ jobs:
       id: rpm_build
       uses: naveenrajm7/rpmbuild@master
       with:
-        spec_file: "libredfish.spec"
+        spec_file: rpm/libredfish.spec
         
     - uses: actions/upload-artifact@v2
       with:
