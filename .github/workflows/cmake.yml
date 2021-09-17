@@ -44,7 +44,7 @@ jobs:
         version: ${{ env.GIT_TAG_NAME }}
         arch: 'x86_64'
         format: 'deb'
-        package: package.yaml
+        package: package-bin.yaml
         
     - uses: actions/upload-artifact@v2
       with:
