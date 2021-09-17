@@ -46,6 +46,14 @@ jobs:
         format: 'deb'
         package: package-bin.yaml
         
+    - uses: kentik/pkg@v1.0.0-rc7
+      with:
+        name: libredfish-dev
+        version: ${{ env.GIT_TAG_NAME }}
+        arch: 'x86_64'
+        format: 'deb'
+        package: package-dev.yaml
+        
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.os }}
