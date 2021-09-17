@@ -38,14 +38,13 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
       
-    - uses: jiro4989/build-deb-action@v2
+    - uses: kentik/pkg@v1
       with:
-        package: libredfish
-        package_root: .debpkg
-        maintainer: Patrick_Boyd@Dell.com
+        name: libredfish
         version: ${{ env.GIT_TAG_NAME }}
-        arch: 'amd64'
-        desc: 'libredfish'
+        arch: 'x86_64'
+        format: 'deb'
+        package: package.yaml
         
     - uses: actions/upload-artifact@v2
       with:
