@@ -499,7 +499,15 @@ static size_t asyncHeaderCallback(char* buffer, size_t size, size_t nitems, void
         free(tmp);
         return nitems * size;
     }
-    value = strtok_r(NULL, ":", &save);
+    // Added support for handling Location header with absolute path
+    if (strstr(name, "Location") && (strstr(save, "http://") || strstr(save, "https://")))
+    {
+        value = save;
+    }
+    else
+    {
+        value = strtok_r(NULL, ":", &save);
+    }
     if(value == NULL)
     {
         free(tmp);

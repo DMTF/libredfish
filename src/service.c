@@ -470,6 +470,21 @@ static void rawCallbackWrapper(asyncHttpRequest* request, asyncHttpResponse* res
         header = responseGetHeader(response, "Location");
         if(header)
         {
+            // Added support for handling Location header with absolute path
+            char *new_value = '\0';
+            if (strstr(header->value, "https://") || strstr(header->value, "http://"))
+            {
+                 new_value = header->value;
+                 // Moving new_value by 9 to ensure that it points to an offset after 'https://' or 'http://' so that it can be later split based on '/'
+                 new_value = new_value + 9;
+                 if (new_value)
+                 {
+                     // assign the value starting from /redfish/v1/
+                     new_value = strchr(new_value, '/');
+                     if (new_value)
+                         header->value = safeStrdup(new_value);
+                 }
+            }
             getUriFromServiceAsync(myContext->service, header->value, myContext->originalOptions, myContext->callback, myContext->originalContext);
             freeAsyncRequest(request);
             freeAsyncResponse(response);
