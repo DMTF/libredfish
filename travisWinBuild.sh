@@ -3,12 +3,12 @@
 echo "Downloading CURL..."
 if [[ "$VISUAL_STUDIO" == "Visual Studio 15 2017 Win64" ]]; then
 CMAKE_FLAGS="-A x64"
-wget https://curl.se/windows/curl-win64-latest.zip
+wget --no-check-certificate https://curl.se/windows/curl-win64-latest.zip
 7z x curl-win64-latest.zip
 mv curl-* curl
 else
 CMAKE_FLAGS=
-wget https://curl.se/windows/curl-win32-latest.zip
+wget --no-check-certificate https://curl.se/windows/curl-win32-latest.zip
 7z x curl-win32-latest.zip
 mv curl-* curl
 fi
