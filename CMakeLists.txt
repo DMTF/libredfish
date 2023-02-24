@@ -41,6 +41,7 @@ find_package(Jansson REQUIRED)
 find_package(CZMQ)
 find_package(OpenSSL)
 find_package(Readline)
+find_package(Threads)
 
 include_directories(${CURL_INCLUDE_DIR})
 include_directories(${JANSSON_INCLUDE_DIRS})
@@ -70,6 +71,9 @@ if(OPENSSL_FOUND)
   target_link_libraries(redfish ${OPENSSL_CRYPTO_LIBRARY})
 endif()
 
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+target_link_libraries(redfish Threads::Threads)
 
 add_executable(redfishtest "${CMAKE_CURRENT_SOURCE_DIR}/examples/test.c")
 target_link_libraries(redfishtest redfish)
