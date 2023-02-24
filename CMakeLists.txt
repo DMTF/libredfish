@@ -138,3 +138,5 @@ elseif(MSVC)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LIBPATH:.. /LIBPATH:../curl/lib")
     endif()
 endif()
+
+configure_file(libredfish.pc.in libredfish.pc @ONLY)
