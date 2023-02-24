@@ -67,6 +67,7 @@ endif()
 if(OPENSSL_FOUND)
   add_definitions(-DHAVE_OPENSSL)
   target_link_libraries(redfish ${OPENSSL_SSL_LIBRARY})
+  target_link_libraries(redfish ${OPENSSL_CRYPTO_LIBRARY})
 endif()
 
 
