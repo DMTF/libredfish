@@ -1,6 +1,6 @@
 # Copyright Notice:
 # Copyright 2017-2019 DMTF. All rights reserved.
-# License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/master/LICENSE.md
+# License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/main/LICENSE.md
 from distutils.core import setup, Extension
 
 module1 = Extension('libredfish',
