@@ -30,7 +30,7 @@ eof
 # Commit and push changes
 git add CHANGELOG.md rpm/libredfish.spec
 git commit -m "$1 versioning"
-git push origin master
+git push origin main
 
 # Make new release in GitHub
 CHANGES="Changes since last release:"$'\n\n'"$CHANGES"
