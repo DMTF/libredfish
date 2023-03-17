@@ -13,7 +13,7 @@ while : ; do
 done
 
 # Rebase
-git checkout master
+git checkout main
 git fetch && git rebase origin
 
 # Update the version number in rf_protocol_validator.py
