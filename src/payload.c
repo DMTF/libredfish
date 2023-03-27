@@ -20,6 +20,52 @@ static redfishPayload* createCollection(redfishService* service, size_t count, r
 static json_t*         json_object_get_by_index(json_t* json, size_t index);
 static bool            isOdataIdNode(json_t* json, char** uriPtr);
 
+typedef struct
+{
+    const char *string;
+    size_t length;
+} string_t;
+
+size_t string_try_next(string_t *str, const char *delimiter)
+{
+    str->string += strspn(str->string, delimiter);
+    str->length = strcspn(str->string, delimiter);
+    return str->length;
+}
+
+json_t *json_object_get_by_path(json_t *object, const char *path)
+{
+    string_t str = {path, strlen(path)};
+    json_t *out = object;
+    const char *delimiter = ".";
+
+    // Doesn't contain delimiter > Not a path.
+    if (!strchr(path, *delimiter)) 
+        return json_object_get(object, path);
+
+    while (string_try_next(&str, delimiter))
+    {
+
+// json_object_getn is only available with Jansson 2.14+.
+// Manually split the keys for compatibility with older versions
+#if JANSSON_VERSION_HEX >= 0x021400
+        out = json_object_getn(out, str.string, str.length);
+#else
+        char sub_key[str.length + 1];
+        memcpy(&sub_key, str.string, str.length);
+        sub_key[str.length] = '\0';
+
+        out = json_object_get(out, (const char *)&sub_key);
+#endif
+
+        if (out == NULL)
+            return NULL;
+        str.string += str.length;
+    }
+
+    return out;
+}
+
 redfishPayload* createEmptyRedfishPayload(redfishService* service)
 {
     redfishPayload* payload;
@@ -293,7 +339,7 @@ redfishPayload* getPayloadByNodeName(redfishPayload* payload, const char* nodeNa
         return NULL;
     }
 
-    value = json_object_get(payload->json, nodeName);
+    value = json_object_get_by_path(payload->json, nodeName);
     if(value == NULL)
     {
         return NULL;
