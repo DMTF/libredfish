@@ -51,11 +51,12 @@ json_t *json_object_get_by_path(json_t *object, const char *path)
 #if JANSSON_VERSION_HEX >= 0x021400
         out = json_object_getn(out, str.string, str.length);
 #else
-        char sub_key[str.length + 1];
-        memcpy(&sub_key, str.string, str.length);
+        char *sub_key = calloc(str.length + 1, sizeof(char));  // allocate dynamic memory for sub_key
+        memcpy(sub_key, str.string, str.length);
         sub_key[str.length] = '\0';
 
-        out = json_object_get(out, (const char *)&sub_key);
+        out = json_object_get(out, (const char *)sub_key);
+        free(sub_key)
 #endif
 
         if (out == NULL)
