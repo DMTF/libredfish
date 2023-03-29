@@ -56,7 +56,7 @@ json_t *json_object_get_by_path(json_t *object, const char *path)
         sub_key[str.length] = '\0';
 
         out = json_object_get(out, (const char *)sub_key);
-        free(sub_key)
+        free(sub_key);
 #endif
 
         if (out == NULL)
