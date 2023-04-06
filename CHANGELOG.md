@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.3.7] - 2023-04-06
+- Corrected JSON path usage inside of a RedPath nodename expression
+
 ## [1.3.6] - 2021-08-30
 - Updated build packages to include EL8 and the latest Debian
 
