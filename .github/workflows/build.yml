@@ -63,6 +63,7 @@ jobs:
 #        spec_file: rpm/libredfish.spec
         
     - uses: softprops/action-gh-release@v1
+      if: ${{ github.event_name == 'release' }}
       with:
         files: ./*.deb
         
