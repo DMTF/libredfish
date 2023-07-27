@@ -65,7 +65,7 @@ libRedfish uses a query language based on XPath (https://www.w3.org/TR/1999/REC-
 | ----------------- | -------------------------------------------------------------------------------------------------------------- |
 | *nodename*        | Selects the JSON entity with the name "nodename"                                                               |
 | /                 | Selects from the root node                                                                                     |
-| [*index*]         | Selects the index number JSON entity from an array or object                                                   |
+| [*index*]         | Selects the index number JSON entity from an array or object. For arrays, the index is 0-based.                |
 | [last()]          | Selects the last index number JSON entity from an array or object                                              |
 | [*nodename*]      | Selects all the elements from an array or object that contain a property named "nodename"                      |
 | [*name*=*value*]  | Selects all the elements from an array or object where the property "name" is equal to "value"                 |
@@ -79,7 +79,7 @@ libRedfish uses a query language based on XPath (https://www.w3.org/TR/1999/REC-
 
 Some examples:
 
-* /Chassis[1] - Will return the first Chassis instance
+* /Chassis[0] - Will return the first Chassis instance
 * /Chassis[SKU=1234] - Will return all Chassis instances with a SKU field equal to 1234
 * /Systems[Storage] - Will return all the System instances that have Storage field populated
 * /Systems[*] - Will return all the System instances
@@ -105,12 +105,10 @@ int main(int argc, char** argv)
 }
 ```
 
-# Release Process
+## Release Process
 
-Run the `release.sh` script to publish a new version.
-
-```bash
-sh release.sh <NewVersion>
-```
-
-Enter the release notes when prompted; an empty line signifies no more notes to add.
+1. Go to the "Actions" page
+2. Select the "Release and Publish" workflow
+3. Click "Run workflow"
+4. Fill out the form
+5. Click "Run workflow"
