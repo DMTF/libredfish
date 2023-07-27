@@ -1,4 +1,4 @@
-name: Release
+name: Build
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04]
+        os: [ubuntu-20.04, ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v2
@@ -47,6 +47,7 @@ jobs:
         package: package-bin.yaml
         
     - uses: kentik/pkg@v1.0.0-rc7
+      if: ${{ github.event_name == 'release' }}
       with:
         name: libredfish-dev-${{ matrix.os }}
         version: ${{ env.GIT_TAG_NAME }}
@@ -70,7 +71,7 @@ jobs:
         
       
   build-windows-x64:
-    runs-on: windows-2019
+    runs-on: windows-latest
     
     steps:
     - uses: actions/checkout@v2
@@ -79,7 +80,7 @@ jobs:
     
     - name: Get Curl
       run: |
-        Invoke-WebRequest -Uri https://curl.se/windows/dl-7.76.1/curl-7.76.1-win64-mingw.zip -OutFile curl.zip
+        Invoke-WebRequest -Uri https://curl.se/windows/latest.cgi?p=win64-mingw.zip -OutFile curl.zip
         Expand-Archive curl.zip
         Move-Item .\curl\*\* .\curl\
         Copy-Item .\curl\lib\libcurl.dll.a .\curl\lib\curl.lib
