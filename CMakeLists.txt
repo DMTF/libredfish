@@ -14,6 +14,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
+if(NOT DEFINED INCLUDE_INSTALL_DIR)
+  set(INCLUDE_INSTALL_DIR include)
+endif()
+if(NOT DEFINED CMAKE_INSTALL_BINDIR)
+  set(CMAKE_INSTALL_BINDIR bin)
+endif()
+if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+  set(CMAKE_INSTALL_LIBDIR lib)
+endif()
+
 set(CMAKE_C_FLAGS_DEBUG "-D_DEBUG")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -41,6 +51,7 @@ find_package(Jansson REQUIRED)
 find_package(CZMQ)
 find_package(OpenSSL)
 find_package(Readline)
+find_package(Threads)
 
 include_directories(${CURL_INCLUDE_DIR})
 include_directories(${JANSSON_INCLUDE_DIRS})
@@ -67,8 +78,12 @@ endif()
 if(OPENSSL_FOUND)
   add_definitions(-DHAVE_OPENSSL)
   target_link_libraries(redfish ${OPENSSL_SSL_LIBRARY})
+  target_link_libraries(redfish ${OPENSSL_CRYPTO_LIBRARY})
 endif()
 
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+target_link_libraries(redfish Threads::Threads)
 
 add_executable(redfishtest "${CMAKE_CURRENT_SOURCE_DIR}/examples/test.c")
 target_link_libraries(redfishtest redfish)
@@ -92,10 +107,10 @@ if(CZMQ_FOUND)
 endif()
 
 install(TARGETS redfishtest redfish
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib)
-install(FILES ${REDFISH_HDR_PUBLIC_RED} DESTINATION include)
-install(FILES ${REDFISH_HDR_PUBLIC_ENTITIES} DESTINATION include/entities)
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+install(FILES ${REDFISH_HDR_PUBLIC_RED} DESTINATION "${INCLUDE_INSTALL_DIR}")
+install(FILES ${REDFISH_HDR_PUBLIC_ENTITIES} DESTINATION "${INCLUDE_INSTALL_DIR}/entities")
 
 ENABLE_TESTING()
 
@@ -123,3 +138,5 @@ elseif(MSVC)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LIBPATH:.. /LIBPATH:../curl/lib")
     endif()
 endif()
+
+configure_file(libredfish.pc.in libredfish.pc @ONLY)

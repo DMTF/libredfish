@@ -1,0 +1,19 @@
+# this template is filled-in by CMake `configure_file(... @ONLY)`
+# the `@....@` are filled in by CMake configure_file(), 
+# from variables set in your CMakeLists.txt or by CMake itself
+#
+# Good tutoral for understanding .pc files: 
+# https://people.freedesktop.org/~dbn/pkg-config-guide.html
+
+prefix="@CMAKE_INSTALL_PREFIX@"
+exec_prefix="@CMAKE_INSTALL_BINDIR@
+libdir="@CMAKE_INSTALL_LIBDIR@"
+includedir="@INCLUDE_INSTALL_DIR@"
+
+Name: @PROJECT_NAME@
+Description: Redfish library
+URL: https://github.com/DMTF/libredfish
+Version: @LIBREDFISH_VERSION_STRING@
+Requires: @pc_req_public@
+Cflags: -I"${includedir}"
+Libs: -L"${libdir}" -lredfish
