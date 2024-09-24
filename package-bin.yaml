@@ -1,0 +1,17 @@
+meta:
+  description: libredfish
+  vendor: DMTF
+  maintainer: Patrick_Boyd@Dell.com
+files:
+  "/usr/lib64/libredfish.so":
+    file: build/lib/libredfish.so
+    mode: "0755"
+    user: "root"
+  "/usr/bin/redfishcli":
+    file: build/bin/redfishcli
+    mode: "0755"
+    user: "root"
+  "/usr/bin/redfishtest":
+    file: build/bin/redfishtest
+    mode: "0755"
+    user: "root"
