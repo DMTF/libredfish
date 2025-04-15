@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017-2019 DMTF. All rights reserved.
+// Copyright 2017-2025 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/main/LICENSE.md
 //----------------------------------------------------------------------------
 #include <string.h>
@@ -156,16 +156,13 @@ void print_usage(const char* name)
     printf("                  the code will follow the ID\n");
     printf(" [Index]        - Where Index is a number. If the current node is an array or collection\n");
     printf("                  it will pick the member at the index\n");
-    printf("Report bugs to Patrick_Boyd@Dell.com\n");
+    printf("Report bugs on GitHub: https://github.com/DMTF/libredfish/issues\n");
 }
 
 void print_version()
 {
-    printf("Dell libRedfish Test Tool\n");
-    printf("Copyright (C) 2016 Dell, Inc.\n");
-    printf("License: This software is liscensed under a non-disclosure agreement.\n");
-    printf("         DO NOT REDISTRIBUTE WITHOUT EXPRESS WRITTEN PERMISSION OF DELL, INC.\n\n");
-    printf("Written by Patrick Boyd.\n");
+    printf("DMTF libRedfish Test Tool\n");
+    printf("Copyright 2017-2025 DMTF.\n");
 }
 
 void printPayload(redfishPayload* payload)

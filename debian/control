@@ -1,7 +1,7 @@
 Source: libredfish
 Priority: optional
 Section: libs
-Maintainer: Patrick Boyd <Patrick_Boyd@Dell.com>
+Maintainer: DMTF <admin@dmtf.org>
 Build-Depends: debhelper (>= 9), libcurl-dev, libjansson-dev, libreadline-dev, python, python-dev
 XS-Python-Version: all
 Standards-Version: 3.9.8
