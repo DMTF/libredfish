@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright Notice:
-// Copyright 2017-2019 DMTF. All rights reserved.
+// Copyright 2017-2025 DMTF. All rights reserved.
 // License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/libredfish/blob/main/LICENSE.md
 //----------------------------------------------------------------------------
 #include <stdio.h>
@@ -89,14 +89,13 @@ void print_usage(const char* name)
     printf("  -u, --username [user]      The username to authenticate with\n");
     printf("  -p, --password [pass]      The password to authenticate with\n");
     printf("  -S, --session              Use session based auth, as opposed to basic auth\n");
-    printf("Report bugs to Patrick_Boyd@Dell.com\n");
+    printf("Report bugs on GitHub: https://github.com/DMTF/libredfish/issues\n");
 }
 
 void print_version()
 {
-    printf("Dell libRedfish CLI Tool\n");
-    printf("Copyright (C) 2019 DMTF.\n");
-    printf("Written by Patrick Boyd.\n");
+    printf("DMTF libRedfish CLI Tool\n");
+    printf("Copyright 2017-2025 DMTF.\n");
 }
 
 int main(int argc, char** argv)
