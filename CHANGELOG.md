@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.3.8] - 2025-04-21
+- Scrubbed stale copyright notices from source
+
 ## [1.3.7] - 2023-04-06
 - Corrected JSON path usage inside of a RedPath nodename expression
 
