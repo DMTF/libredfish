@@ -932,7 +932,7 @@ bool registerForEvents(redfishService* service, const char* postbackUri, unsigne
     }
 
     //User wants libredfish to listen for events directly...
-    if(strncmp(postbackUri, "libredfish", 10) == 0)
+    if(strncmp(postbackUri, "libredfish:", 11) == 0)
     {
         destination = getDestinationAddress(postbackUri+11, &socket);
         if(destination == NULL)
