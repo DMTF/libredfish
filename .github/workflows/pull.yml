@@ -1,0 +1,115 @@
+name: Pull Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+  #Default tag name
+  GIT_TAG_NAME: '0.0.1'
+
+jobs:
+  build-ubuntu:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: olegtarasov/get-tag@v2.1
+      id: tagName
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libjansson-dev libcurl4-openssl-dev libreadline-dev
+      
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      # Build your program with the given configuration
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - uses: kentik/pkg@v1.0.0-rc7
+      with:
+        name: libredfish
+        version: ${{ env.GIT_TAG_NAME }}
+        arch: 'x86_64'
+        format: 'deb'
+        package: package-bin.yaml
+        
+    - uses: kentik/pkg@v1.0.0-rc7
+      with:
+        name: libredfish-dev
+        version: ${{ env.GIT_TAG_NAME }}
+        arch: 'x86_64'
+        format: 'deb'
+        package: package-dev.yaml
+    
+#    - name: build RPM package
+#      id: rpm_build
+#      uses: naveenrajm7/rpmbuild@master
+#      with:
+#        spec_file: rpm/libredfish.spec
+        
+    - uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}
+        path: ./*.deb
+        
+#    - uses: actions/upload-artifact@v2
+#      with:
+#        name: RPM
+#        path: ./*.rpm
+        
+      
+  build-windows-x64:
+    runs-on: windows-2019
+    
+    steps:
+    - uses: actions/checkout@v2
+    - uses: olegtarasov/get-tag@v2.1
+      id: tagName
+    
+    - name: Get Curl
+      run: |
+        Invoke-WebRequest -Uri https://curl.se/windows/dl-7.76.1/curl-7.76.1-win64-mingw.zip -OutFile curl.zip
+        Expand-Archive curl.zip
+        Move-Item .\curl\*\* .\curl\
+        Copy-Item .\curl\lib\libcurl.dll.a .\curl\lib\curl.lib
+        
+    - name: Get Jansson
+      run: |
+        Invoke-WebRequest -OutFile jansson.lib -Uri https://github.com/pboyd04/jansson/releases/download/v2.11/janssonx64.lib
+        Invoke-WebRequest -OutFile include/jansson.h -Uri https://github.com/pboyd04/jansson/releases/download/v2.11/jansson.h
+        Invoke-WebRequest -OutFile include/jansson_config.h -Uri https://github.com/pboyd04/jansson/releases/download/v2.11/jansson_config.h
+        
+    - name: Get getopt.h
+      run: Invoke-WebRequest -OutFile include/getopt.h -Uri https://raw.githubusercontent.com/skandhurkat/Getopt-for-Visual-Studio/master/getopt.h
+  
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -A x64 -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DJANSSON_LIBRARIES=./jansson.lib -DJANSSON_INCLUDE_DIRS=./
+
+    - name: Build
+      # Build your program with the given configuration
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Compress artifacts
+      run: Compress-Archive .\build\bin\Release\* -DestinationPath .\build\libredfish-${{ env.GIT_TAG_NAME }}-x64.zip
+      
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-x64
+        path: ${{github.workspace}}\build\libredfish-${{ env.GIT_TAG_NAME }}-x64.zip
+      

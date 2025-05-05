@@ -1,0 +1,37 @@
+meta:
+  description: libredfish-dev
+  vendor: DMTF
+  maintainer: Patrick_Boyd@Dell.com
+files:
+  "/usr/include/libredfish/redfish.h":
+    file: include/redfish.h
+    mode: "0644"
+    user: "root"
+  "/usr/include/libredfish/redfishEvent.h":
+    file: include/redfishEvent.h
+    mode: "0644"
+    user: "root"
+  "/usr/include/libredfish/redfishPayload.h":
+    file: include/redfishPayload.h
+    mode: "0644"
+    user: "root"
+  "/usr/include/libredfish/redfishRawAsync.h":
+    file: include/redfishRawAsync.h
+    mode: "0644"
+    user: "root"
+  "/usr/include/libredfish/redfishService.h":
+    file: include/redfishService.h
+    mode: "0644"
+    user: "root"
+  "/usr/include/libredfish/redpath.h":
+    file: include/redpath.h
+    mode: "0644"
+    user: "root"
+  "/usr/include/libredfish/entities/chassis.h":
+    file: include/entities/chassis.h
+    mode: "0644"
+    user: "root"
+  "/usr/include/libredfish/entities/resource.h":
+    file: include/entities/resource.h
+    mode: "0644"
+    user: "root"
